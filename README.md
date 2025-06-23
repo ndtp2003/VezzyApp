@@ -1,97 +1,258 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Vezzy - Event Check-in Mobile Application
 
-# Getting Started
+A React Native TypeScript application for event collaborators to manage check-ins and event operations.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Features
 
-## Step 1: Start Metro
+- **Multi-language Support** (English/Vietnamese)
+- **Dark/Light Theme** with system preference
+- **QR Code Scanning** for ticket check-ins
+- **Event Management** with assigned events
+- **Real-time Dashboard** with statistics
+- **News & Notifications** system
+- **Offline Support** with persistent storage
+- **Comprehensive Error Handling**
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 🛠 Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **React Native CLI** (not Expo)
+- **TypeScript** for type safety
+- **React Navigation 6** for navigation
+- **Zustand** for state management
+- **TanStack Query** for server state
+- **AsyncStorage** for local persistence
+- **React Native Vector Icons** for UI icons
+- **react-native-qrcode-scanner** for QR scanning
+- **Axios** for API communication
+- **i18next** for internationalization
 
-```sh
-# Using npm
-npm start
+## 📋 Prerequisites
 
-# OR using Yarn
-yarn start
+- Node.js >= 18
+- React Native CLI
+- Android Studio (for Android development)
+- Xcode (for iOS development on macOS)
+- Java Development Kit (JDK)
+
+## 🔧 Installation
+
+1. **Clone and install dependencies:**
+```bash
+cd Vezzy
+npm install
 ```
 
-## Step 2: Build and run your app
+2. **iOS Setup (macOS only):**
+```bash
+cd ios && pod install && cd ..
+```
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+3. **Android Setup:**
+```bash
+# Make sure you have Android SDK and ANDROID_HOME set up
+npx react-native run-android
+```
 
-### Android
+4. **iOS Setup:**
+```bash
+npx react-native run-ios
+```
 
-```sh
-# Using npm
+## 📱 Android Icon Setup
+
+For React Native Vector Icons to work on Android, add this to `android/app/build.gradle`:
+
+```gradle
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+```
+
+## 🌐 API Configuration
+
+Update the base URL in `src/services/api.ts`:
+
+```typescript
+private baseURL = 'http://192.168.38.49:5000'; // Backend server IP
+```
+
+## 📝 Environment Setup
+
+The app automatically detects device language and sets appropriate defaults.
+
+### API Endpoints
+
+- **Base URL:** `http://192.168.38.49:5000`
+- **Authentication:** JWT Bearer tokens (accessToken + refreshToken)
+- **Response Format:** `{ flag: boolean, message: string, data: any }`
+
+### Key API Routes:
+- `POST /api/account/login` - User authentication
+- `POST /api/account/refresh-token` - Refresh access token
+- `POST /api/account/logout` - User logout
+- `GET /api/event/collaborator/my-events` - Get assigned events
+- `POST /api/ticketissued/checkinMobile` - Check-in via QR
+- `GET /api/ticketissued/event/{eventId}/checkin-history` - Get check-in history
+- `GET /api/news/active` - Get active news
+- `GET /api/notification/user/{userId}` - Get notifications
+- `PUT /api/notification/mark-all-read` - Mark all notifications as read
+
+## 🏗 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+├── screens/            # Screen components
+├── navigation/         # Navigation configuration
+├── services/           # API services
+├── hooks/              # Custom React hooks
+├── store/              # Zustand stores
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── locales/            # Translation files
+└── theme/              # Theme configuration
+```
+
+## 🔐 Authentication Flow
+
+1. App checks for stored accessToken and refreshToken on startup
+2. Token validation with backend using refresh token
+3. Automatic token refresh when expired
+4. Automatic logout when refresh fails
+5. Role-based access (only Collaborators can login)
+6. Secure token storage with AsyncStorage
+
+## 🎨 Theming
+
+The app supports three theme modes:
+- **Light Theme**
+- **Dark Theme**  
+- **System Theme** (follows device setting)
+
+Theme settings are persisted and synced with the backend.
+
+## 🌍 Internationalization
+
+Supported languages:
+- **English (en)**
+- **Vietnamese (vi)**
+
+Language is auto-detected from device settings with manual override available.
+
+## 📊 State Management
+
+### Stores (Zustand):
+- **AuthStore** - Authentication state
+- **SettingsStore** - App settings and preferences
+- **EventStore** - Events and check-in data
+
+### Features:
+- Persistent storage with AsyncStorage
+- Automatic hydration on app start
+- Backend synchronization
+
+## 🔍 QR Code Scanning
+
+Features:
+- Camera permission handling
+- Flashlight toggle
+- Real-time QR code detection
+- Comprehensive error handling for check-in failures
+
+## 📱 Performance Optimizations
+
+- **React Query** caching and background updates
+- **FlatList** virtualization for large lists
+- **Image optimization** and lazy loading
+- **Debounced search** inputs
+- **Background app state** handling
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run linting
+npm run lint
+```
+
+## 📦 Build Commands
+
+```bash
+# Development
+npm run start
+
+# Android
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# iOS
 npm run ios
 
-# OR using Yarn
-yarn ios
+# Build Android APK
+cd android && ./gradlew assembleRelease
+
+# Build iOS (Xcode required)
+# Use Xcode to build and archive
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 🐛 Troubleshooting
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Common Issues:
 
-## Step 3: Modify your app
+1. **Metro bundler issues:**
+```bash
+npx react-native start --reset-cache
+```
 
-Now that you have successfully run the app, let's make changes!
+2. **Android build issues:**
+```bash
+cd android && ./gradlew clean && cd ..
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+3. **iOS build issues:**
+```bash
+cd ios && pod install && cd ..
+```
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+4. **Vector Icons not showing:**
+- Ensure fonts.gradle is applied in Android
+- For iOS, ensure pod install was run after adding the library
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 🔒 Security Features
 
-## Congratulations! :tada:
+- **JWT Token** management
+- **Secure storage** with AsyncStorage
+- **API request/response** interceptors
+- **Error boundary** implementation
+- **Input validation** and sanitization
 
-You've successfully run and modified your React Native App. :partying_face:
+## 📈 Error Handling
 
-### Now what?
+Comprehensive error handling includes:
+- **Network errors** with retry mechanisms
+- **Authentication errors** with auto-logout
+- **API errors** with translated messages
+- **Offline support** with queued requests
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 🤝 Contributing
 
-# Troubleshooting
+1. Follow TypeScript strict mode
+2. Use ESLint configuration
+3. Write comprehensive tests
+4. Update documentation
+5. Follow React Native best practices
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 📄 License
 
-# Learn More
+This project is proprietary software for event management.
 
-To learn more about React Native, take a look at the following resources:
+## 📞 Support
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+For technical support or issues, contact the development team.
+
+---
+
+**Version:** 1.0.0  
+**Last Updated:** December 2024
