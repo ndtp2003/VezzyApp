@@ -1,12 +1,13 @@
 {
-  "login": {
+    "login": {
     "title": "Đăng nhập",
-    "username": "Tên đăng nhập", 
+    "username": "Tên đăng nhập",
     "password": "Mật khẩu",
     "loginButton": "Đăng nhập",
     "rememberMe": "Ghi nhớ đăng nhập",
     "welcome": "Chào mừng trở lại!",
-    "enterCredentials": "Vui lòng nhập thông tin đăng nhập để tiếp tục"
+    "enterCredentials": "Vui lòng nhập thông tin đăng nhập để tiếp tục",
+    "forgotPassword": "Quên mật khẩu?"
   },
   "errors": {
     "TICKET_NOT_FOUND": "Không tìm thấy vé",
@@ -18,7 +19,8 @@
     "UNAUTHORIZED": "Truy cập không được phép",
     "UNKNOWN_ERROR": "Đã xảy ra lỗi không xác định",
     "INVALID_CREDENTIALS": "Tên đăng nhập hoặc mật khẩu không đúng",
-    "SERVER_ERROR": "Lỗi máy chủ"
+    "SERVER_ERROR": "Lỗi máy chủ",
+    "Invalid username or password": "Tên đăng nhập hoặc mật khẩu không đúng"
   },
   "checkin": {
     "scanQR": "Quét mã QR",
@@ -44,6 +46,7 @@
     "yes": "Có",
     "no": "Không",
     "save": "Lưu",
+    "saving": "Đang lưu...",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
     "confirm": "Xác nhận",
@@ -52,7 +55,9 @@
     "done": "Hoàn thành",
     "search": "Tìm kiếm",
     "filter": "Lọc",
-    "refresh": "Làm mới"
+    "refresh": "Làm mới",
+    "logout": "Đăng xuất",
+    "notAvailable": "Không có sẵn"
   },
   "navigation": {
     "home": "Trang chủ",
@@ -65,6 +70,7 @@
   "home": {
     "title": "Bảng điều khiển",
     "welcome": "Chào mừng",
+    "collaboratorWelcome": "Sẵn sàng hỗ trợ check-in sự kiện!",
     "totalEvents": "Tổng số sự kiện",
     "totalCheckins": "Tổng số check-in",
     "todayCheckins": "Check-in hôm nay",
@@ -100,6 +106,165 @@
     "markAsRead": "Đánh dấu đã đọc",
     "markAllAsRead": "Đánh dấu tất cả đã đọc"
   },
+  "forgotPassword": {
+    "title": "Quên mật khẩu",
+    "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi mã xác thực để đặt lại mật khẩu.",
+    "emailLabel": "Địa chỉ Email",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
+    "sendButton": "Gửi mã xác thực",
+    "backToLogin": "Quay lại đăng nhập",
+    "errors": {
+      "emailRequired": "Địa chỉ email là bắt buộc",
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
+    },
+    "messages": {
+      "emailSent": "Mã xác thực đã được gửi đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư."
+    },
+    "help": {
+      "title": "Cần trợ giúp?",
+      "tip1": "Đảm bảo bạn nhập địa chỉ email liên kết với tài khoản của mình",
+      "tip2": "Kiểm tra thư mục spam nếu bạn không nhận được email",
+      "tip3": "Mã xác thực sẽ hết hạn sau 15 phút"
+    }
+  },
+  "resetPassword": {
+    "title": "Đặt lại mật khẩu",
+    "description": "Nhập mã xác thực được gửi đến",
+    "verificationCode": "Mã xác thực",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "resetButton": "Đặt lại mật khẩu",
+    "passwordHint": "Mật khẩu phải có ít nhất 6 ký tự",
+    "didNotReceive": "Không nhận được mã?",
+    "resendCode": "Gửi lại mã",
+    "placeholders": {
+      "verificationCode": "Nhập mã 6 chữ số",
+      "newPassword": "Nhập mật khẩu mới của bạn",
+      "confirmPassword": "Xác nhận mật khẩu mới của bạn"
+    },
+    "errors": {
+      "codeRequired": "Mã xác thực là bắt buộc",
+      "passwordRequired": "Mật khẩu mới là bắt buộc",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+      "passwordMismatch": "Mật khẩu không khớp"
+    },
+    "messages": {
+      "resetSuccess": "Mật khẩu đã được đặt lại thành công. Bạn có thể đăng nhập với mật khẩu mới.",
+      "codeResent": "Mã xác thực đã được gửi lại đến email của bạn"
+    },
+    "help": {
+      "title": "Mẹo bảo mật",
+      "tip1": "Sử dụng mật khẩu mạnh với chữ cái, số và ký hiệu",
+      "tip2": "Không sử dụng lại mật khẩu từ các tài khoản khác",
+      "tip3": "Nếu bạn không yêu cầu đặt lại này, hãy liên hệ hỗ trợ ngay lập tức"
+    }
+  },
+  "editProfile": {
+    "title": "Chỉnh sửa hồ sơ",
+    "fullName": "Họ và tên",
+    "email": "Địa chỉ email",
+    "phone": "Số điện thoại",
+    "gender": "Giới tính",
+    "dateOfBirth": "Ngày sinh",
+    "location": "Địa chỉ",
+    "changeAvatar": "Đổi ảnh đại diện",
+    "emailCannotChange": "Không thể thay đổi địa chỉ email",
+    "selectGender": "Chọn giới tính",
+    "placeholders": {
+      "fullName": "Nhập họ và tên của bạn",
+      "phone": "Nhập số điện thoại của bạn",
+      "location": "Nhập địa chỉ của bạn",
+      "selectDate": "Chọn ngày sinh",
+      "selectGender": "Chọn giới tính"
+    },
+    "errors": {
+      "fullNameRequired": "Họ và tên là bắt buộc",
+      "updateFailed": "Cập nhật hồ sơ thất bại"
+    },
+    "messages": {
+      "updateSuccess": "Cập nhật hồ sơ thành công"
+    }
+  },
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "description": "Để bảo mật, vui lòng nhập mật khẩu hiện tại và tạo mật khẩu mới.",
+    "forAccount": "Cho tài khoản",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "changeButton": "Đổi mật khẩu",
+    "passwordHint": "Mật khẩu phải có ít nhất 6 ký tự",
+    "placeholders": {
+      "currentPassword": "Nhập mật khẩu hiện tại của bạn",
+      "newPassword": "Nhập mật khẩu mới của bạn",
+      "confirmPassword": "Xác nhận mật khẩu mới của bạn"
+    },
+    "errors": {
+      "currentPasswordRequired": "Mật khẩu hiện tại là bắt buộc",
+      "newPasswordRequired": "Mật khẩu mới là bắt buộc",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "samePassword": "Mật khẩu mới phải khác mật khẩu hiện tại",
+      "changeFailed": "Đổi mật khẩu thất bại"
+    },
+    "messages": {
+      "changeSuccess": "Đổi mật khẩu thành công"
+    },
+    "securityTips": {
+      "title": "Mẹo bảo mật",
+      "tip1": "Sử dụng kết hợp chữ cái, số và ký tự đặc biệt",
+      "tip2": "Tránh sử dụng thông tin cá nhân trong mật khẩu",
+      "tip3": "Không sử dụng lại mật khẩu từ các tài khoản khác",
+      "tip4": "Thay đổi mật khẩu thường xuyên"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "language": {
+      "title": "Ngôn ngữ",
+      "description": "Chọn ngôn ngữ ưa thích cho ứng dụng"
+    },
+    "theme": {
+      "title": "Giao diện",
+      "description": "Chọn cách hiển thị của ứng dụng",
+      "light": "Sáng",
+      "dark": "Tối",
+      "system": "Hệ thống"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "description": "Quản lý cách bạn nhận thông báo",
+      "email": {
+        "title": "Thông báo Email",
+        "description": "Nhận thông báo qua email"
+      },
+      "push": {
+        "title": "Thông báo đẩy",
+        "description": "Nhận thông báo đẩy trên thiết bị của bạn"
+      }
+    },
+    "advanced": {
+      "title": "Nâng cao"
+    },
+    "reset": {
+      "title": "Đặt lại cài đặt",
+      "description": "Đặt lại tất cả cài đặt về giá trị mặc định",
+      "message": "Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định? Hành động này không thể hoàn tác.",
+      "confirm": "Đặt lại"
+    },
+    "appInfo": {
+      "version": "Phiên bản",
+      "buildNumber": "Bản dựng"
+    },
+    "errors": {
+      "updateFailed": "Cập nhật cài đặt thất bại",
+      "resetFailed": "Đặt lại cài đặt thất bại"
+    },
+    "messages": {
+      "themeUpdated": "Cập nhật giao diện thành công",
+      "resetSuccess": "Đặt lại cài đặt thành công"
+    }
+  },
   "profile": {
     "title": "Hồ sơ",
     "basicInfo": "Thông tin cơ bản",
@@ -116,9 +281,17 @@
     "accountId": "ID tài khoản",
     "joinedDate": "Ngày tham gia",
     "editProfile": "Chỉnh sửa hồ sơ",
-    "male": "Nam",
-    "female": "Nữ",
-    "other": "Khác",
+    "changePassword": "Đổi mật khẩu",
+    "settings": "Cài đặt",
+    "collaborator": "Cộng tác viên",
+    "logoutTitle": "Đăng xuất",
+    "logoutMessage": "Bạn có chắc chắn muốn đăng xuất?",
+    "gender": {
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác", 
+      "unknown": "Không xác định"
+    },
     "selectGender": "Chọn giới tính",
     "notProvided": "Chưa cung cấp",
     "enterFullName": "Nhập họ và tên",
@@ -128,7 +301,6 @@
     "enterLocation": "Nhập địa chỉ của bạn",
     "updateSuccess": "Cập nhật hồ sơ thành công",
     "updateError": "Cập nhật hồ sơ thất bại",
-    "changePassword": "Đổi mật khẩu",
     "currentPassword": "Mật khẩu hiện tại",
     "newPassword": "Mật khẩu mới",
     "confirmPassword": "Xác nhận mật khẩu",
@@ -142,19 +314,5 @@
       "invalidPhone": "Số điện thoại không hợp lệ",
       "genderRequired": "Giới tính là bắt buộc"
     }
-  },
-  "settings": {
-    "title": "Cài đặt",
-    "language": "Ngôn ngữ",
-    "theme": "Giao diện",
-    "english": "Tiếng Anh",
-    "vietnamese": "Tiếng Việt",
-    "lightTheme": "Sáng",
-    "darkTheme": "Tối",
-    "systemTheme": "Hệ thống",
-    "about": "Giới thiệu",
-    "version": "Phiên bản",
-    "logout": "Đăng xuất",
-    "logoutConfirm": "Bạn có chắc chắn muốn đăng xuất?"
   }
 } 

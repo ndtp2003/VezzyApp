@@ -9,7 +9,8 @@ import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import RootNavigator from './src/navigation/RootNavigator';
-import { i18n } from './src/utils';
+import i18n, { initializeLanguage } from './src/utils/i18n';
+import { ToastProvider } from './src/components';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -27,14 +28,17 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   useEffect(() => {
-    // Any app-level initialization can go here
+    // Initialize language from saved preference
+    initializeLanguage();
     console.log('Vezzy initialized');
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
-        <RootNavigator />
+        <ToastProvider>
+          <RootNavigator />
+        </ToastProvider>
       </I18nextProvider>
     </QueryClientProvider>
   );

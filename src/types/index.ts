@@ -6,20 +6,89 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
-// User & Authentication Types
-export interface User {
-  accountId: string; // ⚠️ LƯU Ý: Đây là userId trong JWT token claims
+// Enums from Backend
+export enum Role {
+  Admin = 0,
+  Customer = 1,
+  EventManager = 2,
+  Collaborator = 3,
+  Other = 4,
+}
+
+export enum Gender {
+  Male = 0,
+  Female = 1,
+  Other = 2,
+  Unknown = 3,
+}
+
+// Backend Classes Mapping
+export interface Account {
+  accountId: string; // Guid in backend
   username: string;
   email: string;
+  role: Role; // Enum
+  isActive: boolean;
+  isEmailVerified: boolean;
+  isOnline: boolean;
+  lastActiveAt: string; // DateTime
+  lastLoginDevice: string;
+  lastLoginIP?: string;
+  lastLoginLocation?: string;
+  createdAt: string; // DateTime
+  lastLogin: string; // DateTime
+}
+
+export interface User {
+  userId: string; // Guid in backend
+  accountId: string; // Reference to Account
   fullName: string;
   phone?: string;
-  role: string;
-  gender: string;
-  dob?: string; // Date of birth
-  location?: string; // User location (null when register, can be updated)
-  avatar?: string; // Avatar URL
+  email: string;
+  avatarUrl?: string;
+  gender: Gender; // Enum
+  dob?: string; // DateTime nullable
+  location?: string;
+  createdAt: string; // DateTime
+}
+
+// Combined interface for frontend convenience
+export interface CombinedUserData {
+  // Account fields
+  accountId: string;
+  username: string;
+  email: string;
+  role: Role;
   isActive: boolean;
-  createdAt: string;
+  isEmailVerified: boolean;
+  isOnline: boolean;
+  lastActiveAt: string;
+  lastLoginDevice: string;
+  lastLoginIP?: string;
+  lastLoginLocation?: string;
+  accountCreatedAt: string;
+  lastLogin: string;
+  
+  // User fields
+  userId: string;
+  fullName?: string;
+  phone?: string;
+  avatarUrl?: string;
+  gender: Gender;
+  dob?: string;
+  location?: string;
+  userCreatedAt?: string;
+}
+
+export interface UserConfig {
+  userConfigId: string;
+  userId: string;
+  language: 'en' | 'vi'; // Language enum
+  theme: 'light' | 'dark' | 'system'; // Theme enum  
+  receiveEmail: boolean;
+  receiveNotify: boolean;
+  customOptions?: any; // BsonDocument
+  updatedAt: string;
 }
 
 export interface LoginRequest {
@@ -27,12 +96,42 @@ export interface LoginRequest {
   password: string;
 }
 
+// Backend response format (actual structure from API)
 export interface AuthResponseDto {
   accessToken: string;
   refreshToken: string;
-  tokenType: string; // "Bearer"
-  expiresIn: number; // 10800 (3 hours)
-  user: User;
+  account: {
+    // Account fields
+    accountId: string;
+    username: string;
+    email: string;
+    role: number; // Backend enum value
+    isActive: boolean;
+    isEmailVerified: boolean;
+    isOnline: boolean;
+    lastActiveAt: string;
+    lastLoginDevice: string;
+    lastLoginIP?: string;
+    lastLoginLocation?: string;
+    createdAt: string;
+    lastLogin: string;
+    
+    // User fields (merged in response)
+    userId: string;
+    phone?: string;
+    gender: number; // Backend enum value
+    dob?: string;
+    location?: string;
+    avatar?: string; // avatarUrl in backend
+    
+    // User config (nested in account)
+    userConfig: {
+      language: number; // Backend enum
+      theme: number; // Backend enum
+      receiveEmail: boolean;
+      receiveNotify: boolean;
+    };
+  };
 }
 
 export interface TokenInfo {
@@ -60,6 +159,27 @@ export interface UpdateProfileRequest {
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface UpdateUserConfigRequest {
+  language: number;
+  theme: number;
+  receiveEmail: boolean;
+  receiveNotify: boolean;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  verificationCode: string;
+  newPassword: string;
+}
+
+export interface AvatarUploadResponse {
+  avatarUrl: string;
 }
 
 // Event Types
@@ -168,6 +288,8 @@ export type RootStackParamList = {
 
 export type AuthStackParamList = {
   Login: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: { email: string };
 };
 
 export type MainTabParamList = {
@@ -191,8 +313,9 @@ export type NewsStackParamList = {
 
 export type ProfileStackParamList = {
   ProfileMain: undefined;
-  Settings: undefined;
+  EditProfile: undefined;
   ChangePassword: undefined;
+  Settings: undefined;
 };
 
 // Error Types

@@ -20,6 +20,8 @@ import NewsScreen from '../screens/NewsScreen';
 import NewsDetailScreen from '../screens/NewsDetailScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -79,9 +81,19 @@ const ProfileNavigator: React.FC = () => {
         options={{ title: t('navigation.profile') }}
       />
       <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: t('editProfile.title') }}
+      />
+      <ProfileStack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ title: t('changePassword.title') }}
+      />
+      <ProfileStack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{ title: t('navigation.settings') }}
+        options={{ title: t('settings.title') }}
       />
     </ProfileStack.Navigator>
   );

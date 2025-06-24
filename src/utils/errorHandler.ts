@@ -1,9 +1,24 @@
 import { ErrorCode, AppError } from '../types';
 
 export const handleApiError = (error: any, t: Function): string => {
-  // Check if it's an API response error with error code
+  // Check if it's a backend API response error (our API structure)
   if (error.response?.data?.message) {
-    const errorCode = error.response.data.message as ErrorCode;
+    // Backend returns: {flag: false, code: 401, message: "Invalid username or password"}
+    const backendMessage = error.response.data.message;
+    
+    // Try to translate the backend message if we have a translation for it
+    const translatedMessage = t(`errors.${backendMessage}`, { defaultValue: null });
+    if (translatedMessage && translatedMessage !== `errors.${backendMessage}`) {
+      return translatedMessage;
+    }
+    
+    // Return the backend message as-is if no translation found
+    return backendMessage;
+  }
+  
+  // Check if it's an API response error with error code (alternative structure)
+  if (error.response?.data?.error) {
+    const errorCode = error.response.data.error as ErrorCode;
     return t(`errors.${errorCode}`, { defaultValue: t('errors.UNKNOWN_ERROR') });
   }
   

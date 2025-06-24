@@ -1,16 +1,18 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, LoginRequest, AuthResponseDto, TokenInfo } from '../types';
+import { CombinedUserData, UserConfig, LoginRequest, AuthResponseDto, TokenInfo, Role, Gender } from '../types';
 import { apiService } from '../services/api';
 import { AUTH_CONFIG } from '../utils/config';
+import { mapUserConfigFromBackend } from '../utils/userConfig';
 
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   accessTokenExpiresAt: number | null;
   refreshTokenExpiresAt: number | null;
-  user: User | null;
+  user: CombinedUserData | null;
+  userConfig: UserConfig | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -19,7 +21,8 @@ interface AuthActions {
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuthToken: () => Promise<void>;
-  updateUser: (user: Partial<User>) => void;
+  updateUser: (user: Partial<CombinedUserData>) => void;
+  updateUserConfig: (config: Partial<UserConfig>) => void;
   setLoading: (loading: boolean) => void;
   checkAuthStatus: () => Promise<void>;
   ensureValidToken: () => Promise<boolean>;
@@ -52,6 +55,7 @@ export const useAuthStore = create<AuthStore>()(
       accessTokenExpiresAt: null,
       refreshTokenExpiresAt: null,
       user: null,
+      userConfig: null,
       isLoading: false,
       isAuthenticated: false,
 
@@ -65,22 +69,52 @@ export const useAuthStore = create<AuthStore>()(
           if (response.flag) {
             const authData = response.data as AuthResponseDto;
             
-            // Check if user is Collaborator
-            if (authData.user.role !== 'Collaborator') {
+            // Check if user is Collaborator (role: 3)
+            if (authData.account.role !== 3) {
               throw new Error('Only Collaborators can access mobile app');
             }
             
             // Calculate token expiry times
-            const now = Date.now();
-            const accessTokenExpiresAt = calculateExpiryTime(authData.expiresIn);
+            const accessTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME);
             const refreshTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME);
+            
+            // Map response data to CombinedUserData interface
+            const user: CombinedUserData = {
+              // Account fields
+              accountId: authData.account.accountId,
+              username: authData.account.username,
+              email: authData.account.email,
+              role: authData.account.role as Role,
+              isActive: authData.account.isActive,
+              isEmailVerified: authData.account.isEmailVerified,
+              isOnline: authData.account.isOnline,
+              lastActiveAt: authData.account.lastActiveAt,
+              lastLoginDevice: authData.account.lastLoginDevice,
+              lastLoginIP: authData.account.lastLoginIP,
+              lastLoginLocation: authData.account.lastLoginLocation,
+              accountCreatedAt: authData.account.createdAt,
+              lastLogin: authData.account.lastLogin,
+              
+              // User fields
+              userId: authData.account.userId,
+              fullName: (authData.account as any).fullName || null, // Use actual fullName from backend
+              phone: authData.account.phone,
+              avatarUrl: authData.account.avatar,
+              gender: authData.account.gender as Gender,
+              dob: authData.account.dob,
+              location: authData.account.location,
+            };
+            
+            // Map userConfig from backend format (userConfig is nested in account)
+            const userConfig = mapUserConfigFromBackend((authData.account as any).userConfig, authData.account.accountId);
             
             set({
               accessToken: authData.accessToken,
               refreshToken: authData.refreshToken,
               accessTokenExpiresAt,
               refreshTokenExpiresAt,
-              user: authData.user,
+              user,
+              userConfig,
               isAuthenticated: true,
               isLoading: false,
             });
@@ -109,14 +143,15 @@ export const useAuthStore = create<AuthStore>()(
             accessTokenExpiresAt: null,
             refreshTokenExpiresAt: null,
             user: null,
+            userConfig: null,
             isAuthenticated: false,
           });
           
           // Clear token from API service
           apiService.setAuthToken(null);
           
-          // Clear AsyncStorage
-          AsyncStorage.multiRemove(['auth-storage']);
+          // Clear only auth storage, preserve language preference
+          AsyncStorage.removeItem('auth-storage');
         }
       },
 
@@ -133,15 +168,46 @@ export const useAuthStore = create<AuthStore>()(
             const authData = response.data as AuthResponseDto;
             
             // Calculate new token expiry times
-            const accessTokenExpiresAt = calculateExpiryTime(authData.expiresIn);
+            const accessTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME);
             const refreshTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME);
+            
+            // Map response data to CombinedUserData interface
+            const user: CombinedUserData = {
+              // Account fields
+              accountId: authData.account.accountId,
+              username: authData.account.username,
+              email: authData.account.email,
+              role: authData.account.role as Role,
+              isActive: authData.account.isActive,
+              isEmailVerified: authData.account.isEmailVerified,
+              isOnline: authData.account.isOnline,
+              lastActiveAt: authData.account.lastActiveAt,
+              lastLoginDevice: authData.account.lastLoginDevice,
+              lastLoginIP: authData.account.lastLoginIP,
+              lastLoginLocation: authData.account.lastLoginLocation,
+              accountCreatedAt: authData.account.createdAt,
+              lastLogin: authData.account.lastLogin,
+              
+              // User fields
+              userId: authData.account.userId,
+              fullName: (authData.account as any).fullName || null, // Use actual fullName from backend
+              phone: authData.account.phone,
+              avatarUrl: authData.account.avatar,
+              gender: authData.account.gender as Gender,
+              dob: authData.account.dob,
+              location: authData.account.location,
+            };
+            
+            // Map userConfig from backend format (userConfig is nested in account)
+            const userConfig = mapUserConfigFromBackend((authData.account as any).userConfig, authData.account.accountId);
             
             set({
               accessToken: authData.accessToken,
               refreshToken: authData.refreshToken,
               accessTokenExpiresAt,
               refreshTokenExpiresAt,
-              user: authData.user,
+              user,
+              userConfig,
               isAuthenticated: true,
             });
 
@@ -157,11 +223,20 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      updateUser: (userData: Partial<User>) => {
+      updateUser: (userData: Partial<CombinedUserData>) => {
         const { user } = get();
         if (user) {
           set({
             user: { ...user, ...userData },
+          });
+        }
+      },
+
+      updateUserConfig: (configData: Partial<UserConfig>) => {
+        const { userConfig } = get();
+        if (userConfig) {
+          set({
+            userConfig: { ...userConfig, ...configData },
           });
         }
       },
@@ -256,6 +331,7 @@ export const useAuthStore = create<AuthStore>()(
         accessTokenExpiresAt: state.accessTokenExpiresAt,
         refreshTokenExpiresAt: state.refreshTokenExpiresAt,
         user: state.user,
+        userConfig: state.userConfig,
         isAuthenticated: state.isAuthenticated,
       }),
     }

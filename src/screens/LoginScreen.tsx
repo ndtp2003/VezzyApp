@@ -8,23 +8,27 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  Switch,
   Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuthStore } from '../store/authStore';
-import { handleApiError, showErrorToast, showSuccessToast } from '../utils';
+import { handleApiError } from '../utils';
 import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
 import { useSettingsStore } from '../store/settingsStore';
+import { useToast } from '../components';
 
 const LoginScreen: React.FC = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const { login, isLoading } = useAuthStore();
   const { theme } = useSettingsStore();
+  const { showSuccessToast, showErrorToast } = useToast();
   
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   const styles = createStyles(currentTheme);
@@ -40,11 +44,16 @@ const LoginScreen: React.FC = () => {
         username: username.trim(),
         password,
       });
-      showSuccessToast(t('common.success'));
+      // No success toast needed - navigation will happen automatically
+      // The user can see they're logged in when the screen changes
     } catch (error) {
       const errorMessage = handleApiError(error, t);
       showErrorToast(errorMessage);
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword' as never);
   };
 
   return (
@@ -63,12 +72,10 @@ const LoginScreen: React.FC = () => {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.appName}>Vezzy</Text>
           </View>
 
           <View style={styles.header}>
             <Text style={styles.title}>{t('login.title')}</Text>
-            <Text style={styles.subtitle}>{t('login.enterCredentials')}</Text>
           </View>
 
           <View style={styles.form}>
@@ -88,29 +95,28 @@ const LoginScreen: React.FC = () => {
 
             <View style={styles.inputContainer}>
               <Text style={styles.label}>{t('login.password')}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={t('login.password')}
-                placeholderTextColor={currentTheme.placeholder}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                returnKeyType="done"
-                onSubmitEditing={handleLogin}
-              />
-            </View>
-
-            <View style={styles.rememberMeContainer}>
-              <Switch
-                value={rememberMe}
-                onValueChange={setRememberMe}
-                trackColor={{ 
-                  false: currentTheme.disabled, 
-                  true: currentTheme.primary 
-                }}
-                thumbColor={rememberMe ? currentTheme.background : currentTheme.textSecondary}
-              />
-              <Text style={styles.rememberMeText}>{t('login.rememberMe')}</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder={t('login.password')}
+                  placeholderTextColor={currentTheme.placeholder}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIcon}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Icon
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={24}
+                    color={currentTheme.textSecondary}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <TouchableOpacity
@@ -123,6 +129,16 @@ const LoginScreen: React.FC = () => {
             >
               <Text style={styles.loginButtonText}>
                 {isLoading ? t('common.loading') : t('login.loginButton')}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Forgot Password Link */}
+            <TouchableOpacity
+              style={styles.forgotPasswordContainer}
+              onPress={handleForgotPassword}
+            >
+              <Text style={styles.forgotPasswordText}>
+                {t('login.forgotPassword')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -156,12 +172,6 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     borderRadius: 50,
     marginBottom: spacing.md,
   },
-  appName: {
-    ...typography.h2,
-    color: theme.primary,
-    fontWeight: 'bold',
-    marginBottom: spacing.lg,
-  },
   header: {
     alignItems: 'center',
     marginBottom: spacing.xxl,
@@ -169,12 +179,6 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   title: {
     ...typography.h3,
     color: theme.text,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  subtitle: {
-    ...typography.body1,
-    color: theme.textSecondary,
     textAlign: 'center',
   },
   form: {
@@ -199,21 +203,34 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     paddingVertical: spacing.md,
     color: theme.text,
   },
-  rememberMeContainer: {
+  passwordContainer: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.xl,
   },
-  rememberMeText: {
-    ...typography.body2,
+  passwordInput: {
+    ...typography.body1,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    paddingRight: spacing.xl,
     color: theme.text,
-    marginLeft: spacing.sm,
+    flex: 1,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: spacing.md,
+    padding: spacing.xs,
   },
   loginButton: {
     backgroundColor: theme.primary,
     borderRadius: borderRadius.md,
     paddingVertical: spacing.md,
     alignItems: 'center',
+    marginTop: spacing.xl,
   },
   loginButtonDisabled: {
     backgroundColor: theme.disabled,
@@ -221,6 +238,15 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   loginButtonText: {
     ...typography.button,
     color: theme.background,
+  },
+  forgotPasswordContainer: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+  },
+  forgotPasswordText: {
+    ...typography.body2,
+    color: theme.primary,
+    textDecorationLine: 'underline',
   },
 });
 

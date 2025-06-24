@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { API_CONFIG } from '../utils/config';
 import {
   ApiResponse,
   LoginRequest,
@@ -6,6 +7,10 @@ import {
   RefreshTokenRequest,
   UpdateProfileRequest,
   ChangePasswordRequest,
+  UpdateUserConfigRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  AvatarUploadResponse,
   Event,
   CheckInRequest,
   TicketIssuedResponse,
@@ -20,7 +25,7 @@ import {
 } from '../types';
 
 class ApiService {
-  private baseURL = 'http://192.168.38.49:5000'; // Backend server IP
+  private baseURL = API_CONFIG.BASE_URL;
   private axiosInstance: AxiosInstance;
   private authToken: string | null = null;
 
@@ -36,10 +41,20 @@ class ApiService {
     // Request interceptor
     this.axiosInstance.interceptors.request.use(
       async (config) => {
-        // Skip token validation for login and refresh-token endpoints
+        // Debug logging
+        if (__DEV__) {
+          console.log('🚀 API Request:', {
+            method: config.method?.toUpperCase(),
+            url: `${config.baseURL}${config.url}`,
+            data: config.data,
+          });
+        }
+        // Skip token validation for public endpoints
         const skipTokenValidation = [
           '/api/account/login',
-          '/api/account/refresh-token'
+          '/api/account/refresh-token',
+          '/api/account/forgot-password',
+          '/api/account/reset-password'
         ].some(endpoint => config.url?.includes(endpoint));
 
         if (!skipTokenValidation && this.authToken) {
@@ -67,8 +82,21 @@ class ApiService {
 
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // Debug logging for successful responses (only in development)
+        if (__DEV__) {
+          console.log('✅ API Response:', {
+            url: response.config.url,
+            status: response.status,
+            data: response.data,
+          });
+        }
+        return response;
+      },
       (error) => {
+        // Removed console error logging to avoid console popup
+        // Error will be handled by error handler utility
+        
         if (error.response?.status === 401) {
           // Handle unauthorized access
           this.setAuthToken(null);
@@ -104,8 +132,32 @@ class ApiService {
     return response.data;
   }
 
-  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<void>> {
+  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<boolean>> {
     const response = await this.axiosInstance.post('/api/account/change-password', data);
+    return response.data;
+  }
+
+  async updateUserConfig(data: UpdateUserConfigRequest): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.put('/api/account/user-config', data);
+    return response.data;
+  }
+
+  async uploadAvatar(formData: FormData): Promise<ApiResponse<AvatarUploadResponse>> {
+    const response = await this.axiosInstance.post('/api/account/upload-avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.post('/api/account/forgot-password', data);
+    return response.data;
+  }
+
+  async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.post('/api/account/reset-password', data);
     return response.data;
   }
 

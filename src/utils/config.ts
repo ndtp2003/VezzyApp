@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.38.49:5000',
+  BASE_URL: 'http://192.168.38.158:5000', // Backend server IP
   TIMEOUT: 10000,
   HEADERS: {
     'Content-Type': 'application/json',

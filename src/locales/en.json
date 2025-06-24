@@ -6,7 +6,8 @@
     "loginButton": "Login",
     "rememberMe": "Remember Me",
     "welcome": "Welcome Back!",
-    "enterCredentials": "Please enter your credentials to continue"
+    "enterCredentials": "Please enter your credentials to continue",
+    "forgotPassword": "Forgot Password?"
   },
   "errors": {
     "TICKET_NOT_FOUND": "Ticket not found",
@@ -18,7 +19,8 @@
     "UNAUTHORIZED": "Unauthorized access",
     "UNKNOWN_ERROR": "An unknown error occurred",
     "INVALID_CREDENTIALS": "Invalid username or password",
-    "SERVER_ERROR": "Server error occurred"
+    "SERVER_ERROR": "Server error occurred",
+    "Invalid username or password": "Invalid username or password"
   },
   "checkin": {
     "scanQR": "Scan QR Code",
@@ -44,6 +46,7 @@
     "yes": "Yes",
     "no": "No",
     "save": "Save",
+    "saving": "Saving...",
     "edit": "Edit",
     "delete": "Delete",
     "confirm": "Confirm",
@@ -52,7 +55,9 @@
     "done": "Done",
     "search": "Search",
     "filter": "Filter",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "logout": "Logout",
+    "notAvailable": "Not available"
   },
   "navigation": {
     "home": "Home",
@@ -65,6 +70,7 @@
   "home": {
     "title": "Dashboard",
     "welcome": "Welcome",
+    "collaboratorWelcome": "Ready to help with event check-ins!",
     "totalEvents": "Total Events",
     "totalCheckins": "Total Check-ins",
     "todayCheckins": "Today's Check-ins",
@@ -100,6 +106,165 @@
     "markAsRead": "Mark as Read",
     "markAllAsRead": "Mark All as Read"
   },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "description": "Enter your email address and we'll send you a verification code to reset your password.",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email address",
+    "sendButton": "Send Verification Code",
+    "backToLogin": "Back to Login",
+    "errors": {
+      "emailRequired": "Email address is required",
+      "invalidEmail": "Please enter a valid email address"
+    },
+    "messages": {
+      "emailSent": "Verification code has been sent to your email address. Please check your inbox."
+    },
+    "help": {
+      "title": "Need Help?",
+      "tip1": "Make sure you enter the email address associated with your account",
+      "tip2": "Check your spam folder if you don't receive the email",
+      "tip3": "The verification code will expire after 15 minutes"
+    }
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "description": "Enter the verification code sent to",
+    "verificationCode": "Verification Code",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "resetButton": "Reset Password",
+    "passwordHint": "Password must be at least 6 characters long",
+    "didNotReceive": "Didn't receive the code?",
+    "resendCode": "Resend Code",
+    "placeholders": {
+      "verificationCode": "Enter 6-digit code",
+      "newPassword": "Enter your new password",
+      "confirmPassword": "Confirm your new password"
+    },
+    "errors": {
+      "codeRequired": "Verification code is required",
+      "passwordRequired": "New password is required",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "messages": {
+      "resetSuccess": "Password has been reset successfully. You can now login with your new password.",
+      "codeResent": "Verification code has been resent to your email"
+    },
+    "help": {
+      "title": "Security Tips",
+      "tip1": "Use a strong password with letters, numbers, and symbols",
+      "tip2": "Don't reuse passwords from other accounts",
+      "tip3": "If you didn't request this reset, contact support immediately"
+    }
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "gender": "Gender",
+    "dateOfBirth": "Date of Birth",
+    "location": "Location",
+    "changeAvatar": "Change Avatar",
+    "emailCannotChange": "Email address cannot be changed",
+    "selectGender": "Select Gender",
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "phone": "Enter your phone number",
+      "location": "Enter your location",
+      "selectDate": "Select date of birth",
+      "selectGender": "Select gender"
+    },
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "updateFailed": "Failed to update profile"
+    },
+    "messages": {
+      "updateSuccess": "Profile updated successfully"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "description": "For your security, please enter your current password and create a new one.",
+    "forAccount": "For account",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "changeButton": "Change Password",
+    "passwordHint": "Password must be at least 6 characters long",
+    "placeholders": {
+      "currentPassword": "Enter your current password",
+      "newPassword": "Enter your new password",
+      "confirmPassword": "Confirm your new password"
+    },
+    "errors": {
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "passwordMismatch": "Passwords do not match",
+      "samePassword": "New password must be different from current password",
+      "changeFailed": "Failed to change password"
+    },
+    "messages": {
+      "changeSuccess": "Password changed successfully"
+    },
+    "securityTips": {
+      "title": "Security Tips",
+      "tip1": "Use a combination of letters, numbers, and symbols",
+      "tip2": "Avoid using personal information in your password",
+      "tip3": "Don't reuse passwords from other accounts",
+      "tip4": "Change your password regularly"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the app"
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Choose how the app looks",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage how you receive notifications",
+      "email": {
+        "title": "Email Notifications",
+        "description": "Receive notifications via email"
+      },
+      "push": {
+        "title": "Push Notifications",
+        "description": "Receive push notifications on your device"
+      }
+    },
+    "advanced": {
+      "title": "Advanced"
+    },
+    "reset": {
+      "title": "Reset Settings",
+      "description": "Reset all settings to default values",
+      "message": "Are you sure you want to reset all settings to default? This action cannot be undone.",
+      "confirm": "Reset"
+    },
+    "appInfo": {
+      "version": "Version",
+      "buildNumber": "Build"
+    },
+    "errors": {
+      "updateFailed": "Failed to update settings",
+      "resetFailed": "Failed to reset settings"
+    },
+    "messages": {
+      "themeUpdated": "Theme updated successfully",
+      "resetSuccess": "Settings reset successfully"
+    }
+  },
   "profile": {
     "title": "Profile",
     "basicInfo": "Basic Information",
@@ -116,9 +281,17 @@
     "accountId": "Account ID",
     "joinedDate": "Joined Date",
     "editProfile": "Edit Profile",
-    "male": "Male",
-    "female": "Female",
-    "other": "Other",
+    "changePassword": "Change Password",
+    "settings": "Settings",
+    "collaborator": "Collaborator",
+    "logoutTitle": "Logout",
+    "logoutMessage": "Are you sure you want to logout?",
+    "gender": {
+      "male": "Male",
+      "female": "Female", 
+      "other": "Other",
+      "unknown": "Unknown"
+    },
     "selectGender": "Select Gender",
     "notProvided": "Not provided",
     "enterFullName": "Enter full name",
@@ -128,7 +301,6 @@
     "enterLocation": "Enter your location",
     "updateSuccess": "Profile updated successfully",
     "updateError": "Failed to update profile",
-    "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
@@ -142,19 +314,5 @@
       "invalidPhone": "Invalid phone number",
       "genderRequired": "Gender is required"
     }
-  },
-  "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "theme": "Theme",
-    "english": "English",
-    "vietnamese": "Vietnamese",
-    "lightTheme": "Light",
-    "darkTheme": "Dark",
-    "systemTheme": "System",
-    "about": "About",
-    "version": "Version",
-    "logout": "Logout",
-    "logoutConfirm": "Are you sure you want to logout?"
   }
 } 
