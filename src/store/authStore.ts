@@ -61,17 +61,27 @@ export const useAuthStore = create<AuthStore>()(
 
       // Actions
       login: async (credentials: LoginRequest) => {
+        const { useLoadingStore } = await import('./loadingStore');
+        const loadingStore = useLoadingStore.getState();
+        
+        // Import translation
+        const { useTranslation } = await import('react-i18next');
+        
         try {
           set({ isLoading: true });
+          loadingStore.showLoading('Authenticating...');
           
           const response = await apiService.login(credentials);
           
           if (response.flag) {
             const authData = response.data as AuthResponseDto;
             
-            // Check if user is Collaborator (role: 3)
+            // Check if user is Collaborator (role: 3) - CLIENT-SIDE VALIDATION
             if (authData.account.role !== 3) {
-              throw new Error('Only Collaborators can access mobile app');
+              // Set loading to false before throwing error
+              set({ isLoading: false });
+              loadingStore.hideLoading();
+              throw new Error('WRONG_ROLE');
             }
             
             // Calculate token expiry times
@@ -121,12 +131,93 @@ export const useAuthStore = create<AuthStore>()(
 
             // Set token for future API calls
             apiService.setAuthToken(authData.accessToken);
+            
+            // Sync userConfig with settingsStore
+            const { useSettingsStore } = await import('./settingsStore');
+            const settingsStore = useSettingsStore.getState();
+            settingsStore.syncWithUserConfig(userConfig);
           } else {
-            throw new Error(response.message);
+            // Handle backend ApiResponse errors - BACKEND VALIDATION
+            let errorKey = 'LOGIN_ERROR';
+            
+            // First check response.code (status code from backend ApiResponse)
+            switch (response.code) {
+              case 401:
+                errorKey = 'INVALID_CREDENTIALS';
+                break;
+              case 403:
+                // Check if it's role-related error
+                if (response.message?.includes('role') || response.message?.includes('collaborator') || response.message?.includes('access denied')) {
+                  errorKey = 'WRONG_ROLE';
+                } else if (response.message?.includes('Account is not active')) {
+                  errorKey = 'ACCOUNT_NOT_ACTIVE';
+                } else if (response.message?.includes('Email is not verified')) {
+                  errorKey = 'EMAIL_NOT_VERIFIED';
+                } else {
+                  errorKey = 'UNAUTHORIZED';
+                }
+                break;
+              case 404:
+                errorKey = 'USER_PROFILE_NOT_FOUND';
+                break;
+              case 500:
+                errorKey = 'SERVER_ERROR';
+                break;
+              default:
+                // Fall back to checking message content
+                if (response.message?.includes('Invalid username or password')) {
+                  errorKey = 'INVALID_CREDENTIALS';
+                } else if (response.message?.includes('role') || response.message?.includes('collaborator') || response.message?.includes('access denied')) {
+                  errorKey = 'WRONG_ROLE';
+                } else if (response.message?.includes('Account is not active')) {
+                  errorKey = 'ACCOUNT_NOT_ACTIVE';
+                } else if (response.message?.includes('Email is not verified')) {
+                  errorKey = 'EMAIL_NOT_VERIFIED';
+                } else if (response.message?.includes('User profile not found')) {
+                  errorKey = 'USER_PROFILE_NOT_FOUND';
+                } else if (response.message?.includes('Server error')) {
+                  errorKey = 'SERVER_ERROR';
+                }
+                break;
+            }
+            
+            throw new Error(errorKey);
           }
-        } catch (error) {
+        } catch (error: any) {
           set({ isLoading: false });
-          throw error;
+          
+          // Handle our custom error types first (from role check or backend response)
+          if (error.message === 'WRONG_ROLE') {
+            throw error;
+          }
+          
+          if (error.message === 'INVALID_CREDENTIALS' ||
+              error.message === 'ACCOUNT_NOT_ACTIVE' ||
+              error.message === 'EMAIL_NOT_VERIFIED' ||
+              error.message === 'USER_PROFILE_NOT_FOUND' ||
+              error.message === 'LOGIN_ERROR' ||
+              error.message === 'SERVER_ERROR') {
+            throw error;
+          }
+          
+          // Handle HTTP status codes as fallback (for actual network errors)
+          if (error?.response?.status === 401) {
+            throw new Error('INVALID_CREDENTIALS');
+          } else if (error?.response?.status === 403) {
+            throw new Error('UNAUTHORIZED');
+          } else if (error?.response?.status === 404) {
+            throw new Error('USER_PROFILE_NOT_FOUND');
+          } else if (error?.response?.status >= 500) {
+            throw new Error('SERVER_ERROR');
+          } else if (!error?.response) {
+            // Network connection error
+            throw new Error('NETWORK_ERROR');
+          }
+          
+          // Default error
+          throw new Error('LOGIN_ERROR');
+        } finally {
+          loadingStore.hideLoading();
         }
       },
 
@@ -135,7 +226,7 @@ export const useAuthStore = create<AuthStore>()(
           // Call logout API
           await apiService.logout();
         } catch (error) {
-          console.error('Logout API failed:', error);
+          // Silent failure - user will still be logged out locally
         } finally {
           set({
             accessToken: null,
@@ -150,8 +241,11 @@ export const useAuthStore = create<AuthStore>()(
           // Clear token from API service
           apiService.setAuthToken(null);
           
-          // Clear only auth storage, preserve language preference
+          // Clear only auth storage, preserve app settings (theme/language)
           AsyncStorage.removeItem('auth-storage');
+          
+          // Note: app-settings storage (theme/language) is preserved automatically
+          // This allows users to keep their preferred theme and language after logout
         }
       },
 
@@ -262,18 +356,15 @@ export const useAuthStore = create<AuthStore>()(
 
           // Check if refresh token is expired
           if (isTokenExpired(refreshTokenExpiresAt)) {
-            console.log('Refresh token expired, logging out');
             get().logout();
             return;
           }
 
           // Check if access token is expired or expiring soon
           if (isTokenExpired(accessTokenExpiresAt) || isTokenExpiringSoon(accessTokenExpiresAt)) {
-            console.log('Access token expired or expiring soon, refreshing...');
             try {
               await get().refreshAuthToken();
             } catch (error) {
-              console.error('Token refresh failed:', error);
               get().logout();
               return;
             }
@@ -283,7 +374,6 @@ export const useAuthStore = create<AuthStore>()(
             set({ isAuthenticated: true });
           }
         } catch (error) {
-          console.error('Check auth status failed:', error);
           get().logout();
         }
       },
@@ -313,7 +403,6 @@ export const useAuthStore = create<AuthStore>()(
             await get().refreshAuthToken();
             return true;
           } catch (error) {
-            console.error('Auto token refresh failed:', error);
             get().logout();
             return false;
           }

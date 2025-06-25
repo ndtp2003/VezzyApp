@@ -14,12 +14,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator: React.FC = () => {
   const { isAuthenticated, isLoading, checkAuthStatus } = useAuthStore();
-  const { theme, initializeSettings } = useSettingsStore();
+  const { theme } = useSettingsStore();
   
   useEffect(() => {
-    initializeSettings();
     checkAuthStatus();
-  }, [initializeSettings, checkAuthStatus]);
+  }, [checkAuthStatus]);
 
   const getTheme = () => {
     if (theme === 'system') {

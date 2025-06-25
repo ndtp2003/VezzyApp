@@ -1,4 +1,4 @@
-Write-Host "🧹 Cleaning React Native project..." -ForegroundColor Green
+Write-Host "Cleaning React Native project..." -ForegroundColor Green
 
 # Clean npm cache
 Write-Host "Cleaning npm cache..." -ForegroundColor Yellow
@@ -39,7 +39,7 @@ $buildDirs = @(
 foreach ($dir in $buildDirs) {
     if (Test-Path $dir) {
         Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
-        Write-Host "  ✓ Removed $dir" -ForegroundColor Gray
+        Write-Host "  Removed $dir" -ForegroundColor Gray
     }
 }
 
@@ -51,6 +51,8 @@ if (Test-Path $gradleCache) {
 }
 
 # Calculate saved space (approximate)
-Write-Host "`n✅ Cleanup completed!" -ForegroundColor Green
-Write-Host "💾 You should have freed up 1-3 GB of disk space." -ForegroundColor Green
-Write-Host "`n📝 To rebuild, run: npm install && npx react-native run-android" -ForegroundColor Cyan 
+Write-Host ""
+Write-Host "Cleanup completed!" -ForegroundColor Green
+Write-Host "You should have freed up 1-3 GB of disk space." -ForegroundColor Green
+Write-Host ""
+Write-Host "To rebuild, run: npm install && npx react-native run-android" -ForegroundColor Cyan 

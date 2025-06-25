@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,38 +11,43 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
-import { useLanguageSync } from '../hooks/useLanguageSync';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSettingsStore } from '../store/settingsStore';
 import { useToast } from '../components';
+import { lightTheme, darkTheme } from '../theme';
 
 const SettingsScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { userConfig, updateUserConfig } = useAuthStore();
+  const { user } = useAuthStore();
   const { 
     theme, 
     language, 
-    emailNotifications, 
+    emailNotifications,
     pushNotifications,
-    updateTheme,
-    updateLanguage,
-    updateEmailNotifications,
-    updatePushNotifications,
-    resetSettings
+    setTheme,
+    setLanguage,
+    setEmailNotifications,
+    setPushNotifications,
+    updateUserConfigApi,
+    resetToDefaults,
+    isLoading
   } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
   
-  // Sync language with user config
-  useLanguageSync();
+  // Ensure i18n language matches settings store language
+  useEffect(() => {
+    if (language && language !== i18n.language) {
+      i18n.changeLanguage(language);
+    }
+  }, []);
+
+  // Monitor language changes
+  useEffect(() => {
+  }, [language]);
   
-  const [localSettings, setLocalSettings] = useState({
-    language: userConfig?.language || 'en',
-    theme: userConfig?.theme || 'light',
-    receiveEmail: userConfig?.receiveEmail || false,
-    receiveNotify: userConfig?.receiveNotify || false,
-  });
-  
-  const [isLoading, setIsLoading] = useState(false);
+  // Get current theme
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const styles = createStyles(currentTheme);
 
   const languageOptions = [
     { label: 'English', value: 'en', flag: '🇺🇸' },
@@ -56,70 +61,70 @@ const SettingsScreen: React.FC = () => {
   ];
 
   const handleLanguageChange = async (newLanguage: 'en' | 'vi') => {
+    if (!user) return;
+    
     try {
-      setLocalSettings(prev => ({ ...prev, language: newLanguage }));
-      await updateLanguage(newLanguage);
-      i18n.changeLanguage(newLanguage);
-      setShowLanguageModal(false);
+      // Update i18n first
+      await i18n.changeLanguage(newLanguage);
+      
+      // Update settings store
+      setLanguage(newLanguage);
+      
+      // Update user config
+      await updateUserConfigApi(user.accountId, { language: newLanguage });
+      
       showSuccessToast(t('settings.messages.themeUpdated'));
     } catch (error) {
+      console.error('Failed to change language:', error);
+      setLanguage(language);
+      i18n.changeLanguage(language);
       showErrorToast(t('settings.errors.updateFailed'));
     }
   };
 
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
+    if (isLoading || !user) return;
+    
     try {
-      setLocalSettings(prev => ({ ...prev, theme: newTheme }));
-      await updateTheme(newTheme);
+      // Update via API and local store
+      await updateUserConfigApi(user.accountId, { theme: newTheme });
+      
       showSuccessToast(t('settings.messages.themeUpdated'));
     } catch (error) {
       showErrorToast(t('settings.errors.updateFailed'));
     }
   };
 
-  const handleEmailNotificationChange = async (value: boolean) => {
+  const handleNotificationToggle = async (type: 'email' | 'push', value: boolean) => {
+    if (isLoading || !user) return;
+    
     try {
-      setLocalSettings(prev => ({ ...prev, receiveEmail: value }));
-      await updateEmailNotifications(value);
-      if (userConfig) {
-        updateUserConfig({ receiveEmail: value });
+      if (type === 'email') {
+        await updateUserConfigApi(user.accountId, { emailNotifications: value });
+      } else {
+        await updateUserConfigApi(user.accountId, { pushNotifications: value });
       }
     } catch (error) {
       showErrorToast(t('settings.errors.updateFailed'));
     }
   };
 
-  const handleNotificationToggle = async (type: 'receiveEmail' | 'receiveNotify', value: boolean) => {
+  const handleResetSettings = async () => {
+    if (isLoading || !user) return;
+    
     try {
-      setLocalSettings(prev => ({ ...prev, [type]: value }));
+      resetToDefaults();
       
-      // TODO: Call API to update user config
-      // await apiService.updateUserConfig({ [type]: value });
+      // Sync with backend
+      await updateUserConfigApi(user.accountId, {
+        language: 'en',
+        theme: 'light',
+        emailNotifications: true,
+        pushNotifications: true,
+      });
       
-      // Update local store
-      updateUserConfig({ [type]: value });
-      
-    } catch (error) {
-      showErrorToast(t('settings.errors.updateFailed'));
-      // Revert on error
-      setLocalSettings(prev => ({ ...prev, [type]: !value }));
-    }
-  };
-
-  const handleResetSettings = () => {
-    // For now, we'll use a simple confirmation with error toast
-    // TODO: Create a custom confirmation dialog component later
-    try {
-      const defaultSettings = {
-        language: 'en' as const,
-        theme: 'light' as const,
-        receiveEmail: false,
-        receiveNotify: true,
-      };
-      
-      setLocalSettings(defaultSettings);
-      i18n.changeLanguage(defaultSettings.language);
-      updateUserConfig(defaultSettings);
+      // Update i18n
+      i18n.changeLanguage('en');
       
       showSuccessToast(t('settings.messages.resetSuccess'));
     } catch (error) {
@@ -141,21 +146,23 @@ const SettingsScreen: React.FC = () => {
               key={option.value}
               style={[
                 styles.optionItem,
-                localSettings.language === option.value && styles.optionItemSelected,
+                language === option.value && styles.optionItemSelected,
+                isLoading && styles.optionItemDisabled,
               ]}
               onPress={() => handleLanguageChange(option.value as 'en' | 'vi')}
+              disabled={isLoading}
             >
               <View style={styles.optionLeft}>
                 <Text style={styles.flagIcon}>{option.flag}</Text>
                 <Text style={[
                   styles.optionText,
-                  localSettings.language === option.value && styles.optionTextSelected,
+                  language === option.value && styles.optionTextSelected,
                 ]}>
                   {option.label}
                 </Text>
               </View>
-              {localSettings.language === option.value && (
-                <Icon name="checkmark" size={20} color="#007AFF" />
+              {language === option.value && (
+                <Icon name="checkmark" size={20} color={currentTheme.primary} />
               )}
             </TouchableOpacity>
           ))}
@@ -171,21 +178,23 @@ const SettingsScreen: React.FC = () => {
               key={option.value}
               style={[
                 styles.optionItem,
-                localSettings.theme === option.value && styles.optionItemSelected,
+                theme === option.value && styles.optionItemSelected,
+                isLoading && styles.optionItemDisabled,
               ]}
               onPress={() => handleThemeChange(option.value as 'light' | 'dark' | 'system')}
+              disabled={isLoading}
             >
               <View style={styles.optionLeft}>
-                <Icon name={option.icon} size={20} color="#666" style={styles.themeIcon} />
+                <Icon name={option.icon} size={20} color={currentTheme.textSecondary} style={styles.themeIcon} />
                 <Text style={[
                   styles.optionText,
-                  localSettings.theme === option.value && styles.optionTextSelected,
+                  theme === option.value && styles.optionTextSelected,
                 ]}>
                   {option.label}
                 </Text>
               </View>
-              {localSettings.theme === option.value && (
-                <Icon name="checkmark" size={20} color="#007AFF" />
+              {theme === option.value && (
+                <Icon name="checkmark" size={20} color={currentTheme.primary} />
               )}
             </TouchableOpacity>
           ))}
@@ -199,34 +208,36 @@ const SettingsScreen: React.FC = () => {
           {/* Email Notifications */}
           <View style={styles.switchItem}>
             <View style={styles.switchLeft}>
-              <Icon name="mail" size={20} color="#666" style={styles.switchIcon} />
+              <Icon name="mail" size={20} color={currentTheme.textSecondary} style={styles.switchIcon} />
               <View>
                 <Text style={styles.switchTitle}>{t('settings.notifications.email.title')}</Text>
                 <Text style={styles.switchDescription}>{t('settings.notifications.email.description')}</Text>
               </View>
             </View>
             <Switch
-              value={localSettings.receiveEmail}
-              onValueChange={(value) => handleNotificationToggle('receiveEmail', value)}
-              trackColor={{ false: '#ccc', true: '#007AFF' }}
-              thumbColor={localSettings.receiveEmail ? '#fff' : '#fff'}
+              value={emailNotifications}
+              onValueChange={(value) => handleNotificationToggle('email', value)}
+              trackColor={{ false: currentTheme.disabled, true: currentTheme.primary }}
+              thumbColor={emailNotifications ? '#fff' : '#fff'}
+              disabled={isLoading}
             />
           </View>
 
           {/* Push Notifications */}
           <View style={styles.switchItem}>
             <View style={styles.switchLeft}>
-              <Icon name="notifications" size={20} color="#666" style={styles.switchIcon} />
+              <Icon name="notifications" size={20} color={currentTheme.textSecondary} style={styles.switchIcon} />
               <View>
                 <Text style={styles.switchTitle}>{t('settings.notifications.push.title')}</Text>
                 <Text style={styles.switchDescription}>{t('settings.notifications.push.description')}</Text>
               </View>
             </View>
             <Switch
-              value={localSettings.receiveNotify}
-              onValueChange={(value) => handleNotificationToggle('receiveNotify', value)}
-              trackColor={{ false: '#ccc', true: '#007AFF' }}
-              thumbColor={localSettings.receiveNotify ? '#fff' : '#fff'}
+              value={pushNotifications}
+              onValueChange={(value) => handleNotificationToggle('push', value)}
+              trackColor={{ false: currentTheme.disabled, true: currentTheme.primary }}
+              thumbColor={pushNotifications ? '#fff' : '#fff'}
+              disabled={isLoading}
             />
           </View>
         </View>
@@ -236,7 +247,11 @@ const SettingsScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>{t('settings.advanced.title')}</Text>
           
           {/* Reset Settings */}
-          <TouchableOpacity style={styles.dangerItem} onPress={handleResetSettings}>
+          <TouchableOpacity 
+            style={[styles.dangerItem, isLoading && styles.dangerItemDisabled]} 
+            onPress={handleResetSettings}
+            disabled={isLoading}
+          >
             <Icon name="refresh" size={20} color="#FF3B30" style={styles.dangerIcon} />
             <View>
               <Text style={styles.dangerTitle}>{t('settings.reset.title')}</Text>
@@ -251,21 +266,30 @@ const SettingsScreen: React.FC = () => {
           <Text style={styles.infoText}>{t('settings.appInfo.buildNumber')}: 1</Text>
         </View>
 
+        {/* Debug Info */}
+        {__DEV__ && (
+          <View style={styles.debugSection}>
+            <Text style={styles.debugText}>Debug Info:</Text>
+            <Text style={styles.debugText}>Settings Language: {language}</Text>
+            <Text style={styles.debugText}>i18n Language: {i18n.language}</Text>
+          </View>
+        )}
+
       </View>
     </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.background,
   },
   content: {
     padding: 16,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.surface,
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -273,12 +297,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 4,
   },
   sectionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     marginBottom: 16,
     lineHeight: 20,
   },
@@ -290,12 +314,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.card,
   },
   optionItemSelected: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: theme.primary + '20',
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: theme.primary,
   },
   optionLeft: {
     flexDirection: 'row',
@@ -310,10 +334,10 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: '#333',
+    color: theme.text,
   },
   optionTextSelected: {
-    color: '#007AFF',
+    color: theme.primary,
     fontWeight: '500',
   },
   switchItem: {
@@ -334,12 +358,12 @@ const styles = StyleSheet.create({
   switchTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: theme.text,
     marginBottom: 2,
   },
   switchDescription: {
     fontSize: 12,
-    color: '#666',
+    color: theme.textSecondary,
   },
   dangerItem: {
     flexDirection: 'row',
@@ -362,7 +386,19 @@ const styles = StyleSheet.create({
   },
   dangerDescription: {
     fontSize: 12,
-    color: '#666',
+    color: theme.textSecondary,
+  },
+  optionItemDisabled: {
+    backgroundColor: theme.disabled,
+    borderWidth: 1,
+    borderColor: theme.border,
+    opacity: 0.6,
+  },
+  dangerItemDisabled: {
+    backgroundColor: theme.disabled,
+    borderWidth: 1,
+    borderColor: theme.border,
+    opacity: 0.6,
   },
   infoSection: {
     alignItems: 'center',
@@ -370,8 +406,19 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 12,
-    color: '#999',
+    color: theme.textSecondary,
     marginBottom: 2,
+  },
+  debugSection: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: theme.surface,
+    borderRadius: 8,
+  },
+  debugText: {
+    fontSize: 12,
+    color: theme.textSecondary,
+    marginBottom: 4,
   },
 });
 

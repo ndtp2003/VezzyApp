@@ -47,6 +47,8 @@ const LoginScreen: React.FC = () => {
       // No success toast needed - navigation will happen automatically
       // The user can see they're logged in when the screen changes
     } catch (error) {
+      // Clear only password on error, keep username
+      setPassword('');
       const errorMessage = handleApiError(error, t);
       showErrorToast(errorMessage);
     }

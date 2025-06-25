@@ -32,9 +32,22 @@ const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 // Event Stack Navigator
 const EventsNavigator: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useSettingsStore();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
-    <EventStack.Navigator>
+    <EventStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: currentTheme.card,
+        },
+        headerTintColor: currentTheme.text,
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 18,
+        },
+      }}
+    >
       <EventStack.Screen
         name="EventsList"
         component={EventsScreen}
@@ -52,9 +65,22 @@ const EventsNavigator: React.FC = () => {
 // News Stack Navigator
 const NewsNavigator: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useSettingsStore();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
-    <NewsStack.Navigator>
+    <NewsStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: currentTheme.card,
+        },
+        headerTintColor: currentTheme.text,
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 18,
+        },
+      }}
+    >
       <NewsStack.Screen
         name="NewsList"
         component={NewsScreen}
@@ -72,9 +98,22 @@ const NewsNavigator: React.FC = () => {
 // Profile Stack Navigator
 const ProfileNavigator: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useSettingsStore();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
-    <ProfileStack.Navigator>
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: currentTheme.card,
+        },
+        headerTintColor: currentTheme.text,
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 18,
+        },
+      }}
+    >
       <ProfileStack.Screen
         name="ProfileMain"
         component={ProfileScreen}
@@ -146,6 +185,7 @@ const MainNavigator: React.FC = () => {
         headerTintColor: currentTheme.text,
         headerTitleStyle: {
           fontWeight: '600',
+          fontSize: 18,
         },
       })}
     >

@@ -2,29 +2,36 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'react-native-localize';
-import { UserSettings } from '../types';
+import { UserConfig } from '../types';
 import { apiService } from '../services/api';
+import { mapUserConfigToBackend } from '../utils/userConfig';
+
+// Type aliases for settings
+type Theme = 'light' | 'dark' | 'system';
+type Language = 'en' | 'vi';
 
 interface SettingsState {
-  language: 'en' | 'vi';
-  theme: 'light' | 'dark' | 'system';
+  theme: Theme;
+  language: Language;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
   isLoading: boolean;
-  settings: UserSettings | null;
 }
 
 interface SettingsActions {
-  setLanguage: (lang: 'en' | 'vi') => void;
-  setTheme: (theme: 'light' | 'dark' | 'system') => void;
-  syncWithBackend: (userId: string) => Promise<void>;
-  loadSettings: (userId: string) => Promise<void>;
-  updateSettings: (userId: string, newSettings: Partial<UserSettings>) => Promise<void>;
-  initializeSettings: () => void;
+  setTheme: (theme: Theme) => void;
+  setLanguage: (language: Language) => void;
+  setEmailNotifications: (enabled: boolean) => void;
+  setPushNotifications: (enabled: boolean) => void;
+  resetToDefaults: () => void;
+  syncWithUserConfig: (userConfig: UserConfig | null) => void;
+  updateUserConfigApi: (accountId: string, newConfig: Partial<SettingsState>) => Promise<void>;
   setLoading: (loading: boolean) => void;
 }
 
 export type SettingsStore = SettingsState & SettingsActions;
 
-const getDeviceLanguage = (): 'en' | 'vi' => {
+const getDeviceLanguage = (): Language => {
   const locales = getLocales();
   const primaryLocale = locales[0];
   
@@ -34,129 +41,100 @@ const getDeviceLanguage = (): 'en' | 'vi' => {
   return 'en';
 };
 
+const defaultSettings: SettingsState = {
+  theme: 'light',
+  language: getDeviceLanguage(),
+  emailNotifications: true,
+  pushNotifications: true,
+  isLoading: false,
+};
+
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set, get) => ({
-      // State
-      language: 'en',
-      theme: 'system',
-      isLoading: false,
-      settings: null,
+      // Default state
+      ...defaultSettings,
 
       // Actions
-      setLanguage: (lang: 'en' | 'vi') => {
-        set({ language: lang });
-      },
-
-      setTheme: (theme: 'light' | 'dark' | 'system') => {
+      setTheme: (theme: Theme) => {
         set({ theme });
       },
 
-      syncWithBackend: async (userId: string) => {
-        try {
-          set({ isLoading: true });
+      setLanguage: (language: Language) => {
+        set({ language });
+      },
+
+      setEmailNotifications: (emailNotifications: boolean) => {
+        set({ emailNotifications });
+      },
+
+      setPushNotifications: (pushNotifications: boolean) => {
+        set({ pushNotifications });
+      },
+
+      resetToDefaults: () => {
+        set({
+          theme: 'light',
+          language: getDeviceLanguage(),
+          emailNotifications: true,
+          pushNotifications: true,
+        });
+      },
+
+      // Sync settings with user config from backend (when login)
+      syncWithUserConfig: (userConfig: UserConfig | null) => {
+        if (userConfig) {
+          const currentState = get();
           
-          const { language, theme, settings } = get();
+          // Only sync from backend if user hasn't set local preferences
+          // This preserves user's language choice if they changed it before login
+          const hasLocalLanguagePreference = !!currentState.language;
           
-          const updatedSettings: Partial<UserSettings> = {
-            language,
-            theme,
-            ...settings,
+          const newSettings = {
+            theme: userConfig.theme,
+            language: hasLocalLanguagePreference ? currentState.language : userConfig.language,
+            emailNotifications: userConfig.receiveEmail,
+            pushNotifications: userConfig.receiveNotify,
           };
-
-          const response = await apiService.updateUserSettings(userId, updatedSettings);
           
-          if (response.flag) {
-            set({ 
-              settings: response.data,
-              isLoading: false 
-            });
-          } else {
-            throw new Error(response.message);
-          }
-        } catch (error) {
-          set({ isLoading: false });
-          console.error('Failed to sync settings with backend:', error);
-          // Don't throw error here as it's not critical for app functionality
+          set(() => newSettings);
         }
       },
 
-      loadSettings: async (userId: string) => {
+      // Update user config via API and sync locally
+      updateUserConfigApi: async (accountId: string, newConfig: Partial<SettingsState>) => {
+        const currentState = get();
+        
         try {
           set({ isLoading: true });
           
-          const response = await apiService.getUserSettings(userId);
-          
-          if (response.flag) {
-            const backendSettings = response.data;
-            
-            set({
-              language: backendSettings.language,
-              theme: backendSettings.theme,
-              settings: backendSettings,
-              isLoading: false,
-            });
-          } else {
-            throw new Error(response.message);
-          }
-        } catch (error) {
-          set({ isLoading: false });
-          console.error('Failed to load settings from backend:', error);
-          // Use local settings as fallback
-        }
-      },
+          // Create the config to send to backend
+          const backendConfig = mapUserConfigToBackend({
+            userConfigId: '', // This will be handled by backend
+            userId: accountId, // Use accountId as userId reference
+            theme: newConfig.theme ?? currentState.theme,
+            language: newConfig.language ?? currentState.language,
+            receiveEmail: newConfig.emailNotifications ?? currentState.emailNotifications,
+            receiveNotify: newConfig.pushNotifications ?? currentState.pushNotifications,
+            updatedAt: new Date().toISOString(),
+          });
 
-      updateSettings: async (userId: string, newSettings: Partial<UserSettings>) => {
-        try {
-          set({ isLoading: true });
-          
-          const { settings } = get();
-          const updatedSettings = { ...settings, ...newSettings };
-          
-          const response = await apiService.updateUserSettings(userId, updatedSettings);
+          const response = await apiService.updateUserConfig(backendConfig);
           
           if (response.flag) {
+            // Update successful, update local state
             set({
-              settings: response.data,
-              language: response.data.language,
-              theme: response.data.theme,
+              ...newConfig,
               isLoading: false,
             });
           } else {
-            throw new Error(response.message);
+            // API failed, revert any optimistic updates
+            set({ isLoading: false });
+            throw new Error(response.message || 'Failed to update settings');
           }
         } catch (error) {
           set({ isLoading: false });
           throw error;
-        }
-      },
-
-      initializeSettings: () => {
-        const { language, theme } = get();
-        
-        // Set device language if not already set
-        if (!language || language === 'en') {
-          const deviceLang = getDeviceLanguage();
-          set({ language: deviceLang });
-        }
-        
-        // Initialize default settings if not exist
-        if (!get().settings) {
-          const defaultSettings: UserSettings = {
-            language: language || getDeviceLanguage(),
-            theme: theme || 'system',
-            notifications: {
-              push: true,
-              email: true,
-              sms: false,
-            },
-            privacy: {
-              profileVisibility: 'public',
-              showOnlineStatus: true,
-            },
-          };
-          
-          set({ settings: defaultSettings });
         }
       },
 
@@ -165,12 +143,13 @@ export const useSettingsStore = create<SettingsStore>()(
       },
     }),
     {
-      name: 'settings-storage',
+      name: 'app-settings',  // Persists independently from auth
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
-        language: state.language,
         theme: state.theme,
-        settings: state.settings,
+        language: state.language,
+        emailNotifications: state.emailNotifications,
+        pushNotifications: state.pushNotifications,
       }),
     }
   )

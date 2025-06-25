@@ -9,18 +9,31 @@ import {
   Image,
   Modal,
   Platform,
+  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { useLoadingStore } from '../store/loadingStore';
 import { Gender } from '../types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useToast } from '../components';
+import { apiService } from '../services/api';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { launchImageLibrary, launchCamera, ImagePickerResponse } from 'react-native-image-picker';
+import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
 
 const EditProfileScreen: React.FC = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const { user, updateUser } = useAuthStore();
+  const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
+  
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const styles = createStyles(currentTheme);
   
   const [formData, setFormData] = useState<{
     fullName: string;
@@ -32,13 +45,15 @@ const EditProfileScreen: React.FC = () => {
     fullName: user?.fullName || user?.username || '',
     phone: user?.phone || '',
     location: user?.location || '',
-    gender: user?.gender || Gender.Unknown,
+    gender: user?.gender ?? Gender.Unknown,
     dob: user?.dob ? new Date(user.dob) : null,
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const genderOptions = [
     { label: t('profile.gender.male'), value: Gender.Male },
@@ -73,9 +88,94 @@ const EditProfileScreen: React.FC = () => {
     return selected ? selected.label : t('editProfile.placeholders.selectGender');
   };
 
+  const handleAvatarSelection = () => {
+    Alert.alert(
+      t('editProfile.selectAvatarSource'),
+      t('editProfile.selectAvatarMessage'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('editProfile.camera'), onPress: () => openCamera() },
+        { text: t('editProfile.gallery'), onPress: () => openGallery() },
+      ]
+    );
+  };
+
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 500,
+        maxHeight: 500,
+      },
+      handleImageResponse
+    );
+  };
+
+  const openGallery = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 500,
+        maxHeight: 500,
+      },
+      handleImageResponse
+    );
+  };
+
+  const handleImageResponse = async (response: ImagePickerResponse) => {
+    if (response.didCancel || response.errorMessage) {
+      return;
+    }
+
+    if (response.assets && response.assets[0]) {
+      const asset = response.assets[0];
+      setSelectedAvatar(asset.uri || null);
+      
+      // Upload avatar immediately after selection
+      if (asset.uri) {
+        await uploadAvatar(asset);
+      }
+    }
+  };
+
+  const uploadAvatar = async (asset: any) => {
+    const { showLoading, hideLoading } = useLoadingStore.getState();
+    
+    try {
+      setIsUploadingAvatar(true);
+      showLoading(t('common.uploadingAvatar'));
+      
+      const formData = new FormData();
+      formData.append('avatarFile', {
+        uri: asset.uri,
+        type: asset.type || 'image/jpeg',
+        name: asset.fileName || 'avatar.jpg',
+      } as any);
+
+      const response = await apiService.uploadAvatar(formData);
+      
+      if (response.flag && response.data) {
+        // Update user with new avatar URL
+        updateUser({ avatarUrl: response.data.avatarUrl });
+        showSuccessToast(t('editProfile.avatarUpdateSuccess'));
+      }
+    } catch (error) {
+      showErrorToast(t('editProfile.avatarUpdateFailed'));
+      setSelectedAvatar(null); // Reset on error
+    } finally {
+      setIsUploadingAvatar(false);
+      hideLoading();
+    }
+  };
+
   const handleSave = async () => {
+    const { showLoading, hideLoading } = useLoadingStore.getState();
+    
     try {
       setIsLoading(true);
+      showLoading(t('common.savingProfile'));
       
       // Validate required fields
       if (!formData.fullName.trim()) {
@@ -83,29 +183,50 @@ const EditProfileScreen: React.FC = () => {
         return;
       }
 
-      // TODO: Call API to update profile
-      // const response = await apiService.updateProfile({
-      //   fullName: formData.fullName,
-      //   phone: formData.phone,
-      //   location: formData.location,
-      //   gender: formData.gender,
-      //   dob: formData.dob?.toISOString(),
-      // });
+      if (!user?.email) {
+        showErrorToast(t('editProfile.errors.emailRequired'));
+        return;
+      }
 
-      // Update local store
-      updateUser({
-        fullName: formData.fullName,
-        phone: formData.phone,
-        location: formData.location,
-        gender: formData.gender,
-        dob: formData.dob?.toISOString(),
-      });
+      // Prepare data for API request - try PascalCase field names
+      const updateData = {
+        FullName: formData.fullName,
+        Email: user.email, // Required by API
+        Phone: formData.phone || undefined,
+        Location: formData.location || undefined,
+        Gender: formData.gender, // Keep as number (enum value)
+        Dob: formData.dob?.toISOString().split('T')[0] || undefined, // Format as YYYY-MM-DD
+      };
+
+      // Call API to update profile
+      const response = await apiService.updateProfile(updateData as any);
+
+      // Update local store with server response
+      if (response.flag && response.data) {
+        updateUser(response.data);
+      } else {
+        // Fallback to local update (convert back to client format)
+        const localUpdateData = {
+          fullName: formData.fullName,
+          phone: formData.phone || undefined,
+          location: formData.location || undefined,
+          gender: formData.gender,
+          dob: formData.dob?.toISOString() || undefined,
+        };
+        updateUser(localUpdateData);
+      }
 
       showSuccessToast(t('editProfile.messages.updateSuccess'));
+      
+      // Navigate back to profile after successful update
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1000); // Small delay to let user see success message
     } catch (error) {
       showErrorToast(t('editProfile.errors.updateFailed'));
     } finally {
       setIsLoading(false);
+      hideLoading();
     }
   };
 
@@ -115,14 +236,27 @@ const EditProfileScreen: React.FC = () => {
         
         {/* Avatar Section */}
         <View style={styles.avatarSection}>
-          <Image
-            source={{
-              uri: user?.avatarUrl || 'https://via.placeholder.com/100',
-            }}
-            style={styles.avatar}
-          />
-          <TouchableOpacity style={styles.changeAvatarButton}>
-            <Text style={styles.changeAvatarText}>{t('editProfile.changeAvatar')}</Text>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{
+                uri: selectedAvatar || user?.avatarUrl || 'https://via.placeholder.com/100',
+              }}
+              style={styles.avatar}
+            />
+            {isUploadingAvatar && (
+              <View style={styles.avatarOverlay}>
+                <Text style={styles.uploadingText}>{t('editProfile.uploading')}</Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity 
+            style={[styles.changeAvatarButton, isUploadingAvatar && styles.changeAvatarButtonDisabled]} 
+            onPress={handleAvatarSelection}
+            disabled={isUploadingAvatar}
+          >
+            <Text style={styles.changeAvatarText}>
+              {isUploadingAvatar ? t('editProfile.uploading') : t('editProfile.changeAvatar')}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -137,7 +271,7 @@ const EditProfileScreen: React.FC = () => {
               value={formData.fullName}
               onChangeText={(text) => setFormData(prev => ({ ...prev, fullName: text }))}
               placeholder={t('editProfile.placeholders.fullName')}
-              placeholderTextColor="#999"
+              placeholderTextColor={currentTheme.placeholder}
             />
           </View>
 
@@ -148,7 +282,7 @@ const EditProfileScreen: React.FC = () => {
               style={[styles.input, styles.readOnlyInput]}
               value={user?.email}
               editable={false}
-              placeholderTextColor="#999"
+              placeholderTextColor={currentTheme.placeholder}
             />
             <Text style={styles.helperText}>{t('editProfile.emailCannotChange')}</Text>
           </View>
@@ -162,7 +296,7 @@ const EditProfileScreen: React.FC = () => {
               onChangeText={(text) => setFormData(prev => ({ ...prev, phone: text }))}
               placeholder={t('editProfile.placeholders.phone')}
               keyboardType="phone-pad"
-              placeholderTextColor="#999"
+              placeholderTextColor={currentTheme.placeholder}
             />
           </View>
 
@@ -176,7 +310,7 @@ const EditProfileScreen: React.FC = () => {
               <Text style={[styles.dateText, !formData.dob && styles.placeholderText]}>
                 {formatDateDisplay(formData.dob)}
               </Text>
-              <Icon name="calendar-today" size={20} color="#999" />
+              <Icon name="calendar-today" size={20} color={currentTheme.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -190,7 +324,7 @@ const EditProfileScreen: React.FC = () => {
               <Text style={styles.pickerText}>
                 {getSelectedGenderLabel()}
               </Text>
-              <Icon name="keyboard-arrow-down" size={24} color="#999" />
+              <Icon name="keyboard-arrow-down" size={24} color={currentTheme.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -202,7 +336,7 @@ const EditProfileScreen: React.FC = () => {
               value={formData.location}
               onChangeText={(text) => setFormData(prev => ({ ...prev, location: text }))}
               placeholder={t('editProfile.placeholders.location')}
-              placeholderTextColor="#999"
+              placeholderTextColor={currentTheme.placeholder}
             />
           </View>
 
@@ -247,7 +381,7 @@ const EditProfileScreen: React.FC = () => {
                 onPress={() => setShowGenderModal(false)}
                 style={styles.modalCloseButton}
               >
-                <Icon name="close" size={24} color="#333" />
+                <Icon name="close" size={24} color={currentTheme.text} />
               </TouchableOpacity>
             </View>
             
@@ -269,7 +403,7 @@ const EditProfileScreen: React.FC = () => {
                   {option.label}
                 </Text>
                 {formData.gender === option.value && (
-                  <Icon name="check" size={20} color="#007AFF" />
+                  <Icon name="check" size={20} color={currentTheme.primary} />
                 )}
               </TouchableOpacity>
             ))}
@@ -280,116 +414,139 @@ const EditProfileScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.background,
   },
   content: {
-    padding: 16,
+    padding: spacing.md,
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: spacing.md,
   },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 16,
+  },
+  avatarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadingText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   changeAvatarButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.md,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: theme.primary,
+    backgroundColor: theme.surface,
+  },
+  changeAvatarButtonDisabled: {
+    backgroundColor: theme.disabled,
+    borderColor: theme.disabled,
   },
   changeAvatarText: {
-    color: '#007AFF',
+    color: theme.primary,
     fontSize: 14,
     fontWeight: '500',
   },
   formSection: {
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 16,
+    ...typography.body2,
     fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
+    color: theme.text,
+    marginBottom: spacing.sm,
   },
   input: {
+    ...typography.body1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    color: theme.text,
+    backgroundColor: theme.surface,
   },
   readOnlyInput: {
-    backgroundColor: '#f0f0f0',
-    color: '#999',
+    backgroundColor: theme.disabled,
+    color: theme.textSecondary,
   },
   helperText: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4,
+    ...typography.caption,
+    color: theme.textSecondary,
+    marginTop: spacing.xs,
   },
   dateInput: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: theme.surface,
   },
   dateText: {
-    fontSize: 16,
-    color: '#333',
+    ...typography.body1,
+    color: theme.text,
   },
   placeholderText: {
-    color: '#999',
+    color: theme.placeholder,
   },
   pickerInput: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: theme.surface,
   },
   pickerText: {
-    fontSize: 16,
-    color: '#333',
+    ...typography.body1,
+    color: theme.text,
   },
   saveButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 16,
-    borderRadius: 8,
+    backgroundColor: theme.primary,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
   },
   saveButtonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: theme.disabled,
   },
   saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.button,
+    color: theme.background,
   },
-  // Modal styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -397,45 +554,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    width: '90%',
+    backgroundColor: theme.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    width: '80%',
     maxWidth: 300,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    ...typography.h4,
+    color: theme.text,
   },
   modalCloseButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   genderOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginBottom: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.sm,
   },
   selectedGenderOption: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: theme.surface,
   },
   genderOptionText: {
-    fontSize: 16,
-    color: '#333',
+    ...typography.body1,
+    color: theme.text,
   },
   selectedGenderOptionText: {
-    color: '#007AFF',
-    fontWeight: '500',
+    color: theme.primary,
+    fontWeight: '600',
   },
 });
 

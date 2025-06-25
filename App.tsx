@@ -6,42 +6,37 @@
  */
 
 import React, { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { I18nextProvider } from 'react-i18next';
+import { StatusBar } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import './src/utils/i18n';
+import { useAuthStore } from './src/store/authStore';
+import { useLoadingStore } from './src/store/loadingStore';
+import { useLanguageSync } from './src/hooks/useLanguageSync';
 import RootNavigator from './src/navigation/RootNavigator';
-import i18n, { initializeLanguage } from './src/utils/i18n';
-import { ToastProvider } from './src/components';
+import { ToastProvider } from './src/components/ToastManager';
+import LoadingSpinner from './src/components/LoadingSpinner';
 
-// Create a client for React Query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+function App(): React.JSX.Element {
+  const { checkAuthStatus } = useAuthStore();
+  const { isLoading, loadingMessage } = useLoadingStore();
+  
+  // Sync language changes with i18n
+  useLanguageSync();
 
-const App: React.FC = () => {
   useEffect(() => {
-    // Initialize language from saved preference
-    initializeLanguage();
-    console.log('Vezzy initialized');
-  }, []);
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <I18nextProvider i18n={i18n}>
-        <ToastProvider>
-          <RootNavigator />
-        </ToastProvider>
-      </I18nextProvider>
-    </QueryClientProvider>
+    <ToastProvider>
+      <StatusBar barStyle="default" />
+      <RootNavigator />
+      <LoadingSpinner 
+        visible={isLoading} 
+        message={loadingMessage} 
+      />
+    </ToastProvider>
   );
-};
+}
 
 export default App;

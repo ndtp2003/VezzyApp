@@ -8,14 +8,32 @@ import {
   TextInput,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '../store/authStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { useLoadingStore } from '../store/loadingStore';
+import { apiService } from '../services/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useToast } from '../components';
+import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
+
+interface PasswordRequirement {
+  key: string;
+  label: string;
+  regex: RegExp;
+  met: boolean;
+}
 
 const ChangePasswordScreen: React.FC = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const { user } = useAuthStore();
+  const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
+  
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const styles = createStyles(currentTheme);
   
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -31,6 +49,47 @@ const ChangePasswordScreen: React.FC = () => {
   
   const [isLoading, setIsLoading] = useState(false);
 
+  // Password requirements validation
+  const getPasswordRequirements = (password: string): PasswordRequirement[] => {
+    return [
+      {
+        key: 'length',
+        label: t('changePassword.requirements.length'),
+        regex: /.{8,}/,
+        met: password.length >= 8,
+      },
+      {
+        key: 'uppercase',
+        label: t('changePassword.requirements.uppercase'),
+        regex: /[A-Z]/,
+        met: /[A-Z]/.test(password),
+      },
+      {
+        key: 'lowercase',
+        label: t('changePassword.requirements.lowercase'),
+        regex: /[a-z]/,
+        met: /[a-z]/.test(password),
+      },
+      {
+        key: 'number',
+        label: t('changePassword.requirements.number'),
+        regex: /[0-9]/,
+        met: /[0-9]/.test(password),
+      },
+      {
+        key: 'special',
+        label: t('changePassword.requirements.special'),
+        regex: /[!@#$%^&*(),.?":{}|<>]/,
+        met: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      },
+    ];
+  };
+
+  const isPasswordStrong = (password: string): boolean => {
+    const requirements = getPasswordRequirements(password);
+    return requirements.every(req => req.met);
+  };
+
   const validateForm = (): boolean => {
     if (!formData.currentPassword.trim()) {
       showErrorToast(t('changePassword.errors.currentPasswordRequired'));
@@ -42,8 +101,8 @@ const ChangePasswordScreen: React.FC = () => {
       return false;
     }
     
-    if (formData.newPassword.length < 6) {
-      showErrorToast(t('changePassword.errors.passwordTooShort'));
+    if (!isPasswordStrong(formData.newPassword)) {
+      showErrorToast(t('changePassword.errors.passwordRequirements'));
       return false;
     }
     
@@ -63,27 +122,54 @@ const ChangePasswordScreen: React.FC = () => {
   const handleChangePassword = async () => {
     if (!validateForm()) return;
     
+    const { showLoading, hideLoading } = useLoadingStore.getState();
+    
     try {
       setIsLoading(true);
+      showLoading(t('common.changingPassword'));
       
-      // TODO: Call API to change password
-      // const response = await apiService.changePassword({
-      //   currentPassword: formData.currentPassword,
-      //   newPassword: formData.newPassword,
-      // });
-
-      // Reset form
-      setFormData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+      const response = await apiService.changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
       });
 
-      showSuccessToast(t('changePassword.messages.changeSuccess'));
-    } catch (error) {
-      showErrorToast(t('changePassword.errors.changeFailed'));
+      if (response.flag) {
+        // Reset form
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+
+        showSuccessToast(t('changePassword.messages.changeSuccess'));
+        
+        // Navigate back to profile after successful change
+        setTimeout(() => {
+          navigation.goBack();
+        }, 1000); // Small delay to let user see success message
+      } else {
+        throw new Error(response.message || 'Change password failed');
+      }
+    } catch (error: any) {
+      // Handle specific backend errors
+      let errorMessage = t('changePassword.errors.changeFailed');
+      
+      if (error?.response?.status === 400) {
+        errorMessage = t('changePassword.errors.currentPasswordIncorrect');
+      } else if (error?.response?.status === 404) {
+        errorMessage = t('changePassword.errors.accountNotFound');
+      } else if (error?.response?.status === 500) {
+        errorMessage = t('changePassword.errors.serverError');
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      showErrorToast(errorMessage);
     } finally {
       setIsLoading(false);
+      hideLoading();
     }
   };
 
@@ -94,16 +180,11 @@ const ChangePasswordScreen: React.FC = () => {
     }));
   };
 
+  const passwordRequirements = getPasswordRequirements(formData.newPassword);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        
-        {/* Header Info */}
-        <View style={styles.infoSection}>
-          <Text style={styles.infoTitle}>{t('changePassword.title')}</Text>
-          <Text style={styles.infoText}>{t('changePassword.description')}</Text>
-          <Text style={styles.username}>{t('changePassword.forAccount')}: {user?.username}</Text>
-        </View>
 
         {/* Form Fields */}
         <View style={styles.formSection}>
@@ -118,7 +199,7 @@ const ChangePasswordScreen: React.FC = () => {
                 onChangeText={(text) => setFormData(prev => ({ ...prev, currentPassword: text }))}
                 placeholder={t('changePassword.placeholders.currentPassword')}
                 secureTextEntry={!showPasswords.current}
-                placeholderTextColor="#999"
+                placeholderTextColor={currentTheme.placeholder}
                 autoCapitalize="none"
               />
               <TouchableOpacity
@@ -128,7 +209,7 @@ const ChangePasswordScreen: React.FC = () => {
                 <Icon
                   name={showPasswords.current ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={currentTheme.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -144,7 +225,7 @@ const ChangePasswordScreen: React.FC = () => {
                 onChangeText={(text) => setFormData(prev => ({ ...prev, newPassword: text }))}
                 placeholder={t('changePassword.placeholders.newPassword')}
                 secureTextEntry={!showPasswords.new}
-                placeholderTextColor="#999"
+                placeholderTextColor={currentTheme.placeholder}
                 autoCapitalize="none"
               />
               <TouchableOpacity
@@ -154,11 +235,32 @@ const ChangePasswordScreen: React.FC = () => {
                 <Icon
                   name={showPasswords.new ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={currentTheme.textSecondary}
                 />
               </TouchableOpacity>
             </View>
-            <Text style={styles.helperText}>{t('changePassword.passwordHint')}</Text>
+            
+            {/* Password Requirements */}
+            {formData.newPassword.length > 0 && (
+              <View style={styles.requirementsContainer}>
+                <Text style={styles.requirementsTitle}>{t('changePassword.requirements.title')}</Text>
+                {passwordRequirements.map((requirement) => (
+                  <View key={requirement.key} style={styles.requirementRow}>
+                    <Icon
+                      name={requirement.met ? 'checkmark-circle' : 'close-circle'}
+                      size={16}
+                      color={requirement.met ? '#4CAF50' : '#F44336'}
+                    />
+                    <Text style={[
+                      styles.requirementText,
+                      { color: requirement.met ? '#4CAF50' : '#F44336' }
+                    ]}>
+                      {requirement.label}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Confirm Password */}
@@ -171,7 +273,7 @@ const ChangePasswordScreen: React.FC = () => {
                 onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
                 placeholder={t('changePassword.placeholders.confirmPassword')}
                 secureTextEntry={!showPasswords.confirm}
-                placeholderTextColor="#999"
+                placeholderTextColor={currentTheme.placeholder}
                 autoCapitalize="none"
               />
               <TouchableOpacity
@@ -181,21 +283,31 @@ const ChangePasswordScreen: React.FC = () => {
                 <Icon
                   name={showPasswords.confirm ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={currentTheme.textSecondary}
                 />
               </TouchableOpacity>
             </View>
+            
+            {/* Password Match Indicator */}
+            {formData.confirmPassword.length > 0 && (
+              <View style={styles.matchIndicator}>
+                <Icon
+                  name={formData.newPassword === formData.confirmPassword ? 'checkmark-circle' : 'close-circle'}
+                  size={16}
+                  color={formData.newPassword === formData.confirmPassword ? '#4CAF50' : '#F44336'}
+                />
+                <Text style={[
+                  styles.matchText,
+                  { color: formData.newPassword === formData.confirmPassword ? '#4CAF50' : '#F44336' }
+                ]}>
+                  {formData.newPassword === formData.confirmPassword 
+                    ? t('changePassword.passwordsMatch') 
+                    : t('changePassword.passwordsDontMatch')}
+                </Text>
+              </View>
+            )}
           </View>
 
-        </View>
-
-        {/* Security Tips */}
-        <View style={styles.tipsSection}>
-          <Text style={styles.tipsTitle}>{t('changePassword.securityTips.title')}</Text>
-          <Text style={styles.tipText}>• {t('changePassword.securityTips.tip1')}</Text>
-          <Text style={styles.tipText}>• {t('changePassword.securityTips.tip2')}</Text>
-          <Text style={styles.tipText}>• {t('changePassword.securityTips.tip3')}</Text>
-          <Text style={styles.tipText}>• {t('changePassword.securityTips.tip4')}</Text>
         </View>
 
         {/* Change Password Button */}
@@ -214,107 +326,90 @@ const ChangePasswordScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.background,
   },
   content: {
-    padding: 16,
-  },
-  infoSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  username: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#007AFF',
+    padding: spacing.md,
   },
   formSection: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: theme.surface,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.lg,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 16,
+    ...typography.body2,
     fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
+    color: theme.text,
+    marginBottom: spacing.sm,
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    borderRadius: borderRadius.md,
+    backgroundColor: theme.surface,
   },
   passwordInput: {
+    ...typography.body1,
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    color: theme.text,
   },
   eyeButton: {
-    padding: 12,
+    padding: spacing.md,
   },
-  helperText: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4,
+  requirementsContainer: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: theme.surface,
+    borderRadius: borderRadius.md,
   },
-  tipsSection: {
-    backgroundColor: '#f8f9fa',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  tipsTitle: {
-    fontSize: 16,
+  requirementsTitle: {
+    ...typography.body2,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
+    color: theme.text,
+    marginBottom: spacing.sm,
   },
-  tipText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 4,
+  requirementRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  requirementText: {
+    ...typography.caption,
+    marginLeft: spacing.sm,
+  },
+  matchIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  matchText: {
+    ...typography.caption,
+    marginLeft: spacing.sm,
   },
   changeButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 16,
-    borderRadius: 8,
+    backgroundColor: theme.primary,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
   },
   changeButtonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: theme.disabled,
   },
   changeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.button,
+    color: theme.background,
   },
 });
 

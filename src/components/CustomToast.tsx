@@ -28,7 +28,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
   duration = 3000,
 }) => {
   const slideAnim = useRef(new Animated.Value(-100)).current;
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -84,7 +84,11 @@ const CustomToast: React.FC<CustomToastProps> = ({
 
   return (
     <Modal transparent visible={visible} animationType="none">
-      <View style={styles.overlay}>
+      <TouchableOpacity 
+        style={styles.overlay}
+        onPress={hideToast}
+        activeOpacity={0.9}
+      >
         <Animated.View
           style={[
             styles.toastContainer,
@@ -94,11 +98,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
             },
           ]}
         >
-          <TouchableOpacity
-            style={styles.toastContent}
-            onPress={hideToast}
-            activeOpacity={0.9}
-          >
+          <View style={styles.toastContent}>
             <Icon
               name={getIconName()}
               size={24}
@@ -109,9 +109,9 @@ const CustomToast: React.FC<CustomToastProps> = ({
             <TouchableOpacity onPress={hideToast} style={styles.closeButton}>
               <Icon name="close" size={20} color="#666" />
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
         </Animated.View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 60, // Status bar height + some padding
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent background
   },
   toastContainer: {
     width: width - 32,

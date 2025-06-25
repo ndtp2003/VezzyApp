@@ -41,14 +41,6 @@ class ApiService {
     // Request interceptor
     this.axiosInstance.interceptors.request.use(
       async (config) => {
-        // Debug logging
-        if (__DEV__) {
-          console.log('🚀 API Request:', {
-            method: config.method?.toUpperCase(),
-            url: `${config.baseURL}${config.url}`,
-            data: config.data,
-          });
-        }
         // Skip token validation for public endpoints
         const skipTokenValidation = [
           '/api/account/login',
@@ -57,8 +49,8 @@ class ApiService {
           '/api/account/reset-password'
         ].some(endpoint => config.url?.includes(endpoint));
 
-        if (!skipTokenValidation && this.authToken) {
-          // Check and refresh token if needed
+        if (!skipTokenValidation) {
+          // Always get fresh token from authStore
           const { useAuthStore } = await import('../store/authStore');
           const isTokenValid = await useAuthStore.getState().ensureValidToken();
           
@@ -69,10 +61,9 @@ class ApiService {
           // Use the potentially refreshed token
           const currentToken = useAuthStore.getState().accessToken;
           if (currentToken) {
-            config.headers.Authorization = `Bearer ${currentToken}`;
+            // Set Authorization header directly
+            (config.headers as any).Authorization = `Bearer ${currentToken}`;
           }
-        } else if (this.authToken) {
-          config.headers.Authorization = `Bearer ${this.authToken}`;
         }
         
         return config;
@@ -83,20 +74,9 @@ class ApiService {
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        // Debug logging for successful responses (only in development)
-        if (__DEV__) {
-          console.log('✅ API Response:', {
-            url: response.config.url,
-            status: response.status,
-            data: response.data,
-          });
-        }
         return response;
       },
       (error) => {
-        // Removed console error logging to avoid console popup
-        // Error will be handled by error handler utility
-        
         if (error.response?.status === 401) {
           // Handle unauthorized access
           this.setAuthToken(null);

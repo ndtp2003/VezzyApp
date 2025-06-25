@@ -49,6 +49,9 @@ i18n
       escapeValue: false, // React already does escaping
     },
     
+    // Enable returnObjects to fix warning when accessing nested objects
+    returnObjects: true,
+    
     // Enable namespace and default namespace
     defaultNS: 'translation',
     ns: ['translation'],

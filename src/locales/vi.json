@@ -12,15 +12,20 @@
   "errors": {
     "TICKET_NOT_FOUND": "Không tìm thấy vé",
     "TICKET_ALREADY_USED": "Vé đã được sử dụng",
-    "UPDATE_FAILED": "Cập nhật vé thất bại",
+    "UPDATE_FAILED": "Cập nhật thất bại",
     "LOG_CREATION_FAILED": "Tạo log check-in thất bại",
     "CHECKIN_ERROR": "Lỗi check-in",
     "NETWORK_ERROR": "Lỗi kết nối mạng",
-    "UNAUTHORIZED": "Truy cập không được phép",
-    "UNKNOWN_ERROR": "Đã xảy ra lỗi không xác định",
+    "UNAUTHORIZED": "Không có quyền truy cập",
+    "UNKNOWN_ERROR": "Lỗi không xác định",
     "INVALID_CREDENTIALS": "Tên đăng nhập hoặc mật khẩu không đúng",
     "SERVER_ERROR": "Lỗi máy chủ",
-    "Invalid username or password": "Tên đăng nhập hoặc mật khẩu không đúng"
+    "Invalid username or password": "Tên đăng nhập hoặc mật khẩu không đúng",
+    "ACCOUNT_NOT_ACTIVE": "Tài khoản chưa được kích hoạt",
+    "EMAIL_NOT_VERIFIED": "Email chưa được xác thực. Vui lòng xác thực email trước.",
+    "USER_PROFILE_NOT_FOUND": "Không tìm thấy hồ sơ người dùng",
+    "WRONG_ROLE": "Vui lòng sử dụng sản phẩm trên website",
+    "LOGIN_ERROR": "Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại."
   },
   "checkin": {
     "scanQR": "Quét mã QR",
@@ -40,6 +45,11 @@
     "success": "Thành công",
     "error": "Lỗi",
     "loading": "Đang tải...",
+    "authenticating": "Đang xác thực...",
+    "savingProfile": "Đang lưu hồ sơ...",
+    "changingPassword": "Đang đổi mật khẩu...",
+    "uploadingAvatar": "Đang tải ảnh đại diện...",
+    "updatingSettings": "Đang cập nhật cài đặt...",
     "retry": "Thử lại",
     "cancel": "Hủy",
     "ok": "OK",
@@ -168,6 +178,13 @@
     "dateOfBirth": "Ngày sinh",
     "location": "Địa chỉ",
     "changeAvatar": "Đổi ảnh đại diện",
+    "selectAvatarSource": "Chọn nguồn ảnh",
+    "selectAvatarMessage": "Chọn nơi để lấy ảnh đại diện của bạn",
+    "camera": "Camera",
+    "gallery": "Thư viện ảnh",
+    "uploading": "Đang tải lên...",
+    "avatarUpdateSuccess": "Cập nhật ảnh đại diện thành công",
+    "avatarUpdateFailed": "Cập nhật ảnh đại diện thất bại",
     "emailCannotChange": "Không thể thay đổi địa chỉ email",
     "selectGender": "Chọn giới tính",
     "placeholders": {
@@ -179,6 +196,7 @@
     },
     "errors": {
       "fullNameRequired": "Họ và tên là bắt buộc",
+      "emailRequired": "Email là bắt buộc",
       "updateFailed": "Cập nhật hồ sơ thất bại"
     },
     "messages": {
@@ -193,29 +211,34 @@
     "newPassword": "Mật khẩu mới",
     "confirmPassword": "Xác nhận mật khẩu mới",
     "changeButton": "Đổi mật khẩu",
-    "passwordHint": "Mật khẩu phải có ít nhất 6 ký tự",
+    "passwordsMatch": "Mật khẩu khớp",
+    "passwordsDontMatch": "Mật khẩu không khớp",
     "placeholders": {
       "currentPassword": "Nhập mật khẩu hiện tại của bạn",
       "newPassword": "Nhập mật khẩu mới của bạn",
       "confirmPassword": "Xác nhận mật khẩu mới của bạn"
     },
+    "requirements": {
+      "title": "Yêu cầu mật khẩu",
+      "length": "Ít nhất 8 ký tự",
+      "uppercase": "Ít nhất một chữ cái viết hoa (A-Z)",
+      "lowercase": "Ít nhất một chữ cái viết thường (a-z)",
+      "number": "Ít nhất một chữ số (0-9)",
+      "special": "Ít nhất một ký tự đặc biệt (!@#$%^&*)"
+    },
     "errors": {
       "currentPasswordRequired": "Mật khẩu hiện tại là bắt buộc",
       "newPasswordRequired": "Mật khẩu mới là bắt buộc",
-      "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+      "passwordRequirements": "Mật khẩu phải đáp ứng tất cả yêu cầu",
       "passwordMismatch": "Mật khẩu không khớp",
       "samePassword": "Mật khẩu mới phải khác mật khẩu hiện tại",
-      "changeFailed": "Đổi mật khẩu thất bại"
+      "changeFailed": "Đổi mật khẩu thất bại",
+      "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
+      "accountNotFound": "Không tìm thấy tài khoản",
+      "serverError": "Lỗi máy chủ khi đổi mật khẩu"
     },
     "messages": {
       "changeSuccess": "Đổi mật khẩu thành công"
-    },
-    "securityTips": {
-      "title": "Mẹo bảo mật",
-      "tip1": "Sử dụng kết hợp chữ cái, số và ký tự đặc biệt",
-      "tip2": "Tránh sử dụng thông tin cá nhân trong mật khẩu",
-      "tip3": "Không sử dụng lại mật khẩu từ các tài khoản khác",
-      "tip4": "Thay đổi mật khẩu thường xuyên"
     }
   },
   "settings": {

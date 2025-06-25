@@ -73,4 +73,8 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       )}
     </ToastContext.Provider>
   );
-}; 
+};
+
+// Default export for backward compatibility
+const ToastManager = ToastProvider;
+export default ToastManager; 

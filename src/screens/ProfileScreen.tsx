@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,7 +16,8 @@ import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { useLanguageSync } from '../hooks/useLanguageSync';
 import { lightTheme, darkTheme, spacing, borderRadius, typography, shadows } from '../theme';
-import { useToast, ConfirmDialog } from '../components';
+import { useToast } from '../components';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
 
@@ -27,11 +28,22 @@ const ProfileScreen: React.FC = () => {
   const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
   
+  // Ref for ScrollView to control scroll position
+  const scrollViewRef = useRef<ScrollView>(null);
+  
   // State for logout confirmation dialog
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   
   // Sync language with user config
   useLanguageSync();
+  
+  // Reset scroll position when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset scroll to top when screen is focused
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
   
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   const styles = createStyles(currentTheme);
@@ -58,7 +70,6 @@ const ProfileScreen: React.FC = () => {
       setShowLogoutDialog(false);
       showSuccessToast(t('common.logout'));
     } catch (error) {
-      console.error('Logout error:', error);
       showErrorToast(t('common.error'));
       setShowLogoutDialog(false);
     }
@@ -94,7 +105,7 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <>
-      <ScrollView style={styles.container}>
+      <ScrollView ref={scrollViewRef} style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
@@ -129,7 +140,7 @@ const ProfileScreen: React.FC = () => {
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>{t('profile.gender')}</Text>
+            <Text style={styles.infoLabel}>{t('editProfile.gender')}</Text>
             <Text style={styles.infoValue}>{getGenderText(user.gender)}</Text>
           </View>
 

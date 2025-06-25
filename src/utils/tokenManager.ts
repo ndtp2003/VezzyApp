@@ -1,3 +1,5 @@
+import { useAuthStore } from '../store/authStore';
+
 // Token management utilities
 export const formatTokenExpiry = (expiresAt: number | null): string => {
   if (!expiresAt) return 'No expiry time';
@@ -38,20 +40,11 @@ export const getTokenStatus = (expiresAt: number | null, bufferMinutes: number =
   }
 };
 
-export const logTokenDebugInfo = (
-  accessToken: string | null,
-  refreshToken: string | null,
-  accessTokenExpiresAt: number | null,
-  refreshTokenExpiresAt: number | null
-) => {
-  if (__DEV__) {
-    console.log('=== TOKEN DEBUG INFO ===');
-    console.log('Access Token:', accessToken ? `${accessToken.substring(0, 20)}...` : 'null');
-    console.log('Refresh Token:', refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null');
-    console.log('Access Token Status:', getTokenStatus(accessTokenExpiresAt));
-    console.log('Access Token Expires:', formatTokenExpiry(accessTokenExpiresAt));
-    console.log('Refresh Token Status:', getTokenStatus(refreshTokenExpiresAt));
-    console.log('Refresh Token Expires:', formatTokenExpiry(refreshTokenExpiresAt));
-    console.log('========================');
-  }
+export const logTokenStatus = () => {
+  const authData = useAuthStore.getState();
+  if (!authData) return;
+
+  const { accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt } = authData;
+  
+  // Remove debug logging to avoid cluttering terminal
 }; 

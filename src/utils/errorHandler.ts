@@ -1,7 +1,34 @@
 import { ErrorCode, AppError } from '../types';
 
 export const handleApiError = (error: any, t: Function): string => {
-  // Check if it's a backend API response error (our API structure)
+
+  // FIRST: Check if error has a message (includes our custom errors like WRONG_ROLE)
+  if (error.message) {
+    // Check if the message is an error code
+    const possibleErrorCode = error.message as ErrorCode;
+    const errorKeys = [
+      'TICKET_NOT_FOUND',
+      'TICKET_ALREADY_USED', 
+      'UPDATE_FAILED',
+      'LOG_CREATION_FAILED',
+      'CHECKIN_ERROR',
+      'NETWORK_ERROR',
+      'UNAUTHORIZED',
+      'INVALID_CREDENTIALS',
+      'SERVER_ERROR',
+      'ACCOUNT_NOT_ACTIVE',
+      'EMAIL_NOT_VERIFIED',
+      'USER_PROFILE_NOT_FOUND',
+      'WRONG_ROLE',
+      'LOGIN_ERROR'
+    ];
+    
+    if (errorKeys.includes(possibleErrorCode)) {
+      return t(`errors.${possibleErrorCode}`);
+    }
+  }
+
+  // SECOND: Check if it's a backend API response error (our API structure)
   if (error.response?.data?.message) {
     // Backend returns: {flag: false, code: 401, message: "Invalid username or password"}
     const backendMessage = error.response.data.message;
@@ -16,13 +43,13 @@ export const handleApiError = (error: any, t: Function): string => {
     return backendMessage;
   }
   
-  // Check if it's an API response error with error code (alternative structure)
+  // THIRD: Check if it's an API response error with error code (alternative structure)
   if (error.response?.data?.error) {
     const errorCode = error.response.data.error as ErrorCode;
     return t(`errors.${errorCode}`, { defaultValue: t('errors.UNKNOWN_ERROR') });
   }
   
-  // Check for specific HTTP status codes
+  // FOURTH: Check for specific HTTP status codes
   if (error.response?.status === 401) {
     return t('errors.UNAUTHORIZED');
   }
@@ -39,36 +66,18 @@ export const handleApiError = (error: any, t: Function): string => {
     return t('errors.SERVER_ERROR');
   }
   
-  // Network errors
-  if (error.code === 'NETWORK_ERROR' || !error.response) {
+  // FIFTH: Network errors (only after checking message)
+  if (error.code === 'NETWORK_ERROR' || (error.code === 'ECONNABORTED') || (error.code === 'ENOTFOUND') || (error.code === 'ECONNREFUSED')) {
     return t('errors.NETWORK_ERROR');
   }
   
-  // Timeout errors
-  if (error.code === 'ECONNABORTED') {
+  // SIXTH: Check for no response (but only if not already handled above)
+  if (!error.response && !error.message) {
     return t('errors.NETWORK_ERROR');
   }
   
-  // Check if error has a message
+  // LAST: Return raw message or fallback
   if (error.message) {
-    // Check if the message is an error code
-    const possibleErrorCode = error.message as ErrorCode;
-    const errorKeys = [
-      'TICKET_NOT_FOUND',
-      'TICKET_ALREADY_USED',
-      'UPDATE_FAILED',
-      'LOG_CREATION_FAILED',
-      'CHECKIN_ERROR',
-      'NETWORK_ERROR',
-      'UNAUTHORIZED',
-      'INVALID_CREDENTIALS',
-      'SERVER_ERROR'
-    ];
-    
-    if (errorKeys.includes(possibleErrorCode)) {
-      return t(`errors.${possibleErrorCode}`);
-    }
-    
     return error.message;
   }
   
