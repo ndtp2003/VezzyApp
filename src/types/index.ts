@@ -329,7 +329,10 @@ export type ErrorCode =
   | 'UNAUTHORIZED'
   | 'INVALID_CREDENTIALS'
   | 'SERVER_ERROR'
-  | 'UNKNOWN_ERROR';
+  | 'UNKNOWN_ERROR'
+  | 'ACCOUNT_NOT_FOUND'
+  | 'INVALID_OR_EXPIRED_CODE'
+  | 'PASSWORD_RESET_ERROR';
 
 export interface AppError {
   code: ErrorCode;

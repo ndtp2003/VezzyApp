@@ -20,7 +20,10 @@ export const handleApiError = (error: any, t: Function): string => {
       'EMAIL_NOT_VERIFIED',
       'USER_PROFILE_NOT_FOUND',
       'WRONG_ROLE',
-      'LOGIN_ERROR'
+      'LOGIN_ERROR',
+      'ACCOUNT_NOT_FOUND',
+      'INVALID_OR_EXPIRED_CODE',
+      'PASSWORD_RESET_ERROR'
     ];
     
     if (errorKeys.includes(possibleErrorCode)) {
@@ -32,6 +35,20 @@ export const handleApiError = (error: any, t: Function): string => {
   if (error.response?.data?.message) {
     // Backend returns: {flag: false, code: 401, message: "Invalid username or password"}
     const backendMessage = error.response.data.message;
+    
+    // Map specific backend messages for forgot/reset password
+    if (backendMessage === 'Account not found') {
+      return t('errors.ACCOUNT_NOT_FOUND');
+    }
+    
+    if (backendMessage === 'Invalid or expired verification code') {
+      return t('errors.INVALID_OR_EXPIRED_CODE');
+    }
+    
+    if (backendMessage === 'An error occurred while processing password reset request. Please try again.' ||
+        backendMessage === 'An error occurred while resetting password. Please try again.') {
+      return t('errors.PASSWORD_RESET_ERROR');
+    }
     
     // Try to translate the backend message if we have a translation for it
     const translatedMessage = t(`errors.${backendMessage}`, { defaultValue: null });

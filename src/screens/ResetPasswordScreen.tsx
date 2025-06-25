@@ -16,6 +16,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { apiService } from '../services/api';
 import { handleApiError } from '../utils';
 import { useToast } from '../components';
+import { useSettingsStore } from '../store/settingsStore';
+import { lightTheme, darkTheme } from '../theme';
 
 interface RouteParams {
   email: string;
@@ -27,6 +29,7 @@ const ResetPasswordScreen: React.FC = () => {
   const route = useRoute();
   const { email } = (route.params as RouteParams) || { email: '' };
   const { showSuccessToast, showErrorToast } = useToast();
+  const { theme } = useSettingsStore();
   
   const [formData, setFormData] = useState({
     verificationCode: '',
@@ -41,6 +44,16 @@ const ResetPasswordScreen: React.FC = () => {
   
   const [isLoading, setIsLoading] = useState(false);
 
+  // Get current theme
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const styles = createStyles(currentTheme);
+
+  const validatePassword = (password: string): boolean => {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const validateForm = (): boolean => {
     if (!formData.verificationCode.trim()) {
       showErrorToast(t('resetPassword.errors.codeRequired'));
@@ -52,8 +65,8 @@ const ResetPasswordScreen: React.FC = () => {
       return false;
     }
     
-    if (formData.newPassword.length < 6) {
-      showErrorToast(t('resetPassword.errors.passwordTooShort'));
+    if (!validatePassword(formData.newPassword)) {
+      showErrorToast(t('resetPassword.errors.passwordRequirements'));
       return false;
     }
     
@@ -128,7 +141,10 @@ const ResetPasswordScreen: React.FC = () => {
 
   return (
     <>
-      <StatusBar backgroundColor="#f5f5f5" barStyle="dark-content" />
+      <StatusBar 
+        backgroundColor={currentTheme.background} 
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} 
+      />
       <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -138,7 +154,7 @@ const ResetPasswordScreen: React.FC = () => {
         {/* Header with Back Button */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-            <Icon name="arrow-back" size={24} color="#007AFF" />
+            <Icon name="arrow-back" size={24} color={currentTheme.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>{t('resetPassword.title')}</Text>
         </View>
@@ -147,7 +163,7 @@ const ResetPasswordScreen: React.FC = () => {
           
           {/* Info Section */}
           <View style={styles.infoSection}>
-            <Icon name="shield-checkmark-outline" size={64} color="#007AFF" style={styles.infoIcon} />
+            <Icon name="shield-checkmark-outline" size={64} color={currentTheme.primary} style={styles.infoIcon} />
             <Text style={styles.infoTitle}>{t('resetPassword.title')}</Text>
             <Text style={styles.infoText}>
               {t('resetPassword.description')} {email}
@@ -163,7 +179,7 @@ const ResetPasswordScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 placeholder={t('resetPassword.placeholders.verificationCode')}
-                placeholderTextColor="#999"
+                placeholderTextColor={currentTheme.textSecondary}
                 value={formData.verificationCode}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, verificationCode: text }))}
                 keyboardType="number-pad"
@@ -180,7 +196,7 @@ const ResetPasswordScreen: React.FC = () => {
                 <TextInput
                   style={styles.passwordInput}
                   placeholder={t('resetPassword.placeholders.newPassword')}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={currentTheme.textSecondary}
                   value={formData.newPassword}
                   onChangeText={(text) => setFormData(prev => ({ ...prev, newPassword: text }))}
                   secureTextEntry={!showPasswords.new}
@@ -194,7 +210,7 @@ const ResetPasswordScreen: React.FC = () => {
                   <Icon
                     name={showPasswords.new ? 'eye-off' : 'eye'}
                     size={20}
-                    color="#999"
+                    color={currentTheme.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -208,7 +224,7 @@ const ResetPasswordScreen: React.FC = () => {
                 <TextInput
                   style={styles.passwordInput}
                   placeholder={t('resetPassword.placeholders.confirmPassword')}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={currentTheme.textSecondary}
                   value={formData.confirmPassword}
                   onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
                   secureTextEntry={!showPasswords.confirm}
@@ -222,7 +238,7 @@ const ResetPasswordScreen: React.FC = () => {
                   <Icon
                     name={showPasswords.confirm ? 'eye-off' : 'eye'}
                     size={20}
-                    color="#999"
+                    color={currentTheme.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -264,10 +280,10 @@ const ResetPasswordScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.background,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -286,7 +302,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
   },
   content: {
     flex: 1,
@@ -301,21 +317,29 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 12,
   },
   infoText: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: 20,
   },
   formSection: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.surface,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   inputGroup: {
     marginBottom: 20,
@@ -323,51 +347,51 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: theme.text,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
+    color: theme.text,
+    backgroundColor: theme.card,
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.border,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: theme.card,
   },
   passwordInput: {
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: theme.text,
   },
   eyeButton: {
     padding: 12,
   },
   helperText: {
     fontSize: 12,
-    color: '#999',
+    color: theme.textSecondary,
     marginTop: 4,
   },
   resetButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.primary,
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
   },
   resetButtonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: theme.disabled,
   },
   resetButtonText: {
     color: '#fff',
@@ -380,20 +404,20 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     marginBottom: 8,
   },
   resendLink: {
     fontSize: 16,
-    color: '#007AFF',
+    color: theme.primary,
     fontWeight: '500',
     textDecorationLine: 'underline',
   },
   resendLinkDisabled: {
-    color: '#999',
+    color: theme.disabled,
   },
   helpSection: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.card,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
@@ -401,12 +425,12 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 12,
   },
   helpText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     lineHeight: 20,
     marginBottom: 4,
   },

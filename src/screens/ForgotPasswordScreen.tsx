@@ -19,6 +19,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { apiService } from '../services/api';
 import { handleApiError } from '../utils';
 import { useToast } from '../components';
+import { useSettingsStore } from '../store/settingsStore';
+import { lightTheme, darkTheme } from '../theme';
 
 type ForgotPasswordNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
 
@@ -26,9 +28,14 @@ const ForgotPasswordScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<ForgotPasswordNavigationProp>();
   const { showSuccessToast, showErrorToast } = useToast();
+  const { theme } = useSettingsStore();
   
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get current theme
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const styles = createStyles(currentTheme);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,7 +80,10 @@ const ForgotPasswordScreen: React.FC = () => {
 
   return (
     <>
-      <StatusBar backgroundColor="#f5f5f5" barStyle="dark-content" />
+      <StatusBar 
+        backgroundColor={currentTheme.background} 
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} 
+      />
       <KeyboardAvoidingView 
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -83,7 +93,7 @@ const ForgotPasswordScreen: React.FC = () => {
         {/* Header with Back Button */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-            <Icon name="arrow-back" size={24} color="#007AFF" />
+            <Icon name="arrow-back" size={24} color={currentTheme.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>{t('forgotPassword.title')}</Text>
         </View>
@@ -92,7 +102,7 @@ const ForgotPasswordScreen: React.FC = () => {
           
           {/* Info Section */}
           <View style={styles.infoSection}>
-            <Icon name="mail-outline" size={64} color="#007AFF" style={styles.infoIcon} />
+            <Icon name="mail-outline" size={64} color={currentTheme.primary} style={styles.infoIcon} />
             <Text style={styles.infoTitle}>{t('forgotPassword.title')}</Text>
             <Text style={styles.infoText}>{t('forgotPassword.description')}</Text>
           </View>
@@ -103,7 +113,7 @@ const ForgotPasswordScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder={t('forgotPassword.emailPlaceholder')}
-              placeholderTextColor="#999"
+              placeholderTextColor={currentTheme.textSecondary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -132,13 +142,6 @@ const ForgotPasswordScreen: React.FC = () => {
             <Text style={styles.helpText}>• {t('forgotPassword.help.tip3')}</Text>
           </View>
 
-          {/* Back to Login */}
-          <TouchableOpacity style={styles.backToLoginContainer} onPress={handleGoBack}>
-            <Text style={styles.backToLoginText}>
-              {t('forgotPassword.backToLogin')}
-            </Text>
-          </TouchableOpacity>
-
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -146,10 +149,10 @@ const ForgotPasswordScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.background,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
   },
   content: {
     flex: 1,
@@ -183,47 +186,55 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 12,
   },
   infoText: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     paddingHorizontal: 20,
   },
   formSection: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.surface,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: theme.text,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.border,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
+    color: theme.text,
+    backgroundColor: theme.card,
     marginBottom: 20,
   },
   sendButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.primary,
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   sendButtonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: theme.disabled,
   },
   sendButtonText: {
     color: '#fff',
@@ -231,7 +242,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   helpSection: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.card,
     padding: 20,
     borderRadius: 12,
     marginBottom: 24,
@@ -239,24 +250,14 @@ const styles = StyleSheet.create({
   helpTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 12,
   },
   helpText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     lineHeight: 20,
     marginBottom: 4,
-  },
-  backToLoginContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  backToLoginText: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '500',
-    textDecorationLine: 'underline',
   },
 });
 
