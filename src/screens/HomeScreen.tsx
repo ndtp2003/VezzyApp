@@ -49,7 +49,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Quick Actions */}
       <View style={styles.quickActionsSection}>
-        <Text style={styles.sectionTitle}>{t('home.quickActions')}</Text>
+        <Text style={styles.sectionTitle}>{t('home.quickActions.title')}</Text>
         
         <TouchableOpacity style={styles.actionButton} onPress={handleScanQR}>
           <Icon name="qr-code-scanner" size={24} color={currentTheme.background} />

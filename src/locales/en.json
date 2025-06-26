@@ -28,7 +28,20 @@
     "LOGIN_ERROR": "An error occurred during login. Please try again.",
     "ACCOUNT_NOT_FOUND": "Account not found. Please check your email address.",
     "INVALID_OR_EXPIRED_CODE": "Invalid or expired verification code. Please request a new code.",
-    "PASSWORD_RESET_ERROR": "An error occurred while processing your request. Please try again."
+    "PASSWORD_RESET_ERROR": "An error occurred while processing your request. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Session expired. Please login again.",
+    "server": "Server error. Please try again later.",
+    "validation": "Please check your input and try again.",
+    "unknown": "An unexpected error occurred.",
+    "accountNotFound": "Account not found",
+    "invalidCredentials": "Invalid username or password",
+    "invalidOrExpiredCode": "Invalid or expired verification code",
+    "ticketNotFound": "Ticket not found",
+    "ticketAlreadyUsed": "Ticket has already been used",
+    "updateFailed": "Update failed",
+    "logCreationFailed": "Failed to create log",
+    "checkinError": "Check-in failed"
   },
   "checkin": {
     "scanQR": "Scan QR Code",
@@ -70,7 +83,19 @@
     "filter": "Filter",
     "refresh": "Refresh",
     "logout": "Logout",
-    "notAvailable": "Not available"
+    "notAvailable": "Not available",
+    "loadingMore": "Loading more...",
+    "close": "Close",
+    "previous": "Previous",
+    "skip": "Skip",
+    "continue": "Continue",
+    "select": "Select",
+    "clear": "Clear",
+    "apply": "Apply",
+    "reset": "Reset",
+    "submit": "Submit",
+    "required": "Required",
+    "createdBy": "Created by"
   },
   "navigation": {
     "home": "Home",
@@ -87,15 +112,54 @@
     "totalEvents": "Total Events",
     "totalCheckins": "Total Check-ins",
     "todayCheckins": "Today's Check-ins",
-    "quickActions": "Quick Actions",
-    "recentActivity": "Recent Activity",
+    "quickActions": {
+      "title": "Quick Actions",
+      "scanQR": "Scan QR Code",
+      "viewEvents": "View Events",
+      "viewNews": "View News",
+      "settings": "Settings"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "noActivity": "No recent activity"
+    },
+    "stats": {
+      "totalEvents": "Total Events",
+      "totalCheckIns": "Total Check-ins",
+      "todayCheckIns": "Today's Check-ins",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month"
+    },
     "viewAllEvents": "View All Events",
     "scanQRCode": "Scan QR Code"
   },
   "events": {
-    "title": "My Events",
+    "title": "Events",
+    "subtitle": "Manage your assigned events",
+    "loading": "Loading events...",
     "searchPlaceholder": "Search events...",
     "noEvents": "No events found",
+    "empty": {
+      "title": "No Events",
+      "message": "You don't have any assigned events at the moment."
+    },
+    "details": {
+      "title": "Event Details",
+      "description": "Description",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "location": "Location",
+      "capacity": "Capacity",
+      "status": "Status",
+      "checkInHistory": "Check-in History",
+      "scanQR": "Scan QR Code"
+    },
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
     "eventDetails": "Event Details",
     "startDate": "Start Date",
     "endDate": "End Date",
@@ -109,15 +173,240 @@
   },
   "news": {
     "title": "News",
+    "subtitle": "Latest news and updates",
+    "loading": "Loading news...",
+    "eventRelated": "Event Related",
+    "empty": {
+      "title": "No News",
+      "message": "There are no news articles available at the moment."
+    },
+    "status": {
+      "approved": "Published",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "unknown": "Unknown"
+    },
+    "details": {
+      "title": "News Details",
+      "author": "Author",
+      "publishedAt": "Published",
+      "updatedAt": "Updated"
+    },
     "noNews": "No news available",
     "readMore": "Read More",
     "publishedOn": "Published on"
   },
   "notifications": {
     "title": "Notifications",
+    "subtitle": "Stay updated with latest notifications",
+    "loading": "Loading notifications...",
+    "markAllRead": "Mark All Read",
+    "empty": {
+      "title": "No Notifications",
+      "message": "You're all caught up! No new notifications."
+    },
+    "types": {
+      "EventApproved": "Event Approved",
+      "PayoutProcessed": "Payout Processed",
+      "OrderSuccess": "Order Success",
+      "EventManagerNewEvent": "New Event",
+      "EventManagerUpdateEvent": "Event Updated",
+      "EventManagerNewPost": "New Post",
+      "AdminNewEvent": "Admin: New Event",
+      "EventApprovedByAdmin": "Event Approved",
+      "EventRejectedByAdmin": "Event Rejected",
+      "AdminNewReport": "New Report",
+      "WithdrawalRequested": "Withdrawal Requested",
+      "WithdrawalApproved": "Withdrawal Approved",
+      "WithdrawalRejected": "Withdrawal Rejected",
+      "AdminWithdrawalRequest": "Admin: Withdrawal Request",
+      "Other": "Notification"
+    },
     "noNotifications": "No notifications",
     "markAsRead": "Mark as Read",
     "markAllAsRead": "Mark All as Read"
+  },
+  "qrScanner": {
+    "title": "QR Scanner",
+    "subtitle": "Scan QR code to check in",
+    "instruction": "Point your camera at the QR code",
+    "scanSuccess": "QR code scanned successfully",
+    "scanError": "Failed to scan QR code",
+    "invalidCode": "Invalid QR code",
+    "alreadyUsed": "This ticket has already been used",
+    "notFound": "Ticket not found",
+    "checkInSuccess": "Check-in successful!",
+    "checkInError": "Check-in failed",
+    "cameraPermission": "Camera permission is required to scan QR codes"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account information",
+    "loading": "Loading profile...",
+    "updating": "Updating profile...",
+    "uploadingAvatar": "Uploading...",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "dateOfBirth": "Date of Birth",
+    "gender": {
+      "label": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other",
+      "unknown": "Prefer not to say"
+    },
+    "location": "Location",
+    "avatar": {
+      "title": "Profile Picture",
+      "change": "Change Avatar",
+      "selectSource": "Select Image Source",
+      "camera": "Take Photo",
+      "gallery": "Choose from Gallery",
+      "uploadSuccess": "Avatar updated successfully",
+      "uploadError": "Failed to upload avatar"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "changePassword": "Change Password", 
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile",
+    "basicInfo": "Basic Information",
+    "additionalInfo": "Additional Information",
+    "accountInfo": "Account Information",
+    "username": "Username",
+    "accountId": "Account ID",
+    "joinedDate": "Joined Date",
+    "collaborator": "Collaborator",
+    "logoutTitle": "Logout",
+    "logoutMessage": "Are you sure you want to logout?",
+    "selectGender": "Select Gender",
+    "notProvided": "Not provided",
+    "enterFullName": "Enter full name",
+    "enterEmail": "Enter email",
+    "enterPhone": "Enter phone number",
+    "enterDateOfBirth": "YYYY-MM-DD",
+    "enterLocation": "Enter your location",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "updateProfile": "Update Profile",
+    "profileUpdated": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully",
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email format",
+      "invalidPhone": "Invalid phone number",
+      "genderRequired": "Gender is required"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your app experience",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the app",
+      "english": "English",
+      "vietnamese": "Tiếng Việt"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Choose how the app looks",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage how you receive notifications",
+      "push": "Push Notifications",
+      "email": "Email Notifications",
+      "sms": "SMS Notifications"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "profileVisibility": "Profile Visibility",
+      "showOnlineStatus": "Show Online Status"
+    },
+    "about": {
+      "title": "About",
+      "version": "Version",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "support": "Support"
+    },
+    "advanced": {
+      "title": "Advanced"
+    },
+    "reset": {
+      "title": "Reset Settings",
+      "description": "Reset all settings to default values",
+      "message": "Are you sure you want to reset all settings to default? This action cannot be undone.",
+      "confirm": "Reset"
+    },
+    "appInfo": {
+      "version": "Version",
+      "buildNumber": "Build"
+    },
+    "errors": {
+      "updateFailed": "Failed to update settings",
+      "resetFailed": "Failed to reset settings"
+    },
+    "messages": {
+      "themeUpdated": "Theme updated successfully",
+      "resetSuccess": "Settings reset successfully"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "subtitle": "Update your account password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "changeButton": "Change Password",
+    "changing": "Changing password...",
+    "success": "Password changed successfully",
+    "error": "Failed to change password",
+    "currentPasswordRequired": "Current password is required",
+    "newPasswordRequired": "New password is required",
+    "passwordMismatch": "New passwords do not match",
+    "weakPassword": "Password must be at least 8 characters long",
+    "description": "For your security, please enter your current password and create a new one.",
+    "forAccount": "For account",
+    "passwordsMatch": "Passwords match",
+    "passwordsDontMatch": "Passwords do not match",
+    "placeholders": {
+      "currentPassword": "Enter your current password",
+      "newPassword": "Enter your new password",
+      "confirmPassword": "Confirm your new password"
+    },
+    "requirements": {
+      "title": "Password Requirements",
+      "length": "At least 8 characters",
+      "uppercase": "At least one uppercase letter (A-Z)",
+      "lowercase": "At least one lowercase letter (a-z)", 
+      "number": "At least one number (0-9)",
+      "special": "At least one special character (!@#$%^&*)"
+    },
+    "errors": {
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "passwordRequirements": "Password must meet all requirements",
+      "passwordMismatch": "Passwords do not match",
+      "samePassword": "New password must be different from current password",
+      "changeFailed": "Failed to change password",
+      "currentPasswordIncorrect": "Current password is incorrect",
+      "accountNotFound": "Account not found",
+      "serverError": "Server error occurred while changing password"
+    },
+    "messages": {
+      "changeSuccess": "Password changed successfully"
+    }
   },
   "forgotPassword": {
     "title": "Forgot Password",
@@ -205,141 +494,6 @@
     },
     "messages": {
       "updateSuccess": "Profile updated successfully"
-    }
-  },
-  "changePassword": {
-    "title": "Change Password",
-    "description": "For your security, please enter your current password and create a new one.",
-    "forAccount": "For account",
-    "currentPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm New Password",
-    "changeButton": "Change Password",
-    "passwordsMatch": "Passwords match",
-    "passwordsDontMatch": "Passwords do not match",
-    "placeholders": {
-      "currentPassword": "Enter your current password",
-      "newPassword": "Enter your new password",
-      "confirmPassword": "Confirm your new password"
-    },
-    "requirements": {
-      "title": "Password Requirements",
-      "length": "At least 8 characters",
-      "uppercase": "At least one uppercase letter (A-Z)",
-      "lowercase": "At least one lowercase letter (a-z)", 
-      "number": "At least one number (0-9)",
-      "special": "At least one special character (!@#$%^&*)"
-    },
-    "errors": {
-      "currentPasswordRequired": "Current password is required",
-      "newPasswordRequired": "New password is required",
-      "passwordRequirements": "Password must meet all requirements",
-      "passwordMismatch": "Passwords do not match",
-      "samePassword": "New password must be different from current password",
-      "changeFailed": "Failed to change password",
-      "currentPasswordIncorrect": "Current password is incorrect",
-      "accountNotFound": "Account not found",
-      "serverError": "Server error occurred while changing password"
-    },
-    "messages": {
-      "changeSuccess": "Password changed successfully"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "language": {
-      "title": "Language",
-      "description": "Choose your preferred language for the app"
-    },
-    "theme": {
-      "title": "Appearance",
-      "description": "Choose how the app looks",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "description": "Manage how you receive notifications",
-      "email": {
-        "title": "Email Notifications",
-        "description": "Receive notifications via email"
-      },
-      "push": {
-        "title": "Push Notifications",
-        "description": "Receive push notifications on your device"
-      }
-    },
-    "advanced": {
-      "title": "Advanced"
-    },
-    "reset": {
-      "title": "Reset Settings",
-      "description": "Reset all settings to default values",
-      "message": "Are you sure you want to reset all settings to default? This action cannot be undone.",
-      "confirm": "Reset"
-    },
-    "appInfo": {
-      "version": "Version",
-      "buildNumber": "Build"
-    },
-    "errors": {
-      "updateFailed": "Failed to update settings",
-      "resetFailed": "Failed to reset settings"
-    },
-    "messages": {
-      "themeUpdated": "Theme updated successfully",
-      "resetSuccess": "Settings reset successfully"
-    }
-  },
-  "profile": {
-    "title": "Profile",
-    "basicInfo": "Basic Information",
-    "additionalInfo": "Additional Information",
-    "accountInfo": "Account Information",
-    "personalInfo": "Personal Information",
-    "fullName": "Full Name",
-    "email": "Email",
-    "phone": "Phone",
-    "gender": "Gender",
-    "dateOfBirth": "Date of Birth",
-    "location": "Location",
-    "username": "Username",
-    "accountId": "Account ID",
-    "joinedDate": "Joined Date",
-    "editProfile": "Edit Profile",
-    "changePassword": "Change Password",
-    "settings": "Settings",
-    "collaborator": "Collaborator",
-    "logoutTitle": "Logout",
-    "logoutMessage": "Are you sure you want to logout?",
-    "gender": {
-      "male": "Male",
-      "female": "Female", 
-      "other": "Other",
-      "unknown": "Unknown"
-    },
-    "selectGender": "Select Gender",
-    "notProvided": "Not provided",
-    "enterFullName": "Enter full name",
-    "enterEmail": "Enter email",
-    "enterPhone": "Enter phone number",
-    "enterDateOfBirth": "YYYY-MM-DD",
-    "enterLocation": "Enter your location",
-    "updateSuccess": "Profile updated successfully",
-    "updateError": "Failed to update profile",
-    "currentPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "updateProfile": "Update Profile",
-    "profileUpdated": "Profile updated successfully",
-    "passwordChanged": "Password changed successfully",
-    "errors": {
-      "fullNameRequired": "Full name is required",
-      "emailRequired": "Email is required",
-      "invalidEmail": "Invalid email format",
-      "invalidPhone": "Invalid phone number",
-      "genderRequired": "Gender is required"
     }
   }
 } 

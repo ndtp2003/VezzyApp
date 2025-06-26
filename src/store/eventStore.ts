@@ -1,189 +1,159 @@
 import { create } from 'zustand';
-import { Event, TicketIssuedResponse, DashboardStats, SearchFilters, PaginationParams } from '../types';
 import { apiService } from '../services/api';
+import { Event, PaginatedData, PaginationParams, ApiResponse } from '../types';
+import { handleApiError } from '../utils/errorHandler';
 
 interface EventState {
-  assignedEvents: Event[];
+  // Event data
+  events: Event[];
   selectedEvent: Event | null;
-  checkInHistory: TicketIssuedResponse[];
-  dashboardStats: DashboardStats | null;
+  
+  // Pagination
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  
+  // Loading states
   isLoading: boolean;
-  isCheckingIn: boolean;
-  searchFilters: SearchFilters;
-  pagination: PaginationParams;
+  isLoadingMore: boolean;
+  isRefreshing: boolean;
+  
+  // Error state
   error: string | null;
-}
-
-interface EventActions {
-  fetchAssignedEvents: (filters?: SearchFilters) => Promise<void>;
-  selectEvent: (event: Event) => void;
-  clearSelectedEvent: () => void;
-  checkInByQR: (qrContent: string) => Promise<boolean>;
-  fetchCheckInHistory: (eventId: string, pagination?: PaginationParams) => Promise<void>;
-  fetchDashboardStats: () => Promise<void>;
-  setSearchFilters: (filters: SearchFilters) => void;
-  setPagination: (pagination: PaginationParams) => void;
+  
+  // Actions
+  loadEvents: (refresh?: boolean) => Promise<void>;
+  loadMoreEvents: () => Promise<void>;
   refreshEvents: () => Promise<void>;
-  setLoading: (loading: boolean) => void;
-  setCheckingIn: (checking: boolean) => void;
-  setError: (error: string | null) => void;
+  setSelectedEvent: (event: Event | null) => void;
   clearError: () => void;
+  reset: () => void;
 }
 
-export type EventStore = EventState & EventActions;
+const DEFAULT_PAGE_SIZE = 20;
 
-export const useEventStore = create<EventStore>((set, get) => ({
-  // State
-  assignedEvents: [],
+export const useEventStore = create<EventState>((set, get) => ({
+  // Initial state
+  events: [],
   selectedEvent: null,
-  checkInHistory: [],
-  dashboardStats: null,
+  currentPage: 1,
+  totalPages: 0,
+  totalItems: 0,
+  hasNextPage: false,
+  hasPreviousPage: false,
   isLoading: false,
-  isCheckingIn: false,
-  searchFilters: {},
-  pagination: {
-    page: 1,
-    limit: 20,
-    sortBy: 'startDate',
-    sortOrder: 'desc',
-  },
+  isLoadingMore: false,
+  isRefreshing: false,
   error: null,
 
-  // Actions
-  fetchAssignedEvents: async (filters?: SearchFilters) => {
+  // Load events with pagination
+  loadEvents: async (refresh = false) => {
+    const currentState = get();
+    
+    if (refresh) {
+      set({ 
+        isRefreshing: true, 
+        error: null,
+        currentPage: 1 
+      });
+    } else {
+      set({ 
+        isLoading: true, 
+        error: null 
+      });
+    }
+
     try {
-      set({ isLoading: true, error: null });
-      
-      const response = await apiService.getAssignedEvents(filters);
+      const response: ApiResponse<Event[]> = await apiService.getAssignedEvents();
       
       if (response.flag) {
         set({
-          assignedEvents: response.data,
+          events: response.data,
           isLoading: false,
+          isRefreshing: false,
+          error: null,
         });
       } else {
         throw new Error(response.message);
       }
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
       set({
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch events',
+        isRefreshing: false,
+        error: errorMessage,
       });
-      throw error;
     }
   },
 
-  selectEvent: (event: Event) => {
+  // Load more events (for pagination)
+  loadMoreEvents: async () => {
+    const currentState = get();
+    
+    if (!currentState.hasNextPage || currentState.isLoadingMore) {
+      return;
+    }
+
+    set({ isLoadingMore: true, error: null });
+
+    try {
+      const pagination: PaginationParams = {
+        page: currentState.currentPage + 1,
+        pageSize: DEFAULT_PAGE_SIZE,
+      };
+
+      const response: ApiResponse<Event[]> = await apiService.getAssignedEvents();
+      
+      if (response.flag) {
+        set({
+          events: [...currentState.events, ...response.data],
+          currentPage: currentState.currentPage + 1,
+          isLoadingMore: false,
+          error: null,
+        });
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error: any) {
+      const errorMessage = handleApiError(error);
+      set({
+        isLoadingMore: false,
+        error: errorMessage,
+      });
+    }
+  },
+
+  // Refresh events
+  refreshEvents: async () => {
+    await get().loadEvents(true);
+  },
+
+  // Set selected event
+  setSelectedEvent: (event: Event | null) => {
     set({ selectedEvent: event });
   },
 
-  clearSelectedEvent: () => {
-    set({ selectedEvent: null, checkInHistory: [] });
-  },
-
-  checkInByQR: async (qrContent: string) => {
-    try {
-      set({ isCheckingIn: true, error: null });
-      
-      const response = await apiService.checkInByQR({ qrContent });
-      
-      if (response.flag) {
-        // Refresh dashboard stats after successful check-in
-        get().fetchDashboardStats();
-        
-        // Refresh check-in history if we have a selected event
-        const { selectedEvent } = get();
-        if (selectedEvent) {
-          get().fetchCheckInHistory(selectedEvent.eventId);
-        }
-        
-        set({ isCheckingIn: false });
-        return true;
-      } else {
-        set({ 
-          isCheckingIn: false,
-          error: response.message 
-        });
-        return false;
-      }
-    } catch (error) {
-      set({
-        isCheckingIn: false,
-        error: error instanceof Error ? error.message : 'Check-in failed',
-      });
-      return false;
-    }
-  },
-
-  fetchCheckInHistory: async (eventId: string, pagination?: PaginationParams) => {
-    try {
-      set({ isLoading: true, error: null });
-      
-      const paginationParams = pagination || get().pagination;
-      const response = await apiService.getCheckinHistory(eventId, paginationParams);
-      
-      if (response.flag) {
-        set({
-          checkInHistory: response.data.data,
-          pagination: {
-            ...paginationParams,
-            page: response.data.pagination.page,
-          },
-          isLoading: false,
-        });
-      } else {
-        throw new Error(response.message);
-      }
-    } catch (error) {
-      set({
-        isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch check-in history',
-      });
-      throw error;
-    }
-  },
-
-  fetchDashboardStats: async () => {
-    try {
-      const response = await apiService.getDashboardStats();
-      
-      if (response.flag) {
-        set({ dashboardStats: response.data });
-      } else {
-        console.error('Failed to fetch dashboard stats:', response.message);
-      }
-    } catch (error) {
-      console.error('Failed to fetch dashboard stats:', error);
-      // Don't set error state for dashboard stats as it's not critical
-    }
-  },
-
-  setSearchFilters: (filters: SearchFilters) => {
-    set({ searchFilters: filters });
-  },
-
-  setPagination: (pagination: PaginationParams) => {
-    set({ pagination });
-  },
-
-  refreshEvents: async () => {
-    const { searchFilters } = get();
-    await get().fetchAssignedEvents(searchFilters);
-  },
-
-  setLoading: (loading: boolean) => {
-    set({ isLoading: loading });
-  },
-
-  setCheckingIn: (checking: boolean) => {
-    set({ isCheckingIn: checking });
-  },
-
-  setError: (error: string | null) => {
-    set({ error });
-  },
-
+  // Clear error
   clearError: () => {
     set({ error: null });
+  },
+
+  // Reset store
+  reset: () => {
+    set({
+      events: [],
+      selectedEvent: null,
+      currentPage: 1,
+      totalPages: 0,
+      totalItems: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+      isLoading: false,
+      isLoadingMore: false,
+      isRefreshing: false,
+      error: null,
+    });
   },
 })); 

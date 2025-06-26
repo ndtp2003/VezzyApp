@@ -28,7 +28,20 @@
     "LOGIN_ERROR": "Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại.",
     "ACCOUNT_NOT_FOUND": "Không tìm thấy tài khoản. Vui lòng kiểm tra địa chỉ email.",
     "INVALID_OR_EXPIRED_CODE": "Mã xác thực không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu mã mới.",
-    "PASSWORD_RESET_ERROR": "Có lỗi xảy ra khi xử lý yêu cầu của bạn. Vui lòng thử lại."
+    "PASSWORD_RESET_ERROR": "Có lỗi xảy ra khi xử lý yêu cầu của bạn. Vui lòng thử lại.",
+    "network": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
+    "unauthorized": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
+    "server": "Lỗi máy chủ. Vui lòng thử lại sau.",
+    "validation": "Vui lòng kiểm tra thông tin nhập và thử lại.",
+    "unknown": "Đã xảy ra lỗi không mong muốn.",
+    "accountNotFound": "Không tìm thấy tài khoản",
+    "invalidCredentials": "Tên đăng nhập hoặc mật khẩu không đúng",
+    "invalidOrExpiredCode": "Mã xác thực không hợp lệ hoặc đã hết hạn",
+    "ticketNotFound": "Không tìm thấy vé",
+    "ticketAlreadyUsed": "Vé đã được sử dụng",
+    "updateFailed": "Cập nhật thất bại",
+    "logCreationFailed": "Không thể tạo log",
+    "checkinError": "Check-in thất bại"
   },
   "checkin": {
     "scanQR": "Quét mã QR",
@@ -54,8 +67,8 @@
     "uploadingAvatar": "Đang tải ảnh đại diện...",
     "updatingSettings": "Đang cập nhật cài đặt...",
     "retry": "Thử lại",
-    "cancel": "Hủy",
-    "ok": "OK",
+    "cancel": "Hủy bỏ",
+    "ok": "Đồng ý",
     "yes": "Có",
     "no": "Không",
     "save": "Lưu",
@@ -70,7 +83,19 @@
     "filter": "Lọc",
     "refresh": "Làm mới",
     "logout": "Đăng xuất",
-    "notAvailable": "Không có sẵn"
+    "notAvailable": "Không có sẵn",
+    "loadingMore": "Đang tải thêm...",
+    "close": "Đóng",
+    "previous": "Trước đó",
+    "skip": "Bỏ qua",
+    "continue": "Tiếp tục",
+    "select": "Chọn",
+    "clear": "Xóa",
+    "apply": "Áp dụng",
+    "reset": "Đặt lại",
+    "submit": "Gửi",
+    "required": "Bắt buộc",
+    "createdBy": "Tạo bởi"
   },
   "navigation": {
     "home": "Trang chủ",
@@ -87,15 +112,54 @@
     "totalEvents": "Tổng số sự kiện",
     "totalCheckins": "Tổng số check-in",
     "todayCheckins": "Check-in hôm nay",
-    "quickActions": "Thao tác nhanh",
-    "recentActivity": "Hoạt động gần đây",
+    "quickActions": {
+      "title": "Thao tác nhanh",
+      "scanQR": "Quét mã QR",
+      "viewEvents": "Xem sự kiện",
+      "viewNews": "Xem tin tức",
+      "settings": "Cài đặt"
+    },
+    "recentActivity": {
+      "title": "Hoạt động gần đây",
+      "noActivity": "Không có hoạt động gần đây"
+    },
+    "stats": {
+      "totalEvents": "Tổng số sự kiện",
+      "totalCheckIns": "Tổng số check-in",
+      "todayCheckIns": "Check-in hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này"
+    },
     "viewAllEvents": "Xem tất cả sự kiện",
     "scanQRCode": "Quét mã QR"
   },
   "events": {
     "title": "Sự kiện của tôi",
+    "subtitle": "Quản lý các sự kiện được giao",
+    "loading": "Đang tải sự kiện...",
     "searchPlaceholder": "Tìm kiếm sự kiện...",
     "noEvents": "Không tìm thấy sự kiện",
+    "empty": {
+      "title": "Không Có Sự Kiện",
+      "message": "Bạn chưa được giao sự kiện nào tại thời điểm này."
+    },
+    "details": {
+      "title": "Chi Tiết Sự Kiện",
+      "description": "Mô tả",
+      "startTime": "Thời gian bắt đầu",
+      "endTime": "Thời gian kết thúc",
+      "location": "Địa điểm",
+      "capacity": "Sức chứa",
+      "status": "Trạng thái",
+      "checkInHistory": "Lịch sử check-in",
+      "scanQR": "Quét mã QR"
+    },
+    "status": {
+      "approved": "Đã duyệt",
+      "pending": "Chờ duyệt",
+      "cancelled": "Đã hủy",
+      "completed": "Hoàn thành"
+    },
     "eventDetails": "Chi tiết sự kiện",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
@@ -105,19 +169,81 @@
     "registered": "Đã đăng ký",
     "checkInTab": "Check-in",
     "historyTab": "Lịch sử",
-    "totalCheckIns": "Tổng số check-in"
+    "totalCheckIns": "Tổng số check-in",
+    "checkInHistory": "Lịch sử check-in",
+    "checkInHistoryDesc": "Xem lịch sử check-in của sự kiện này",
+    "faceCheckIn": "Check-in bằng khuôn mặt",
+    "faceCheckInDesc": "Sử dụng nhận diện khuôn mặt để check-in",
+    "tapToSelect": "Nhấn để chọn"
   },
   "news": {
     "title": "Tin tức",
     "noNews": "Không có tin tức",
     "readMore": "Đọc thêm",
-    "publishedOn": "Đăng vào"
+    "publishedOn": "Đăng vào",
+    "subtitle": "Tin tức và cập nhật mới nhất",
+    "loading": "Đang tải tin tức...",
+    "eventRelated": "Liên Quan Sự Kiện",
+    "empty": {
+      "title": "Không Có Tin Tức",
+      "message": "Hiện tại không có bài báo tin tức nào."
+    },
+    "status": {
+      "approved": "Đã Xuất Bản",
+      "pending": "Chờ Duyệt",
+      "rejected": "Đã Từ Chối",
+      "unknown": "Không Xác Định"
+    },
+    "details": {
+      "title": "Chi Tiết Tin Tức",
+      "author": "Tác giả",
+      "publishedAt": "Xuất bản",
+      "updatedAt": "Cập nhật",
+      "content": "Nội dung"
+    }
   },
   "notifications": {
     "title": "Thông báo",
     "noNotifications": "Không có thông báo",
     "markAsRead": "Đánh dấu đã đọc",
-    "markAllAsRead": "Đánh dấu tất cả đã đọc"
+    "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "subtitle": "Cập nhật thông báo mới nhất",
+    "loading": "Đang tải thông báo...",
+    "markAllRead": "Đánh Dấu Tất Cả Đã Đọc",
+    "empty": {
+      "title": "Không Có Thông Báo",
+      "message": "Bạn đã xem hết! Không có thông báo mới."
+    },
+    "types": {
+      "EventApproved": "Sự Kiện Được Duyệt",
+      "PayoutProcessed": "Thanh Toán Đã Xử Lý",
+      "OrderSuccess": "Đặt Hàng Thành Công",
+      "EventManagerNewEvent": "Sự Kiện Mới",
+      "EventManagerUpdateEvent": "Sự Kiện Đã Cập Nhật",
+      "EventManagerNewPost": "Bài Viết Mới",
+      "AdminNewEvent": "Admin: Sự Kiện Mới",
+      "EventApprovedByAdmin": "Sự Kiện Được Duyệt",
+      "EventRejectedByAdmin": "Sự Kiện Bị Từ Chối",
+      "AdminNewReport": "Báo Cáo Mới",
+      "WithdrawalRequested": "Yêu Cầu Rút Tiền",
+      "WithdrawalApproved": "Rút Tiền Được Duyệt",
+      "WithdrawalRejected": "Rút Tiền Bị Từ Chối",
+      "AdminWithdrawalRequest": "Admin: Yêu Cầu Rút Tiền",
+      "Other": "Thông Báo"
+    }
+  },
+  "qrScanner": {
+    "title": "Máy Quét QR",
+    "subtitle": "Quét mã QR để check-in",
+    "instruction": "Hướng camera vào mã QR",
+    "scanSuccess": "Quét mã QR thành công",
+    "scanError": "Không thể quét mã QR",
+    "invalidCode": "Mã QR không hợp lệ",
+    "alreadyUsed": "Vé này đã được sử dụng",
+    "notFound": "Không tìm thấy vé",
+    "checkInSuccess": "Check-in thành công!",
+    "checkInError": "Check-in thất bại",
+    "cameraPermission": "Cần quyền truy cập camera để quét mã QR"
   },
   "forgotPassword": {
     "title": "Quên mật khẩu",
@@ -247,9 +373,11 @@
   },
   "settings": {
     "title": "Cài đặt",
+    "subtitle": "Tùy chỉnh trải nghiệm ứng dụng",
     "language": {
       "title": "Ngôn ngữ",
-      "description": "Chọn ngôn ngữ ưa thích cho ứng dụng"
+      "english": "English",
+      "vietnamese": "Tiếng Việt"
     },
     "theme": {
       "title": "Giao diện",
@@ -268,7 +396,20 @@
       "push": {
         "title": "Thông báo đẩy",
         "description": "Nhận thông báo đẩy trên thiết bị của bạn"
-      }
+      },
+      "sms": "Thông Báo SMS"
+    },
+    "privacy": {
+      "title": "Quyền Riêng Tư",
+      "profileVisibility": "Hiển Thị Hồ Sơ",
+      "showOnlineStatus": "Hiển Thị Trạng Thái Online"
+    },
+    "about": {
+      "title": "Giới Thiệu",
+      "version": "Phiên Bản",
+      "termsOfService": "Điều Khoản Dịch Vụ",
+      "privacyPolicy": "Chính Sách Bảo Mật",
+      "support": "Hỗ Trợ"
     },
     "advanced": {
       "title": "Nâng cao"
@@ -294,31 +435,28 @@
   },
   "profile": {
     "title": "Hồ sơ",
-    "basicInfo": "Thông tin cơ bản",
-    "additionalInfo": "Thông tin bổ sung",
-    "accountInfo": "Thông tin tài khoản",
-    "personalInfo": "Thông tin cá nhân",
-    "fullName": "Họ và tên",
-    "email": "Email",
-    "phone": "Số điện thoại",
-    "gender": "Giới tính",
-    "dateOfBirth": "Ngày sinh",
-    "location": "Địa chỉ",
-    "username": "Tên đăng nhập",
-    "accountId": "ID tài khoản",
-    "joinedDate": "Ngày tham gia",
-    "editProfile": "Chỉnh sửa hồ sơ",
-    "changePassword": "Đổi mật khẩu",
-    "settings": "Cài đặt",
+    "subtitle": "Quản lý thông tin tài khoản",
+    "loading": "Đang tải hồ sơ...",
+    "updating": "Đang cập nhật hồ sơ...",
+    "uploadingAvatar": "Đang tải lên...",
     "collaborator": "Cộng tác viên",
-    "logoutTitle": "Đăng xuất",
-    "logoutMessage": "Bạn có chắc chắn muốn đăng xuất?",
-    "gender": {
-      "male": "Nam",
-      "female": "Nữ",
-      "other": "Khác", 
-      "unknown": "Không xác định"
-    },
+    "personalInfo": "Thông Tin Cá Nhân",
+    "basicInfo": "Thông Tin Cơ Bản",
+    "additionalInfo": "Thông Tin Bổ Sung",
+    "accountInfo": "Thông Tin Tài Khoản",
+    "fullName": "Họ và Tên",
+    "email": "Email",
+    "phone": "Số Điện Thoại",
+    "username": "Tên đăng nhập",
+    "accountId": "ID Tài Khoản",
+    "dateOfBirth": "Ngày Sinh",
+    "location": "Địa Chỉ",
+    "joinedDate": "Ngày tham gia",
+    "editProfile": "Chỉnh Sửa Hồ Sơ",
+    "changePassword": "Đổi Mật Khẩu",
+    "settings": "Cài Đặt",
+    "logoutTitle": "Xác nhận đăng xuất",
+    "logoutMessage": "Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?",
     "selectGender": "Chọn giới tính",
     "notProvided": "Chưa cung cấp",
     "enterFullName": "Nhập họ và tên",
@@ -326,20 +464,42 @@
     "enterPhone": "Nhập số điện thoại",
     "enterDateOfBirth": "YYYY-MM-DD",
     "enterLocation": "Nhập địa chỉ của bạn",
-    "updateSuccess": "Cập nhật hồ sơ thành công",
-    "updateError": "Cập nhật hồ sơ thất bại",
     "currentPassword": "Mật khẩu hiện tại",
     "newPassword": "Mật khẩu mới",
     "confirmPassword": "Xác nhận mật khẩu",
     "updateProfile": "Cập nhật hồ sơ",
-    "profileUpdated": "Cập nhật hồ sơ thành công",
-    "passwordChanged": "Đổi mật khẩu thành công",
+    "profileUpdated": "Hồ sơ đã được cập nhật thành công",
+    "passwordChanged": "Mật khẩu đã được thay đổi thành công",
+    "gender": {
+      "label": "Giới Tính",
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác",
+      "unknown": "Không muốn tiết lộ"
+    },
+    "avatar": {
+      "title": "Ảnh Đại Diện",
+      "change": "Thay Đổi Avatar",
+      "selectSource": "Chọn Nguồn Ảnh",
+      "camera": "Chụp Ảnh",
+      "gallery": "Chọn Từ Thư Viện",
+      "uploadSuccess": "Cập nhật avatar thành công",
+      "uploadError": "Không thể tải lên avatar"
+    },
+    "actions": {
+      "editProfile": "Chỉnh Sửa Hồ Sơ",
+      "changePassword": "Đổi Mật Khẩu",
+      "settings": "Cài Đặt",
+      "logout": "Đăng Xuất"
+    },
     "errors": {
       "fullNameRequired": "Họ và tên là bắt buộc",
       "emailRequired": "Email là bắt buộc",
       "invalidEmail": "Định dạng email không hợp lệ",
       "invalidPhone": "Số điện thoại không hợp lệ",
       "genderRequired": "Giới tính là bắt buộc"
-    }
+    },
+    "updateSuccess": "Cập nhật hồ sơ thành công",
+    "updateError": "Không thể cập nhật hồ sơ"
   }
 } 

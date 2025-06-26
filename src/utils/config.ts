@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.38.182:5000', // Backend server IP
+  BASE_URL: 'http://192.168.101.10:5000', // Backend server IP
   TIMEOUT: 30000, // Increased to 30 seconds for better reliability
   HEADERS: {
     'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const ERROR_CODES = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
 
-// API Endpoints
+// API Endpoints - Cập nhật theo backend mới
 export const API_ENDPOINTS = {
   // Authentication
   LOGIN: '/api/account/login',
@@ -69,23 +69,23 @@ export const API_ENDPOINTS = {
   UPDATE_PROFILE: '/api/account/profile',
   CHANGE_PASSWORD: '/api/account/change-password',
   
-  // Events
-  MY_EVENTS: '/api/event/collaborator/my-events',
-  EVENT_DETAIL: (eventId: string) => `/api/event/${eventId}`,
-  EVENT_STATS: (eventId: string) => `/api/event/${eventId}/stats`,
+  // Events - Cập nhật endpoint mới
+  MY_EVENTS: '/api/Event/collaborator/my-events',
+  EVENT_DETAIL: (eventId: string) => `/api/Event/${eventId}`,
+  EVENT_STATS: (eventId: string) => `/api/Event/${eventId}/stats`,
   
-  // Check-in
-  CHECKIN_MOBILE: '/api/ticketissued/checkinMobile',
-  CHECKIN_HISTORY: (eventId: string) => `/api/ticketissued/event/${eventId}/checkin-history`,
+  // Check-in - Cập nhật endpoint mới
+  CHECKIN_MOBILE: '/api/TicketIssued/checkinMobile',
+  CHECKIN_HISTORY: (eventId: string) => `/api/TicketIssued/event/${eventId}/checkin-history`,
   
-  // News
-  NEWS_ACTIVE: '/api/news/active',
-  NEWS_DETAIL: (newsId: string) => `/api/news/${newsId}`,
+  // News - Cập nhật endpoint mới (PUBLIC)
+  NEWS_ACTIVE: '/api/News/active',
+  NEWS_DETAIL: (newsId: string) => `/api/News/${newsId}`,
   
-  // Notifications
-  USER_NOTIFICATIONS: (userId: string) => `/api/notification/user/${userId}`,
-  MARK_NOTIFICATION_READ: (notificationId: string) => `/api/notification/${notificationId}/read`,
-  MARK_ALL_NOTIFICATIONS_READ: '/api/notification/mark-all-read',
+  // Notifications - Cập nhật endpoint mới
+  USER_NOTIFICATIONS: (userId: string) => `/api/Notification/user/${userId}`,
+  MARK_NOTIFICATION_READ: (notificationId: string) => `/api/Notification/${notificationId}/read`,
+  MARK_ALL_NOTIFICATIONS_READ: (userId: string) => `/api/Notification/user/${userId}/read-all`,
   
   // Settings
   USER_CONFIG: (userId: string) => `/api/user/${userId}/config`,

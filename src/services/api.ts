@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { API_CONFIG } from '../utils/config';
 import {
   ApiResponse,
+  PaginatedData,
   LoginRequest,
   AuthResponseDto,
   RefreshTokenRequest,
@@ -13,13 +14,12 @@ import {
   AvatarUploadResponse,
   Event,
   CheckInRequest,
-  TicketIssuedResponse,
+  TicketIssued,
   News,
   Notification,
   UserSettings,
   User,
   DashboardStats,
-  PaginatedResponse,
   SearchFilters,
   PaginationParams
 } from '../types';
@@ -46,7 +46,8 @@ class ApiService {
           '/api/account/login',
           '/api/account/refresh-token',
           '/api/account/forgot-password',
-          '/api/account/reset-password'
+          '/api/account/reset-password',
+          '/api/News/active' // News API is public
         ].some(endpoint => config.url?.includes(endpoint));
 
         if (!skipTokenValidation) {
@@ -141,84 +142,75 @@ class ApiService {
     return response.data;
   }
 
-  // Events endpoints
-  async getAssignedEvents(filters?: SearchFilters): Promise<ApiResponse<Event[]>> {
-    const params = new URLSearchParams();
-    if (filters?.query) params.append('search', filters.query);
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
-    if (filters?.dateTo) params.append('dateTo', filters.dateTo);
-    if (filters?.location) params.append('location', filters.location);
-
-    const response = await this.axiosInstance.get(`/api/event/collaborator/my-events?${params}`);
+  // Events endpoints - Cập nhật theo API mới
+  async getAssignedEvents(): Promise<ApiResponse<Event[]>> {
+    const response = await this.axiosInstance.get('/api/Event/collaborator/my-events');
     return response.data;
   }
 
   async getEventById(eventId: string): Promise<ApiResponse<Event>> {
-    const response = await this.axiosInstance.get(`/api/event/${eventId}`);
+    const response = await this.axiosInstance.get(`/api/Event/${eventId}`);
     return response.data;
   }
 
   async getEventStats(eventId: string): Promise<ApiResponse<any>> {
-    const response = await this.axiosInstance.get(`/api/event/${eventId}/stats`);
+    const response = await this.axiosInstance.get(`/api/Event/${eventId}/stats`);
     return response.data;
   }
 
-  // Check-in endpoints
+  // Check-in endpoints - Cập nhật theo API mới
   async checkInByQR(request: CheckInRequest): Promise<ApiResponse<boolean>> {
-    const response = await this.axiosInstance.post('/api/ticketissued/checkinMobile', request);
+    const response = await this.axiosInstance.post('/api/TicketIssued/checkinMobile', request);
     return response.data;
   }
 
   async getCheckinHistory(
     eventId: string, 
     pagination?: PaginationParams
-  ): Promise<ApiResponse<PaginatedResponse<TicketIssuedResponse>>> {
+  ): Promise<ApiResponse<PaginatedData<TicketIssued>>> {
     const params = new URLSearchParams();
-    if (pagination?.page) params.append('page', pagination.page.toString());
-    if (pagination?.limit) params.append('limit', pagination.limit.toString());
-    if (pagination?.sortBy) params.append('sortBy', pagination.sortBy);
-    if (pagination?.sortOrder) params.append('sortOrder', pagination.sortOrder);
+    if (pagination?.page) params.append('Page', pagination.page.toString());
+    if (pagination?.pageSize) params.append('PageSize', pagination.pageSize.toString());
 
-    const response = await this.axiosInstance.get(`/api/ticketissued/event/${eventId}/checkin-history?${params}`);
+    const response = await this.axiosInstance.get(`/api/TicketIssued/event/${eventId}/checkin-history?${params}`);
     return response.data;
   }
 
-  // News endpoints
-  async getActiveNews(pagination?: PaginationParams): Promise<ApiResponse<PaginatedResponse<News>>> {
+  // News endpoints - Cập nhật theo API mới (PUBLIC)
+  async getActiveNews(pagination?: PaginationParams): Promise<ApiResponse<PaginatedData<News>>> {
     const params = new URLSearchParams();
-    if (pagination?.page) params.append('page', pagination.page.toString());
-    if (pagination?.limit) params.append('limit', pagination.limit.toString());
+    if (pagination?.page) params.append('Page', pagination.page.toString());
+    if (pagination?.pageSize) params.append('PageSize', pagination.pageSize.toString());
 
-    const response = await this.axiosInstance.get(`/api/news/active?${params}`);
+    const response = await this.axiosInstance.get(`/api/News/active?${params}`);
     return response.data;
   }
 
   async getNewsById(newsId: string): Promise<ApiResponse<News>> {
-    const response = await this.axiosInstance.get(`/api/news/${newsId}`);
+    const response = await this.axiosInstance.get(`/api/News/${newsId}`);
     return response.data;
   }
 
-  // Notifications endpoints
+  // Notifications endpoints - Cập nhật theo API mới
   async getUserNotifications(
     userId: string,
     pagination?: PaginationParams
-  ): Promise<ApiResponse<PaginatedResponse<Notification>>> {
+  ): Promise<ApiResponse<PaginatedData<Notification>>> {
     const params = new URLSearchParams();
     if (pagination?.page) params.append('page', pagination.page.toString());
-    if (pagination?.limit) params.append('pageSize', pagination.limit.toString());
+    if (pagination?.pageSize) params.append('pageSize', pagination.pageSize.toString());
 
-    const response = await this.axiosInstance.get(`/api/notification/user/${userId}?${params}`);
+    const response = await this.axiosInstance.get(`/api/Notification/user/${userId}?${params}`);
     return response.data;
   }
 
   async markNotificationAsRead(notificationId: string): Promise<ApiResponse<boolean>> {
-    const response = await this.axiosInstance.put(`/api/notification/${notificationId}/read`);
+    const response = await this.axiosInstance.put(`/api/Notification/${notificationId}/read`);
     return response.data;
   }
 
-  async markAllNotificationsAsRead(): Promise<ApiResponse<boolean>> {
-    const response = await this.axiosInstance.put('/api/notification/mark-all-read');
+  async markAllNotificationsAsRead(userId: string): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.put(`/api/Notification/user/${userId}/read-all`);
     return response.data;
   }
 

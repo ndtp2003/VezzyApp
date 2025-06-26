@@ -16,6 +16,7 @@ export const borderRadius = {
   lg: 16,
   xl: 24,
   round: 50,
+  full: 9999, // For perfect circles
 };
 
 export const shadows = {

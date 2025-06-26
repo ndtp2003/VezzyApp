@@ -6,6 +6,16 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
+// Pagination structure từ backend mới
+export interface PaginatedData<T> {
+  items: T[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 // Enums from Backend
 export enum Role {
   Admin = 0,
@@ -20,6 +30,30 @@ export enum Gender {
   Female = 1,
   Other = 2,
   Unknown = 3,
+}
+
+export enum NewsStatus {
+  Pending = 0,
+  Approved = 1,
+  Rejected = 2,
+}
+
+export enum NotificationType {
+  EventApproved = 0,
+  PayoutProcessed = 1,
+  OrderSuccess = 2,
+  EventManagerNewEvent = 3,
+  EventManagerUpdateEvent = 4,
+  EventManagerNewPost = 5,
+  AdminNewEvent = 6,
+  EventApprovedByAdmin = 7,
+  EventRejectedByAdmin = 8,
+  AdminNewReport = 9,
+  WithdrawalRequested = 10,
+  WithdrawalApproved = 11,
+  WithdrawalRejected = 12,
+  AdminWithdrawalRequest = 13,
+  Other = 14,
 }
 
 // Backend Classes Mapping
@@ -182,19 +216,17 @@ export interface AvatarUploadResponse {
   avatarUrl: string;
 }
 
-// Event Types
+// Event Types - Cập nhật theo API mới
 export interface Event {
-  eventId: string;
+  eventId: string; // Guid
   eventName: string;
   eventDescription: string;
-  eventStartDate: string;
-  eventEndDate: string;
-  eventLocation: string;
-  capacity: number;
-  status: 'Draft' | 'PendingApproval' | 'Approved' | 'Active' | 'Completed' | 'Cancelled';
-  bannerImage?: string;
+  startAt: string; // DateTime
+  endAt: string; // DateTime
+  isApproved: string; // "Approved", "Pending", etc.
+  isCancelled: boolean;
   createdBy: string;
-  createdAt: string;
+  categoryId: string; // Guid
 }
 
 export interface EventStats {
@@ -203,16 +235,17 @@ export interface EventStats {
   lastCheckIn?: string;
 }
 
-// Ticket & Check-in Types
+// Ticket & Check-in Types - Cập nhật theo API mới
 export interface TicketIssued {
-  id: string;
-  ticketCode: string;
+  issuedId: string; // Guid
+  ticketId: string;
   eventId: string;
-  userId: string;
-  status: 'active' | 'used' | 'expired' | 'cancelled';
-  issuedAt: string;
-  usedAt?: string;
-  qrContent: string;
+  qrCode: string;
+  used: boolean;
+  checkedInAt?: string; // nullable DateTime
+  checkedInBy?: string; // nullable accountId
+  issuedToEmail: string;
+  createdAt: string; // DateTime
 }
 
 export interface CheckInRequest {
@@ -236,29 +269,34 @@ export interface TicketIssuedResponse {
   issuedAt: string;
 }
 
-// News Types
+// News Types - Cập nhật theo API mới
 export interface News {
-  newsId: string;
-  title: string;
-  description: string;
-  content: string;
-  bannerImage?: string;
-  status: 'Active' | 'Inactive';
-  createdAt: string;
-  updatedAt: string;
+  newsId: string; // Guid
+  eventId?: string; // nullable
+  newsDescription: string;
+  newsTitle: string;
+  newsContent: string;
+  authorId: string;
+  authorName?: string; // Author name from API
+  imageUrl?: string; // nullable
+  status: NewsStatus; // Enum: Pending, Approved, Rejected
+  createdAt: string; // DateTime
+  updatedAt: string; // DateTime
 }
 
-// Notification Types
+// Notification Types - Cập nhật theo API mới
 export interface Notification {
-  notificationId: string;
+  notificationId: string; // Guid
   userId: string;
   notificationTitle: string;
   notificationMessage: string;
-  notificationType: string;
+  notificationType: NotificationType; // Enum
   isRead: boolean;
-  redirectUrl?: string;
-  createdAt: string;
-  readAt?: string;
+  redirectUrl?: string; // nullable
+  createdAt: string; // DateTime
+  createdAtVietnam: string; // DateTime in Vietnam timezone
+  readAt?: string; // nullable DateTime
+  readAtVietnam?: string; // nullable DateTime in Vietnam timezone
 }
 
 // Settings Types
@@ -384,7 +422,7 @@ export interface DashboardStats {
 // Search & Filter Types
 export interface SearchFilters {
   query?: string;
-  status?: Event['status'];
+  status?: Event['isApproved'];
   dateFrom?: string;
   dateTo?: string;
   location?: string;
@@ -392,7 +430,7 @@ export interface SearchFilters {
 
 export interface PaginationParams {
   page: number;
-  limit: number;
+  pageSize: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }

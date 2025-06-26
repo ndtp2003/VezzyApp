@@ -1,6 +1,12 @@
 import { ErrorCode, AppError } from '../types';
 
-export const handleApiError = (error: any, t: Function): string => {
+export const handleApiError = (error: any, t?: Function): string => {
+  // Fallback function if no translation function provided
+  const translate = t || ((key: string, options?: any) => {
+    // Extract the last part after the dot for fallback
+    const fallbackKey = key.split('.').pop() || key;
+    return options?.defaultValue || fallbackKey.replace(/_/g, ' ').toLowerCase();
+  });
 
   // FIRST: Check if error has a message (includes our custom errors like WRONG_ROLE)
   if (error.message) {
@@ -27,7 +33,7 @@ export const handleApiError = (error: any, t: Function): string => {
     ];
     
     if (errorKeys.includes(possibleErrorCode)) {
-      return t(`errors.${possibleErrorCode}`);
+      return translate(`errors.${possibleErrorCode}`);
     }
   }
 
@@ -38,20 +44,20 @@ export const handleApiError = (error: any, t: Function): string => {
     
     // Map specific backend messages for forgot/reset password
     if (backendMessage === 'Account not found') {
-      return t('errors.ACCOUNT_NOT_FOUND');
+      return translate('errors.ACCOUNT_NOT_FOUND');
     }
     
     if (backendMessage === 'Invalid or expired verification code') {
-      return t('errors.INVALID_OR_EXPIRED_CODE');
+      return translate('errors.INVALID_OR_EXPIRED_CODE');
     }
     
     if (backendMessage === 'An error occurred while processing password reset request. Please try again.' ||
         backendMessage === 'An error occurred while resetting password. Please try again.') {
-      return t('errors.PASSWORD_RESET_ERROR');
+      return translate('errors.PASSWORD_RESET_ERROR');
     }
     
     // Try to translate the backend message if we have a translation for it
-    const translatedMessage = t(`errors.${backendMessage}`, { defaultValue: null });
+    const translatedMessage = translate(`errors.${backendMessage}`, { defaultValue: null });
     if (translatedMessage && translatedMessage !== `errors.${backendMessage}`) {
       return translatedMessage;
     }
@@ -63,34 +69,34 @@ export const handleApiError = (error: any, t: Function): string => {
   // THIRD: Check if it's an API response error with error code (alternative structure)
   if (error.response?.data?.error) {
     const errorCode = error.response.data.error as ErrorCode;
-    return t(`errors.${errorCode}`, { defaultValue: t('errors.UNKNOWN_ERROR') });
+    return translate(`errors.${errorCode}`, { defaultValue: translate('errors.UNKNOWN_ERROR') });
   }
   
   // FOURTH: Check for specific HTTP status codes
   if (error.response?.status === 401) {
-    return t('errors.UNAUTHORIZED');
+    return translate('errors.UNAUTHORIZED');
   }
   
   if (error.response?.status === 403) {
-    return t('errors.UNAUTHORIZED');
+    return translate('errors.UNAUTHORIZED');
   }
   
   if (error.response?.status === 404) {
-    return t('errors.TICKET_NOT_FOUND');
+    return translate('errors.TICKET_NOT_FOUND');
   }
   
   if (error.response?.status >= 500) {
-    return t('errors.SERVER_ERROR');
+    return translate('errors.SERVER_ERROR');
   }
   
   // FIFTH: Network errors (only after checking message)
   if (error.code === 'NETWORK_ERROR' || (error.code === 'ECONNABORTED') || (error.code === 'ENOTFOUND') || (error.code === 'ECONNREFUSED')) {
-    return t('errors.NETWORK_ERROR');
+    return translate('errors.NETWORK_ERROR');
   }
   
   // SIXTH: Check for no response (but only if not already handled above)
   if (!error.response && !error.message) {
-    return t('errors.NETWORK_ERROR');
+    return translate('errors.NETWORK_ERROR');
   }
   
   // LAST: Return raw message or fallback
@@ -99,7 +105,7 @@ export const handleApiError = (error: any, t: Function): string => {
   }
   
   // Fallback to unknown error
-  return t('errors.UNKNOWN_ERROR');
+  return translate('errors.UNKNOWN_ERROR');
 };
 
 export const createAppError = (code: ErrorCode, message?: string, details?: any): AppError => {

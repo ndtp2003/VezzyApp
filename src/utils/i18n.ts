@@ -8,13 +8,13 @@ import vi from '../locales/vi.json';
 
 const LANGUAGE_KEY = 'app_language';
 
-// Get saved language or default to English
+// Get saved language or default to Vietnamese
 const getSavedLanguage = async (): Promise<string> => {
   try {
     const savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
-    return savedLanguage || 'en'; // Default to English
+    return savedLanguage || 'vi'; // Default to Vietnamese
   } catch {
-    return 'en';
+    return 'vi';
   }
 };
 
@@ -36,13 +36,13 @@ const resources = {
   },
 };
 
-// Initialize with English as default
+// Initialize with Vietnamese as default (suitable for Vietnamese users)
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en', // Always start with English
-    fallbackLng: 'en',
+    lng: 'vi', // Start with Vietnamese as default
+    fallbackLng: 'vi', // Fall back to Vietnamese
     debug: __DEV__, // Enable debug in development
     
     interpolation: {
@@ -72,7 +72,12 @@ i18n
 // Load saved language on app start
 export const initializeLanguage = async (): Promise<void> => {
   const savedLanguage = await getSavedLanguage();
-  i18n.changeLanguage(savedLanguage);
+  if (savedLanguage !== i18n.language) {
+    await i18n.changeLanguage(savedLanguage);
+  }
 };
+
+// Initialize language immediately
+initializeLanguage();
 
 export default i18n; 
