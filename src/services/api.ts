@@ -50,7 +50,8 @@ class ApiService {
           '/api/account/refresh-token',
           '/api/account/forgot-password',
           '/api/account/reset-password',
-          '/api/News/active' // News API is public
+          '/api/News/active', // News API is public
+          '/api/News/all-Home' // News home API is also public
         ].some(endpoint => config.url?.includes(endpoint));
 
         if (!skipTokenValidation) {
@@ -221,11 +222,7 @@ class ApiService {
 
   // News endpoints - Cập nhật theo API mới (PUBLIC)
   async getActiveNews(pagination?: PaginationParams): Promise<ApiResponse<PaginatedData<News>>> {
-    const params = new URLSearchParams();
-    if (pagination?.page) params.append('Page', pagination.page.toString());
-    if (pagination?.pageSize) params.append('PageSize', pagination.pageSize.toString());
-
-    const response = await this.axiosInstance.get(`/api/News/active?${params}`);
+    const response = await this.axiosInstance.get('/api/News/all-Home');
     return response.data;
   }
 

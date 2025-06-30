@@ -255,7 +255,8 @@
       "publishedAt": "Xuất bản",
       "updatedAt": "Cập nhật",
       "content": "Nội dung"
-    }
+    },
+    "share": "Chia sẻ tin tức"
   },
   "notifications": {
     "title": "Thông báo",

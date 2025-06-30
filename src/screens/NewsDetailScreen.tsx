@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import HTMLView from 'react-native-htmlview';
 import { News, NewsStackParamList, NewsStatus } from '../types';
 import { useNewsStore } from '../store/newsStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -67,8 +68,10 @@ const NewsDetailScreen: React.FC = () => {
     if (!news) return;
     
     try {
+      const shareUrl = `https://vezzy.com/News/${news.newsId}`;
       await Share.share({
-        message: `${news.newsTitle}\n\n${news.newsDescription}`,
+        message: `${news.newsTitle}\n\n${shareUrl}`,
+        url: shareUrl,
         title: news.newsTitle,
       });
     } catch (error) {
@@ -130,6 +133,55 @@ const NewsDetailScreen: React.FC = () => {
     
     return authorNames[authorId] || `Tác giả #${authorId.slice(0, 8)}`;
   };
+
+  // HTML styles for theme support
+  const htmlStyles = StyleSheet.create({
+    p: {
+      ...typography.body1,
+      color: currentTheme.text,
+      marginBottom: spacing.sm,
+      lineHeight: 24,
+    },
+    h1: {
+      ...typography.h4,
+      color: currentTheme.text,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    h2: {
+      ...typography.h5,
+      color: currentTheme.text,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    h3: {
+      ...typography.h6,
+      color: currentTheme.text,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    strong: {
+      color: currentTheme.text,
+      fontWeight: 'bold',
+    },
+    a: {
+      color: currentTheme.primary,
+      textDecorationLine: 'underline',
+    },
+    ul: {
+      color: currentTheme.text,
+      marginBottom: spacing.sm,
+    },
+    ol: {
+      color: currentTheme.text,
+      marginBottom: spacing.sm,
+    },
+    li: {
+      color: currentTheme.text,
+      marginBottom: spacing.xs,
+      lineHeight: 22,
+    },
+  });
 
   if (isLoading) {
     return <LoadingSpinner visible={true} message={t('common.loading')} />;
@@ -223,7 +275,10 @@ const NewsDetailScreen: React.FC = () => {
         {/* Content */}
         <View style={styles.contentSection}>
           <Text style={styles.sectionTitle}>{t('news.details.title')}</Text>
-          <Text style={styles.content}>{news.newsContent}</Text>
+                     <HTMLView
+             value={news.newsContent || '<p>Không có nội dung</p>'}
+             stylesheet={htmlStyles}
+           />
         </View>
 
         {/* Share Section */}
@@ -233,7 +288,7 @@ const NewsDetailScreen: React.FC = () => {
             onPress={handleShare}
           >
             <Icon name="share" size={24} color={currentTheme.primary} />
-            <Text style={styles.shareText}>Chia sẻ tin tức</Text>
+            <Text style={styles.shareText}>{t('news.share')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -373,11 +428,6 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     color: theme.text,
     marginBottom: spacing.md,
     fontWeight: 'bold',
-  },
-  content: {
-    ...typography.body1,
-    color: theme.text,
-    lineHeight: 26,
   },
   shareContainer: {
     marginTop: spacing.lg,
