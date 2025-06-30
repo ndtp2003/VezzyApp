@@ -41,25 +41,18 @@ const NewsDetailScreen: React.FC = () => {
   const { newsList, selectedNews, loadNewsDetail } = useNewsStore();
 
   useEffect(() => {
-    // Try to find news in store first
-    const foundNews = newsList.find(item => item.newsId === newsId);
-    if (foundNews) {
-      setNews(foundNews);
-      setIsLoading(false);
-    } else {
-      // Fetch from API to get complete news with authorName
-      const fetchNewsDetail = async () => {
-        try {
-          setIsLoading(true);
-          await loadNewsDetail(newsId);
-        } catch (error) {
-          setError(t('news.empty.message'));
-          setIsLoading(false);
-        }
-      };
-      fetchNewsDetail();
-    }
-  }, [newsId, newsList, loadNewsDetail, t]);
+    // Always fetch from API to get complete news with authorName
+    const fetchNewsDetail = async () => {
+      try {
+        setIsLoading(true);
+        await loadNewsDetail(newsId);
+      } catch (error) {
+        setError(t('news.empty.message'));
+        setIsLoading(false);
+      }
+    };
+    fetchNewsDetail();
+  }, [newsId, loadNewsDetail, t]);
 
   // Listen for selectedNews changes from store
   useEffect(() => {
@@ -190,11 +183,11 @@ const NewsDetailScreen: React.FC = () => {
 
         {/* Author and Meta Info */}
         <View style={styles.metaContainer}>
-          <View style={styles.statusContainer}>
+          <View style={styles.authorContainer}>
             <Icon name="person" size={16} color={currentTheme.primary} />
-                          <Text style={[styles.metaText, { marginLeft: 6, fontWeight: '500', color: currentTheme.text }]}>
-                {t('news.details.author')}: {getAuthorName(news.authorId, news.authorName)}
-              </Text>
+            <Text style={styles.authorText}>
+              {t('news.details.author')}: {getAuthorName(news.authorId, news.authorName)}
+            </Text>
           </View>
           <Text style={styles.metaText}>
             {t('news.details.publishedAt')}: {formatDate(news.createdAt)}

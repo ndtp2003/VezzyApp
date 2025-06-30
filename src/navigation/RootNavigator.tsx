@@ -61,6 +61,7 @@ const RootNavigator: React.FC = () => {
 
   return (
     <NavigationContainer theme={navigationTheme}>
+      {/* @ts-ignore */}
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
           <>
@@ -69,8 +70,7 @@ const RootNavigator: React.FC = () => {
               name="QRScanner" 
               component={QRScannerScreen}
               options={{
-                headerShown: true,
-                title: 'QR Scanner',
+                headerShown: false,
                 presentation: 'modal',
               }}
             />

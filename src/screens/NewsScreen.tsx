@@ -15,8 +15,9 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNewsStore } from '../store/newsStore';
 import { useAuthStore } from '../store/authStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { News, NewsStatus, NewsStackParamList, MainTabParamList } from '../types';
-import { lightTheme, darkTheme } from '../theme/colors';
+import { lightTheme, darkTheme } from '../theme';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -25,7 +26,8 @@ type NewsScreenNavigationProp = StackNavigationProp<NewsStackParamList, 'NewsLis
 const NewsScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NewsScreenNavigationProp>();
-  const isDarkMode = false; // TODO: Implement theme support
+  const { theme } = useSettingsStore();
+  const isDarkMode = theme === 'dark';
   const colors = isDarkMode ? darkTheme : lightTheme;
   const { user } = useAuthStore();
   

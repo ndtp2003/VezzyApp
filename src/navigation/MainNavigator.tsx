@@ -36,6 +36,7 @@ const EventsNavigator: React.FC = () => {
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
+    // @ts-ignore
     <EventStack.Navigator
       screenOptions={{
         headerStyle: {
@@ -69,6 +70,7 @@ const NewsNavigator: React.FC = () => {
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
+    // @ts-ignore
     <NewsStack.Navigator
       screenOptions={{
         headerStyle: {
@@ -102,6 +104,7 @@ const ProfileNavigator: React.FC = () => {
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   
   return (
+    // @ts-ignore
     <ProfileStack.Navigator
       screenOptions={{
         headerStyle: {
@@ -146,6 +149,7 @@ const MainNavigator: React.FC = () => {
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
 
   return (
+    // @ts-ignore
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {

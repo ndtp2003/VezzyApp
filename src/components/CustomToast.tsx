@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 60, // Status bar height + some padding
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent background
+    backgroundColor: 'transparent', // Remove background to avoid conflict with camera
   },
   toastContainer: {
     width: width - 32,
@@ -130,21 +130,25 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 8,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 20, // Higher elevation for camera screens
   },
   successToast: {
     backgroundColor: '#E8F5E8',
     borderLeftWidth: 4,
     borderLeftColor: '#4CAF50',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
   },
   errorToast: {
     backgroundColor: '#FFEBEE',
     borderLeftWidth: 4,
     borderLeftColor: '#F44336',
+    borderWidth: 1,
+    borderColor: '#F44336',
   },
   toastContent: {
     flexDirection: 'row',

@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { API_CONFIG } from '../utils/config';
 import {
   ApiResponse,
+  BackendApiResponse,
   PaginatedData,
   LoginRequest,
   AuthResponseDto,
@@ -159,7 +160,7 @@ class ApiService {
   }
 
   // Check-in endpoints - Cập nhật theo API mới
-  async checkInByQR(request: CheckInRequest): Promise<ApiResponse<boolean>> {
+  async checkInByQR(request: CheckInRequest): Promise<BackendApiResponse<boolean>> {
     const response = await this.axiosInstance.post('/api/TicketIssued/checkinMobile', request);
     return response.data;
   }

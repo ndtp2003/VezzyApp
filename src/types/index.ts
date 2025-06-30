@@ -6,6 +6,13 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
+// New backend response format for specific endpoints
+export interface BackendApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
 // Pagination structure từ backend mới
 export interface PaginatedData<T> {
   items: T[];
