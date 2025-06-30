@@ -8,6 +8,7 @@ import { RootStackParamList } from '../types';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import QRScannerScreen from '../screens/QRScannerScreen';
+import CheckInHistoryScreen from '../screens/CheckInHistoryScreen';
 import { lightTheme, darkTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,6 +70,14 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen 
               name="QRScanner" 
               component={QRScannerScreen}
+              options={{
+                headerShown: false,
+                presentation: 'modal',
+              }}
+            />
+            <Stack.Screen 
+              name="CheckInHistory" 
+              component={CheckInHistoryScreen}
               options={{
                 headerShown: false,
                 presentation: 'modal',

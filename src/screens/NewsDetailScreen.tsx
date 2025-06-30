@@ -72,7 +72,7 @@ const NewsDetailScreen: React.FC = () => {
         title: news.newsTitle,
       });
     } catch (error) {
-      console.error('Error sharing news:', error);
+      // Silent fail for sharing
     }
   };
 

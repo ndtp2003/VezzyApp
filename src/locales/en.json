@@ -182,7 +182,6 @@
       "location": "Location",
       "capacity": "Capacity",
       "status": "Status",
-      "checkInHistory": "Check-in History",
       "scanQR": "Scan QR Code"
     },
     "status": {
@@ -200,9 +199,38 @@
     "registered": "Registered",
     "checkInTab": "Check-in",
     "historyTab": "History",
-    "totalCheckIns": "Total Check-ins"
+    "totalCheckIns": "Total Check-ins",
+    "checkInHistory": "Check-in History",
+    "checkInHistoryDesc": "View check-in history for this event",
+    "faceCheckIn": "Face Check-in",
+    "faceCheckInDesc": "Use facial recognition for check-in",
+    "tapToSelect": "Tap to select"
   },
-  "news": {
+  "checkInHistory": {
+    "title": "Check-in History",
+    "loading": "Loading check-in history...",
+    "loadError": "Failed to load check-in history",
+    "emptyTitle": "No Check-ins",
+    "emptyMessage": "No check-in records found for this event",
+    "totalCheckedIn": "{{count}} total check-ins",
+    "searchByQR": "Search by QR Code",
+    "enterQRCode": "Enter QR code to search",
+    "searchSuccess": "QR code found",
+    "searchError": "Failed to search QR code",
+    "searchResult": "Search Result",
+    "customer": "Customer",
+    "checkedInAt": "Checked in at",
+    "checkedBy": "Checked by",
+    "method": "Method",
+    "notCheckedIn": "Not checked in",
+    "unknown": "Unknown",
+    "methods": {
+      "qrcode": "QR Code",
+      "facerecognition": "Face Recognition",
+      "other": "Other"
+    }
+     },
+    "news": {
     "title": "News",
     "subtitle": "Latest news and updates",
     "loading": "Loading news...",

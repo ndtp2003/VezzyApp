@@ -22,7 +22,9 @@ import {
   User,
   DashboardStats,
   SearchFilters,
-  PaginationParams
+  PaginationParams,
+  CheckInHistoryResponse,
+  QRCodeDetailResponse
 } from '../types';
 
 class ApiService {
@@ -163,6 +165,46 @@ class ApiService {
   async checkInByQR(request: CheckInRequest): Promise<BackendApiResponse<boolean>> {
     const response = await this.axiosInstance.post('/api/TicketIssued/checkinMobile', request);
     return response.data;
+  }
+
+  // Get check-in history for an event (paginated)
+  async getCheckInHistory(eventId: string, pageNumber: number = 1, pageSize: number = 10): Promise<CheckInHistoryResponse> {
+    const response = await this.axiosInstance.get(`/api/TicketIssued/checkinloghistory/${eventId}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+    
+    // Handle backend response format mapping
+    const backendResponse = response.data;
+    
+    // Map backend format {success, message, data} to expected format {isSuccess, message, data}
+    if (backendResponse && typeof backendResponse.success === 'boolean') {
+      return {
+        isSuccess: backendResponse.success,
+        message: backendResponse.message,
+        data: backendResponse.data
+      };
+    }
+    
+    // If already in expected format, return as is
+    return backendResponse;
+  }
+
+  // Get QR code ticket detail
+  async getQRCodeDetail(qrCode: string): Promise<QRCodeDetailResponse> {
+    const response = await this.axiosInstance.get(`/api/TicketIssued/qrdetail/${qrCode}`);
+    
+    // Handle backend response format mapping
+    const backendResponse = response.data;
+    
+    // Map backend format {success, message, data} to expected format {isSuccess, message, data}
+    if (backendResponse && typeof backendResponse.success === 'boolean') {
+      return {
+        isSuccess: backendResponse.success,
+        message: backendResponse.message,
+        data: backendResponse.data
+      };
+    }
+    
+    // If already in expected format, return as is
+    return backendResponse;
   }
 
   async getCheckinHistory(

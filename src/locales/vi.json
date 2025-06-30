@@ -207,7 +207,31 @@
     "faceCheckInDesc": "Sử dụng nhận diện khuôn mặt để check-in",
     "tapToSelect": "Nhấn để chọn"
   },
-  "news": {
+  "checkInHistory": {
+    "title": "Lịch sử Check-in",
+    "loading": "Đang tải lịch sử check-in...",
+    "loadError": "Không thể tải lịch sử check-in",
+    "emptyTitle": "Chưa có Check-in",
+    "emptyMessage": "Không tìm thấy bản ghi check-in cho sự kiện này",
+    "totalCheckedIn": "{{count}} lượt check-in",
+    "searchByQR": "Tìm kiếm theo mã QR",
+    "enterQRCode": "Nhập mã QR để tìm kiếm",
+    "searchSuccess": "Đã tìm thấy mã QR",
+    "searchError": "Không thể tìm kiếm mã QR",
+    "searchResult": "Kết quả tìm kiếm",
+    "customer": "Khách hàng",
+    "checkedInAt": "Check-in lúc",
+    "checkedBy": "Check-in bởi",
+    "method": "Phương thức",
+    "notCheckedIn": "Chưa check-in",
+    "unknown": "Không xác định",
+    "methods": {
+      "qrcode": "Mã QR",
+      "facerecognition": "Nhận diện khuôn mặt",
+      "other": "Khác"
+    }
+     },
+    "news": {
     "title": "Tin tức",
     "noNews": "Không có tin tức",
     "readMore": "Đọc thêm",

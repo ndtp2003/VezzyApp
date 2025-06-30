@@ -164,19 +164,19 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.actionsSection}>
           <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
             <Icon name="edit" size={24} color={currentTheme.primary} />
-            <Text style={styles.actionButtonText}>{t('profile.editProfile')}</Text>
+            <Text style={styles.actionButtonText}>{t('profile.actions.editProfile')}</Text>
             <Icon name="chevron-right" size={24} color={currentTheme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleChangePassword}>
             <Icon name="lock" size={24} color={currentTheme.primary} />
-            <Text style={styles.actionButtonText}>{t('profile.changePassword')}</Text>
+            <Text style={styles.actionButtonText}>{t('profile.actions.changePassword')}</Text>
             <Icon name="chevron-right" size={24} color={currentTheme.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleSettings}>
             <Icon name="settings" size={24} color={currentTheme.primary} />
-            <Text style={styles.actionButtonText}>{t('profile.settings')}</Text>
+            <Text style={styles.actionButtonText}>{t('profile.actions.settings')}</Text>
             <Icon name="chevron-right" size={24} color={currentTheme.textSecondary} />
           </TouchableOpacity>
 

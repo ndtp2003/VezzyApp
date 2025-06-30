@@ -13,6 +13,68 @@ export interface BackendApiResponse<T = any> {
   data: T;
 }
 
+// Check-in History API Response
+export interface CheckInHistoryResponse {
+  isSuccess: boolean;
+  data: {
+    items: CheckInLogItem[];
+    pageNumber: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  message: string | null;
+}
+
+// Check-in Log Item
+export interface CheckInLogItem {
+  issuedId: string;
+  checkInLogId: string;
+  qrCode: string;
+  ticketId: string;
+  eventId: string;
+  checkedInAt: string | null;
+  checkedInBy: string | null;
+  checkerName: string | null;
+  ticketName: string | null;
+  eventName: string | null;
+  customerEmail: string | null;
+  customerName: string | null;
+  checkInMethod: 'QrCode' | 'FaceRecognition' | 'Other';
+  used: boolean;
+  status: string;
+  createdAt: string;
+}
+
+// QR Code Detail API Response
+export interface QRCodeDetailResponse {
+  isSuccess: boolean;
+  data: QRCodeDetailItem;
+  message: string | null;
+}
+
+// QR Code Detail Item
+export interface QRCodeDetailItem {
+  issuedId: string;
+  qrCode: string;
+  ticketId: string;
+  eventId: string;
+  isCheckedIn: boolean;
+  checkedInAt: string | null;
+  checkedInBy: string | null;
+  checkerName: string;
+  ticketName: string;
+  eventName: string;
+  customerEmail: string;
+  customerName: string;
+  status: 'Checked In' | 'Not Checked In' | 'Not Found';
+  message: string;
+  createdAt: string;
+  qrCodeUrl: string;
+}
+
 // Pagination structure từ backend mới
 export interface PaginatedData<T> {
   items: T[];
@@ -329,6 +391,7 @@ export type RootStackParamList = {
   EventDetail: { eventId: string };
   NewsDetail: { newsId: string };
   ChangePassword: undefined;
+  CheckInHistory: { eventId: string; eventName: string };
 };
 
 export type AuthStackParamList = {

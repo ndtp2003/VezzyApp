@@ -18,11 +18,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useEventStore } from '../store/eventStore';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { Event, MainTabParamList } from '../types';
+import { Event, RootStackParamList } from '../types';
 import { lightTheme, darkTheme, spacing, borderRadius, typography, shadows } from '../theme';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-type EventsScreenNavigationProp = StackNavigationProp<MainTabParamList, 'Events'>;
+type EventsScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const EventsScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -63,13 +63,20 @@ const EventsScreen: React.FC = () => {
   const handleCheckInHistory = useCallback(() => {
     setShowActionModal(false);
     if (selectedEvent) {
-      Alert.alert(
-        t('events.checkInHistory'),
-        `${t('events.checkInHistory')} cho "${selectedEvent.eventName}"`,
-        [{ text: t('common.ok') }]
-      );
+      try {
+        navigation.navigate('CheckInHistory', { 
+          eventId: selectedEvent.eventId,
+          eventName: selectedEvent.eventName 
+        });
+      } catch (error) {
+        Alert.alert(
+          t('events.checkInHistory'),
+          `${t('events.checkInHistory')} cho "${selectedEvent.eventName}"`,
+          [{ text: t('common.ok') }]
+        );
+      }
     }
-  }, [selectedEvent, t]);
+  }, [selectedEvent, t, navigation]);
 
   // Handle face check-in
   const handleFaceCheckIn = useCallback(() => {
@@ -86,9 +93,8 @@ const EventsScreen: React.FC = () => {
   // Handle QR Scanner (from action buttons)
   const handleQRScanner = useCallback((event: Event) => {
     try {
-      (navigation as any).navigate('QRScanner', { eventId: event.eventId });
+      navigation.navigate('QRScanner', { eventId: event.eventId });
     } catch (error) {
-      console.log('QR Scanner navigation:', event.eventId);
       Alert.alert(
         'QR Scanner',
         `Mở QR Scanner cho sự kiện: ${event.eventName}`,

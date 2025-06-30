@@ -75,7 +75,6 @@ const SettingsScreen: React.FC = () => {
       
       showSuccessToast(t('settings.messages.themeUpdated'));
     } catch (error) {
-      console.error('Failed to change language:', error);
       setLanguage(language);
       i18n.changeLanguage(language);
       showErrorToast(t('settings.errors.updateFailed'));
