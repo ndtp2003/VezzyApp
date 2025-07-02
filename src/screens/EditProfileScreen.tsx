@@ -24,6 +24,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { launchImageLibrary, launchCamera, ImagePickerResponse } from 'react-native-image-picker';
 import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
+import { RootStackParamList } from '../types';
 
 const EditProfileScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -267,6 +268,17 @@ const EditProfileScreen: React.FC = () => {
               {isUploadingAvatar ? t('editProfile.uploading') : t('editProfile.changeAvatar')}
             </Text>
           </TouchableOpacity>
+          
+          {/* Update Face Button */}
+          <TouchableOpacity 
+            style={styles.updateFaceButton} 
+            onPress={() => (navigation as any).navigate('FaceScanner', { mode: 'update' })}
+          >
+            <Icon name="face" size={20} color={currentTheme.primary} style={styles.updateFaceIcon} />
+            <Text style={styles.updateFaceText}>
+              {t('face.updateFace')}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Form Fields */}
@@ -474,6 +486,25 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     borderColor: theme.disabled,
   },
   changeAvatarText: {
+    color: theme.primary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  updateFaceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.primary,
+    backgroundColor: theme.surface,
+    marginTop: spacing.sm,
+  },
+  updateFaceIcon: {
+    marginRight: spacing.sm,
+  },
+  updateFaceText: {
     color: theme.primary,
     fontSize: 14,
     fontWeight: '500',

@@ -392,6 +392,7 @@ export type RootStackParamList = {
   NewsDetail: { newsId: string };
   ChangePassword: undefined;
   CheckInHistory: { eventId: string; eventName: string };
+  FaceScanner: { mode?: 'update' | 'login' };
 };
 
 export type AuthStackParamList = {

@@ -136,6 +136,16 @@ class ApiService {
     return response.data;
   }
 
+  async updateFace(formData: FormData): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.put('/api/account/updateFace', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 10000, // 10 seconds for AI face processing
+    });
+    return response.data;
+  }
+
   async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<boolean>> {
     const response = await this.axiosInstance.post('/api/account/forgot-password', data);
     return response.data;

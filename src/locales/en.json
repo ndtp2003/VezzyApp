@@ -373,7 +373,12 @@
       "invalidEmail": "Invalid email format",
       "invalidPhone": "Invalid phone number",
       "genderRequired": "Gender is required"
-    }
+    },
+    "changeAvatar": "Change Avatar",
+    "uploading": "Uploading...",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "updateFace": "Update Face"
   },
   "settings": {
     "title": "Settings",
@@ -570,6 +575,47 @@
     },
     "messages": {
       "updateSuccess": "Profile updated successfully"
+    },
+    "updateFace": "Update Face"
+  },
+  "face": {
+    "updateFace": "Update Face",
+    "loginByFace": "Login by Face",
+    "updateInstructions": "Position your face within the frame and tap to capture",
+    "loginInstructions": "Position your face for authentication", 
+    "smartInstructions": "Position your face in the frame. Auto capture in a few seconds...",
+    "positionYourFace": "Position your face within the frame for best results",
+    "cameraPermissionRequired": "Camera permission is required for face scanning",
+    "cameraPermissionError": "Failed to request camera permission",
+    "requestingPermission": "Requesting camera permission...",
+    "captureError": "Failed to capture face image",
+    "processing": "Processing face image...",
+    "photoTaken": "Photo captured! Processing...",
+    "retakePhoto": "Retake Photo",
+    "updateSuccess": "Face updated successfully",
+    "updateFailed": "Failed to update face",
+    "loginNotImplemented": "Face login feature is not yet implemented",
+    "capturing": "Capturing...",
+    "faceDetected": "Face detected!",
+    "lookingForFace": "Looking for face...",
+    "autoCapturing": "Auto capturing in",
+    "errorDialog": {
+      "title": "Face Update Failed",
+      "tryAgain": "Try Again", 
+      "goBack": "Go Back",
+      "errors": {
+        "noFileField": "No image file provided in request",
+        "noFileSelected": "No image file was selected",
+        "imageReadError": "Unable to read the image file",
+        "embeddingError": "Failed to process face features",
+        "faceNotDetected": "No face detected in the image. Please ensure your face is clearly visible and well-lit",
+        "antiSpoofing": "Live photo required. Please take a real-time photo instead of using existing images",
+        "networkError": "Network connection failed. Please check your internet connection",
+        "timeout": "Request timed out. Please try again",
+        "serverError": "Server error occurred. Please try again later",
+        "methodNotAllowed": "Invalid request method",
+        "unknownError": "An unexpected error occurred. Please try again"
+      }
     }
   }
 } 

@@ -69,12 +69,12 @@ const EventsScreen: React.FC = () => {
           eventName: selectedEvent.eventName 
         });
       } catch (error) {
-        Alert.alert(
-          t('events.checkInHistory'),
+      Alert.alert(
+        t('events.checkInHistory'),
           t('events.checkInHistory') + ' cho "' + selectedEvent.eventName + '"',
-          [{ text: t('common.ok') }]
-        );
-      }
+        [{ text: t('common.ok') }]
+      );
+    }
     }
   }, [selectedEvent, t, navigation]);
 

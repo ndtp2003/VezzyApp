@@ -373,11 +373,11 @@
     "gender": "Giới tính",
     "dateOfBirth": "Ngày sinh",
     "location": "Địa chỉ",
-    "changeAvatar": "Đổi ảnh đại diện",
+    "changeAvatar": "Thay đổi ảnh đại diện",
     "selectAvatarSource": "Chọn nguồn ảnh",
     "selectAvatarMessage": "Chọn nơi để lấy ảnh đại diện của bạn",
     "camera": "Camera",
-    "gallery": "Thư viện ảnh",
+    "gallery": "Thư viện",
     "uploading": "Đang tải lên...",
     "avatarUpdateSuccess": "Cập nhật ảnh đại diện thành công",
     "avatarUpdateFailed": "Cập nhật ảnh đại diện thất bại",
@@ -395,10 +395,11 @@
       "emailRequired": "Email là bắt buộc",
       "updateFailed": "Cập nhật hồ sơ thất bại"
     },
-    "messages": {
-      "updateSuccess": "Cập nhật hồ sơ thành công"
-    }
-  },
+          "updateFace": "Cập nhật khuôn mặt",
+      "messages": {
+        "updateSuccess": "Cập nhật hồ sơ thành công"
+      }
+    },
   "changePassword": {
     "title": "Đổi mật khẩu",
     "subtitle": "Cập nhật mật khẩu tài khoản của bạn",
@@ -576,5 +577,45 @@
     },
     "updateSuccess": "Cập nhật hồ sơ thành công",
     "updateError": "Không thể cập nhật hồ sơ"
+  },
+  "face": {
+    "updateFace": "Cập nhật khuôn mặt",
+    "loginByFace": "Đăng nhập bằng khuôn mặt",
+    "updateInstructions": "Đặt khuôn mặt vào khung và chạm để chụp",
+    "loginInstructions": "Đặt khuôn mặt để xác thực",
+    "smartInstructions": "Đặt khuôn mặt vào khung. Tự động chụp sau vài giây...",
+    "positionYourFace": "Đặt khuôn mặt vào khung để có kết quả tốt nhất",
+    "cameraPermissionRequired": "Cần quyền truy cập camera để quét khuôn mặt",
+    "cameraPermissionError": "Không thể yêu cầu quyền truy cập camera",
+    "requestingPermission": "Đang yêu cầu quyền truy cập camera...",
+    "captureError": "Không thể chụp ảnh khuôn mặt",
+    "processing": "Đang xử lý ảnh khuôn mặt...",
+    "photoTaken": "Đã chụp ảnh! Đang xử lý...",
+    "retakePhoto": "Chụp Lại",
+    "updateSuccess": "Cập nhật khuôn mặt thành công",
+    "updateFailed": "Không thể cập nhật khuôn mặt",
+    "loginNotImplemented": "Tính năng đăng nhập bằng khuôn mặt chưa được triển khai",
+    "capturing": "Đang chụp...",
+    "faceDetected": "Đã phát hiện khuôn mặt!",
+    "lookingForFace": "Đang tìm khuôn mặt...",
+    "autoCapturing": "Tự động chụp sau",
+    "errorDialog": {
+      "title": "Cập nhật khuôn mặt thất bại",
+      "tryAgain": "Thử lại",
+      "goBack": "Quay lại", 
+      "errors": {
+        "noFileField": "Không có file ảnh trong yêu cầu",
+        "noFileSelected": "Không có file ảnh nào được chọn",
+        "imageReadError": "Không thể đọc file ảnh",
+        "embeddingError": "Không thể xử lý đặc trưng khuôn mặt",
+        "faceNotDetected": "Không phát hiện khuôn mặt trong ảnh. Vui lòng đảm bảo khuôn mặt hiển thị rõ ràng và đủ ánh sáng",
+        "antiSpoofing": "Cần ảnh chụp trực tiếp. Vui lòng chụp ảnh thật thay vì sử dụng ảnh có sẵn",
+        "networkError": "Kết nối mạng thất bại. Vui lòng kiểm tra kết nối internet",
+        "timeout": "Yêu cầu hết thời gian chờ. Vui lòng thử lại",
+        "serverError": "Lỗi máy chủ. Vui lòng thử lại sau",
+        "methodNotAllowed": "Phương thức yêu cầu không hợp lệ",
+        "unknownError": "Đã xảy ra lỗi không xác định. Vui lòng thử lại"
+      }
+    }
   }
 } 

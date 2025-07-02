@@ -10,6 +10,7 @@ import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import QRScannerScreen from '../screens/QRScannerScreen';
 import CheckInHistoryScreen from '../screens/CheckInHistoryScreen';
+import FaceScannerScreen from '../screens/FaceScannerScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { lightTheme, darkTheme } from '../theme';
 
@@ -105,6 +106,14 @@ const RootNavigator: React.FC = () => {
             <Stack.Screen 
               name="CheckInHistory" 
               component={CheckInHistoryScreen}
+              options={{
+                headerShown: false,
+                presentation: 'modal',
+              }}
+            />
+            <Stack.Screen 
+              name="FaceScanner" 
+              component={FaceScannerScreen}
               options={{
                 headerShown: false,
                 presentation: 'modal',
