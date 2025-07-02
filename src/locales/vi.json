@@ -128,6 +128,11 @@
     "required": "Bắt buộc",
     "createdBy": "Tạo bởi"
   },
+  "splash": {
+    "welcome": "Chào mừng đến với CollaboratorApp",
+    "loading": "Đang chuẩn bị trải nghiệm của bạn...",
+    "tagline": "Đối tác hợp tác sự kiện của bạn"
+  },
   "navigation": {
     "home": "Trang chủ",
     "events": "Sự kiện",
@@ -256,7 +261,8 @@
       "updatedAt": "Cập nhật",
       "content": "Nội dung"
     },
-    "share": "Chia sẻ tin tức"
+    "share": "Chia sẻ tin tức",
+    "noContent": "Không có nội dung"
   },
   "notifications": {
     "title": "Thông báo",
@@ -285,7 +291,11 @@
       "WithdrawalApproved": "Rút Tiền Được Duyệt",
       "WithdrawalRejected": "Rút Tiền Bị Từ Chối",
       "AdminWithdrawalRequest": "Admin: Yêu Cầu Rút Tiền",
-      "Other": "Thông Báo"
+      "Other": "Thông Báo",
+      "EventAssigned": "Được Giao Sự Kiện",
+      "NewsPublished": "Tin Tức Mới",
+      "SystemUpdate": "Cập Nhật Hệ Thống",
+      "CheckInCompleted": "Hoàn Thành Check-in"
     }
   },
   "qrScanner": {

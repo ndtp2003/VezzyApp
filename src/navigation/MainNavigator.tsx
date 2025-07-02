@@ -1,9 +1,11 @@
 import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../store/settingsStore';
+import { useNotificationStore } from '../store/notificationStore';
 import { lightTheme, darkTheme } from '../theme';
 import { 
   MainTabParamList, 
@@ -141,10 +143,46 @@ const ProfileNavigator: React.FC = () => {
   );
 };
 
+// Custom Icon with Badge Component
+const IconWithBadge: React.FC<{
+  iconName: string;
+  size: number;
+  color: string;
+  badgeCount?: number;
+  theme: any;
+}> = ({ iconName, size, color, badgeCount, theme }) => {
+  // Ensure badgeCount is a safe number
+  const safeBadgeCount = Number(badgeCount) || 0;
+  
+  return (
+    <View style={{ position: 'relative' }}>
+      <Icon name={iconName} size={size} color={color} />
+      {safeBadgeCount > 0 && (
+        <View style={[
+          styles.badge,
+          { 
+            backgroundColor: theme.error,
+            minWidth: safeBadgeCount > 9 ? 18 : 16,
+            height: safeBadgeCount > 9 ? 18 : 16,
+          }
+        ]}>
+          <Text style={[
+            styles.badgeText,
+            { fontSize: safeBadgeCount > 9 ? 10 : 11 }
+          ]}>
+            {safeBadgeCount > 99 ? '99+' : String(safeBadgeCount)}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
 // Main Tab Navigator
 const MainNavigator: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useSettingsStore();
+  const { unreadCount } = useNotificationStore();
   
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
 
@@ -167,7 +205,15 @@ const MainNavigator: React.FC = () => {
               break;
             case 'Notifications':
               iconName = 'notifications';
-              break;
+              return (
+                <IconWithBadge
+                  iconName={iconName}
+                  size={size}
+                  color={color}
+                  badgeCount={Number(unreadCount) || 0}
+                  theme={currentTheme}
+                />
+              );
             case 'Profile':
               iconName = 'person';
               break;
@@ -236,5 +282,25 @@ const MainNavigator: React.FC = () => {
     </Tab.Navigator>
   );
 };
+
+// Styles for badge
+const styles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 2,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});
 
 export default MainNavigator; 

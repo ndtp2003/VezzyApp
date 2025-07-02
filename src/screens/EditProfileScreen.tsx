@@ -188,6 +188,15 @@ const EditProfileScreen: React.FC = () => {
         return;
       }
 
+      // Helper function to format date without timezone issues
+      const formatDateForAPI = (date: Date | null): string | undefined => {
+        if (!date) return undefined;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-based
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
       // Prepare data for API request - try PascalCase field names
       const updateData = {
         FullName: formData.fullName,
@@ -195,7 +204,7 @@ const EditProfileScreen: React.FC = () => {
         Phone: formData.phone || undefined,
         Location: formData.location || undefined,
         Gender: formData.gender, // Keep as number (enum value)
-        Dob: formData.dob?.toISOString().split('T')[0] || undefined, // Format as YYYY-MM-DD
+        Dob: formatDateForAPI(formData.dob), // Format as YYYY-MM-DD without timezone conversion
       };
 
       // Call API to update profile

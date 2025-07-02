@@ -128,6 +128,11 @@
     "required": "Required",
     "createdBy": "Created by"
   },
+  "splash": {
+    "welcome": "Welcome to CollaboratorApp",
+    "loading": "Preparing your experience...",
+    "tagline": "Your event collaboration partner"
+  },
   "navigation": {
     "home": "Home",
     "events": "Events",
@@ -252,6 +257,7 @@
       "updatedAt": "Updated"
     },
     "share": "Share News",
+    "noContent": "No content available",
     "noNews": "No news available",
     "readMore": "Read More",
     "publishedOn": "Published on"
@@ -280,7 +286,11 @@
       "WithdrawalApproved": "Withdrawal Approved",
       "WithdrawalRejected": "Withdrawal Rejected",
       "AdminWithdrawalRequest": "Admin: Withdrawal Request",
-      "Other": "Notification"
+      "Other": "Notification",
+      "EventAssigned": "Event Assigned",
+      "NewsPublished": "News Published",
+      "SystemUpdate": "System Update",
+      "CheckInCompleted": "Check-in Completed"
     },
     "noNotifications": "No notifications",
     "markAsRead": "Mark as Read",

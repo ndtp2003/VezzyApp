@@ -15,6 +15,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import HTMLView from 'react-native-htmlview';
+import i18n from '../utils/i18n';
 import { News, NewsStackParamList, NewsStatus } from '../types';
 import { useNewsStore } from '../store/newsStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -81,7 +82,8 @@ const NewsDetailScreen: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
+    const locale = i18n.language === 'en' ? 'en-US' : 'vi-VN';
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -131,7 +133,7 @@ const NewsDetailScreen: React.FC = () => {
       'system': 'Hệ thống',
     };
     
-    return authorNames[authorId] || `Tác giả #${authorId.slice(0, 8)}`;
+    return authorNames[authorId] || ('Tác giả #' + authorId.slice(0, 8));
   };
 
   // HTML styles for theme support
@@ -276,7 +278,7 @@ const NewsDetailScreen: React.FC = () => {
         <View style={styles.contentSection}>
           <Text style={styles.sectionTitle}>{t('news.details.title')}</Text>
                      <HTMLView
-             value={news.newsContent || '<p>Không có nội dung</p>'}
+             value={news.newsContent || ('<p>' + t('news.noContent') + '</p>')}
              stylesheet={htmlStyles}
            />
         </View>

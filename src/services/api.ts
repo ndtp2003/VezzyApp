@@ -241,27 +241,78 @@ class ApiService {
     if (pagination?.pageSize) params.append('pageSize', pagination.pageSize.toString());
 
     const response = await this.axiosInstance.get(`/api/Notification/user/${userId}?${params}`);
+    
+    console.log('Notification API response:', JSON.stringify(response.data, null, 2));
+    
+    // Handle backend response format mapping if needed
+    const backendResponse = response.data;
+    
+    // Check if backend returns {success, message, data} format instead of {flag, message, data}
+    if (backendResponse && typeof backendResponse.success === 'boolean') {
+      return {
+        flag: backendResponse.success,
+        code: backendResponse.success ? 200 : 400,
+        message: backendResponse.message || '',
+        data: backendResponse.data
+      };
+    }
+    
+    // If already in expected format, return as is
     return response.data;
   }
 
-  async markNotificationAsRead(notificationId: string): Promise<ApiResponse<boolean>> {
-    const response = await this.axiosInstance.put(`/api/Notification/${notificationId}/read`);
+  async markNotificationAsRead(notificationId: string, userId: string): Promise<ApiResponse<boolean>> {
+    const response = await this.axiosInstance.put(`/api/Notification/${notificationId}/read?userId=${userId}`);
+    
+    console.log('Mark notification as read API response:', JSON.stringify(response.data, null, 2));
+    
+    // Handle backend response format mapping if needed
+    const backendResponse = response.data;
+    
+    // Check if backend returns {success, message, data} format instead of {flag, message, data}
+    if (backendResponse && typeof backendResponse.success === 'boolean') {
+      return {
+        flag: backendResponse.success,
+        code: backendResponse.success ? 200 : 400,
+        message: backendResponse.message || '',
+        data: backendResponse.data
+      };
+    }
+    
+    // If already in expected format, return as is
     return response.data;
   }
 
   async markAllNotificationsAsRead(userId: string): Promise<ApiResponse<boolean>> {
     const response = await this.axiosInstance.put(`/api/Notification/user/${userId}/read-all`);
+    
+    console.log('Mark all notifications as read API response:', JSON.stringify(response.data, null, 2));
+    
+    // Handle backend response format mapping if needed
+    const backendResponse = response.data;
+    
+    // Check if backend returns {success, message, data} format instead of {flag, message, data}
+    if (backendResponse && typeof backendResponse.success === 'boolean') {
+      return {
+        flag: backendResponse.success,
+        code: backendResponse.success ? 200 : 400,
+        message: backendResponse.message || '',
+        data: backendResponse.data
+      };
+    }
+    
+    // If already in expected format, return as is
     return response.data;
   }
 
   // Settings endpoints
-  async getUserSettings(userId: string): Promise<ApiResponse<UserSettings>> {
-    const response = await this.axiosInstance.get(`/api/user/${userId}/config`);
+  async getUserSettings(accountId: string): Promise<ApiResponse<UserSettings>> {
+    const response = await this.axiosInstance.get(`/api/user/${accountId}/config`);
     return response.data;
   }
 
-  async updateUserSettings(userId: string, settings: Partial<UserSettings>): Promise<ApiResponse<UserSettings>> {
-    const response = await this.axiosInstance.put(`/api/user/${userId}/config`, settings);
+  async updateUserSettings(accountId: string, settings: Partial<UserSettings>): Promise<ApiResponse<UserSettings>> {
+    const response = await this.axiosInstance.put(`/api/user/${accountId}/config`, settings);
     return response.data;
   }
 

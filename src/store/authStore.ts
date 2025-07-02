@@ -35,6 +35,14 @@ const calculateExpiryTime = (expiresInSeconds: number): number => {
   return Date.now() + (expiresInSeconds * 1000);
 };
 
+// Calculate expiry using config values (backend doesn't provide expiry times)
+const calculateTokenExpiry = (): { accessTokenExpiresAt: number, refreshTokenExpiresAt: number } => {
+  return {
+    accessTokenExpiresAt: calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME),
+    refreshTokenExpiresAt: calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME),
+  };
+};
+
 const isTokenExpired = (expiresAt: number | null): boolean => {
   if (!expiresAt) return true;
   return Date.now() >= expiresAt;
@@ -85,8 +93,7 @@ export const useAuthStore = create<AuthStore>()(
             }
             
             // Calculate token expiry times
-            const accessTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME);
-            const refreshTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME);
+            const { accessTokenExpiresAt, refreshTokenExpiresAt } = calculateTokenExpiry();
             
             // Map response data to CombinedUserData interface
             const user: CombinedUserData = {
@@ -244,6 +251,14 @@ export const useAuthStore = create<AuthStore>()(
           // Clear only auth storage, preserve app settings (theme/language)
           AsyncStorage.removeItem('auth-storage');
           
+          // Clear notification store
+          try {
+            const notificationStore = require('./notificationStore').useNotificationStore.getState();
+            notificationStore.reset();
+          } catch (error) {
+            // Silently handle notification store clear error
+          }
+          
           // Note: app-settings storage (theme/language) is preserved automatically
           // This allows users to keep their preferred theme and language after logout
         }
@@ -262,8 +277,7 @@ export const useAuthStore = create<AuthStore>()(
             const authData = response.data as AuthResponseDto;
             
             // Calculate new token expiry times
-            const accessTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME);
-            const refreshTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME);
+            const { accessTokenExpiresAt, refreshTokenExpiresAt } = calculateTokenExpiry();
             
             // Map response data to CombinedUserData interface
             const user: CombinedUserData = {
@@ -341,14 +355,19 @@ export const useAuthStore = create<AuthStore>()(
 
       checkAuthStatus: async () => {
         try {
+          const state = get();
           const { 
             accessToken, 
             refreshToken: storedRefreshToken, 
             accessTokenExpiresAt, 
-            refreshTokenExpiresAt 
-          } = get();
+            refreshTokenExpiresAt,
+            isAuthenticated,
+            user
+          } = state;
           
-          // If no tokens, logout
+                    // Check auth state consistency
+          
+          // If no tokens, set isAuthenticated to false
           if (!accessToken || !storedRefreshToken) {
             set({ isAuthenticated: false });
             return;

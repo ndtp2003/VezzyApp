@@ -43,7 +43,7 @@ i18n
     resources,
     lng: 'vi', // Start with Vietnamese as default
     fallbackLng: 'vi', // Fall back to Vietnamese
-    debug: __DEV__, // Enable debug in development
+    debug: false, // Disable debug to reduce console logs
     
     interpolation: {
       escapeValue: false, // React already does escaping

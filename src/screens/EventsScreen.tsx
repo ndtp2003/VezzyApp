@@ -71,7 +71,7 @@ const EventsScreen: React.FC = () => {
       } catch (error) {
         Alert.alert(
           t('events.checkInHistory'),
-          `${t('events.checkInHistory')} cho "${selectedEvent.eventName}"`,
+          t('events.checkInHistory') + ' cho "' + selectedEvent.eventName + '"',
           [{ text: t('common.ok') }]
         );
       }
@@ -84,7 +84,7 @@ const EventsScreen: React.FC = () => {
     if (selectedEvent) {
       Alert.alert(
         t('events.faceCheckIn'),
-        `${t('events.faceCheckIn')} cho "${selectedEvent.eventName}"`,
+        t('events.faceCheckIn') + ' cho "' + selectedEvent.eventName + '"',
         [{ text: t('common.ok') }]
       );
     }
@@ -97,7 +97,7 @@ const EventsScreen: React.FC = () => {
     } catch (error) {
       Alert.alert(
         'QR Scanner',
-        `Mở QR Scanner cho sự kiện: ${event.eventName}`,
+        'Mở QR Scanner cho sự kiện: ' + event.eventName,
         [{ text: t('common.ok') }]
       );
     }

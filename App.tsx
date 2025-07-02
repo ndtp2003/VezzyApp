@@ -32,9 +32,10 @@ function App(): React.JSX.Element {
   // Sync language changes with i18n
   useLanguageSync();
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+  // Note: checkAuthStatus is now handled in RootNavigator to avoid race conditions
+  // useEffect(() => {
+  //   checkAuthStatus();
+  // }, [checkAuthStatus]);
 
   return (
     <ToastProvider>

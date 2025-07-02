@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ActivityIndicator, View } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { useSignalR } from '../hooks/useSignalR';
 import { RootStackParamList } from '../types';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import QRScannerScreen from '../screens/QRScannerScreen';
 import CheckInHistoryScreen from '../screens/CheckInHistoryScreen';
+import SplashScreen from '../screens/SplashScreen';
 import { lightTheme, darkTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -16,10 +17,34 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootNavigator: React.FC = () => {
   const { isAuthenticated, isLoading, checkAuthStatus } = useAuthStore();
   const { theme } = useSettingsStore();
+  const [showSplash, setShowSplash] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  
+  // Initialize SignalR for real-time notifications
+  useSignalR();
   
   useEffect(() => {
-    checkAuthStatus();
+    const performAuthCheck = async () => {
+      try {
+        // Add small delay to ensure zustand persist rehydration is complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await checkAuthStatus();
+      } catch (error) {
+        console.log('Auth check error:', error);
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    
+    performAuthCheck();
   }, [checkAuthStatus]);
+
+  // Handle splash screen completion - only after auth check is done
+  const handleSplashFinish = () => {
+    if (authChecked) {
+      setShowSplash(false);
+    }
+  };
 
   const getTheme = () => {
     if (theme === 'system') {
@@ -47,17 +72,9 @@ const RootNavigator: React.FC = () => {
     },
   };
 
-  if (isLoading) {
-    return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: getTheme().background 
-      }}>
-        <ActivityIndicator size="large" color={getTheme().primary} />
-      </View>
-    );
+  // Show splash screen until auth check is complete
+  if (showSplash || isLoading || !authChecked) {
+    return <SplashScreen onFinish={handleSplashFinish} canFinish={authChecked} />;
   }
 
   return (
