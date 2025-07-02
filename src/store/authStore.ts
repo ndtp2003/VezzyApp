@@ -143,6 +143,17 @@ export const useAuthStore = create<AuthStore>()(
             const { useSettingsStore } = await import('./settingsStore');
             const settingsStore = useSettingsStore.getState();
             settingsStore.syncWithUserConfig(userConfig);
+            
+            // Auto-fetch notifications sau khi login thành công
+            try {
+              const { initializeNotifications } = await import('./notificationStore');
+              // Run in background, don't wait for completion
+              initializeNotifications().catch(() => {
+                // Silent failure
+              });
+            } catch (error) {
+              // Silent failure
+            }
           } else {
             // Handle backend ApiResponse errors - BACKEND VALIDATION
             let errorKey = 'LOGIN_ERROR';
@@ -320,6 +331,17 @@ export const useAuthStore = create<AuthStore>()(
             });
 
             apiService.setAuthToken(authData.accessToken);
+            
+            // Auto-fetch notifications sau khi refresh token thành công
+            try {
+              const { initializeNotifications } = await import('./notificationStore');
+              // Run in background, don't wait for completion
+              initializeNotifications().catch(() => {
+                // Silent failure
+              });
+            } catch (error) {
+              // Silent failure
+            }
           } else {
             // Token refresh failed, logout user
             get().logout();
@@ -391,6 +413,17 @@ export const useAuthStore = create<AuthStore>()(
             // Access token is still valid, just set it
             apiService.setAuthToken(accessToken);
             set({ isAuthenticated: true });
+            
+            // Auto-fetch notifications nếu user đã authenticated với token hợp lệ
+            try {
+              const { initializeNotifications } = await import('./notificationStore');
+              // Run in background, don't wait for completion
+              initializeNotifications().catch(() => {
+                // Silent failure
+              });
+            } catch (error) {
+              // Silent failure
+            }
           }
         } catch (error) {
           get().logout();

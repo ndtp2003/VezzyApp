@@ -242,8 +242,6 @@ class ApiService {
 
     const response = await this.axiosInstance.get(`/api/Notification/user/${userId}?${params}`);
     
-    console.log('Notification API response:', JSON.stringify(response.data, null, 2));
-    
     // Handle backend response format mapping if needed
     const backendResponse = response.data;
     
@@ -264,8 +262,6 @@ class ApiService {
   async markNotificationAsRead(notificationId: string, userId: string): Promise<ApiResponse<boolean>> {
     const response = await this.axiosInstance.put(`/api/Notification/${notificationId}/read?userId=${userId}`);
     
-    console.log('Mark notification as read API response:', JSON.stringify(response.data, null, 2));
-    
     // Handle backend response format mapping if needed
     const backendResponse = response.data;
     
@@ -285,8 +281,6 @@ class ApiService {
 
   async markAllNotificationsAsRead(userId: string): Promise<ApiResponse<boolean>> {
     const response = await this.axiosInstance.put(`/api/Notification/user/${userId}/read-all`);
-    
-    console.log('Mark all notifications as read API response:', JSON.stringify(response.data, null, 2));
     
     // Handle backend response format mapping if needed
     const backendResponse = response.data;

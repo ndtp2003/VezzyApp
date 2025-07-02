@@ -48,6 +48,21 @@ interface NotificationActions {
 
 type NotificationStore = NotificationState & NotificationActions;
 
+// Helper function để auto-fetch notifications khi user đã authenticated
+export const initializeNotifications = async () => {
+  try {
+    const authStore = require('./authStore').useAuthStore.getState();
+    const notificationStore = require('./notificationStore').useNotificationStore.getState();
+    
+    if (authStore.isAuthenticated && authStore.user?.userId) {
+      // Fetch notifications silently in background
+      await notificationStore.fetchNotifications(1, false);
+    }
+  } catch (error) {
+    // Silent failure - không hiển thị error cho user
+  }
+};
+
 const initialState: NotificationState = {
   notifications: [],
   unreadCount: 0,

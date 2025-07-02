@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { initializeNotifications } from '../store/notificationStore';
 import { useSignalR } from '../hooks/useSignalR';
 import { RootStackParamList } from '../types';
 import AuthNavigator from './AuthNavigator';
@@ -38,6 +39,15 @@ const RootNavigator: React.FC = () => {
     
     performAuthCheck();
   }, [checkAuthStatus]);
+
+  // Separate effect để auto-fetch notifications sau khi auth check hoàn tất và user authenticated
+  useEffect(() => {
+    if (authChecked && isAuthenticated) {
+      initializeNotifications().catch(() => {
+        // Silent failure
+      });
+    }
+  }, [authChecked, isAuthenticated]);
 
   // Handle splash screen completion - only after auth check is done
   const handleSplashFinish = () => {
