@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.38.79:5000', // Backend server IP
-  NOTIFICATION_SERVICE_URL: 'http://192.168.38.79:5000', // NotificationService URL - same as main API for now
+  BASE_URL: 'http://192.168.101.10:5000', // Backend server IP
+  NOTIFICATION_SERVICE_URL: 'http://192.168.101.10:5000', // NotificationService URL - same as main API for now
   TIMEOUT: 30000, // Increased to 30 seconds for better reliability
   HEADERS: {
     'Content-Type': 'application/json',

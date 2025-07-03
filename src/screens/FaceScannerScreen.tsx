@@ -265,11 +265,8 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         
         showSuccessToast(t('face.loginSuccess'));
         
-        // Navigate to main screen
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainNavigator' as never }],
-        });
+        // No need to navigate manually - RootNavigator will automatically 
+        // switch to MainNavigator when isAuthenticated becomes true
       } else {
         throw new Error(response.message || t('face.loginFailed'));
       }
