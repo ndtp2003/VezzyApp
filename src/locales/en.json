@@ -594,6 +594,8 @@
     "retakePhoto": "Retake Photo",
     "updateSuccess": "Face updated successfully",
     "updateFailed": "Failed to update face",
+    "loginSuccess": "Face login successful",
+    "loginFailed": "Face login failed",
     "loginNotImplemented": "Face login feature is not yet implemented",
     "capturing": "Capturing...",
     "faceDetected": "Face detected!",

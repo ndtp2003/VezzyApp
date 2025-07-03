@@ -27,6 +27,7 @@ import { requestCameraPermission } from '../utils/permissions';
 import { apiService } from '../services/api';
 import { showSuccessToast, showErrorToast } from '../utils/toast';
 import { useSettingsStore } from '../store/settingsStore';
+import { useAuthStore } from '../store/authStore';
 
 type FaceScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'FaceScanner'>;
 type FaceScannerScreenRouteProp = RouteProp<RootStackParamList, 'FaceScanner'>;
@@ -39,6 +40,7 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
   const { mode = 'update' } = route.params || {};
   const { t } = useTranslation();
   const { theme } = useSettingsStore();
+  const { setLoading, updateUser, updateUserConfig } = useAuthStore();
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   const styles = createStyles(currentTheme);
 
@@ -145,7 +147,11 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         const result = await cameraRef.current.capture();
         if (result && result.uri) {
           setCapturedImage(result.uri);
-          await uploadFaceImage(result.uri);
+          if (mode === 'login') {
+            await loginByFace(result.uri);
+          } else {
+            await uploadFaceImage(result.uri);
+          }
         }
       }
     } catch (error) {
@@ -174,6 +180,98 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         navigation.goBack();
       } else {
         throw new Error(response.message || t('face.updateFailed'));
+      }
+    } catch (error: any) {
+      // Stop scanning and show error dialog
+      setIsScanning(false);
+      setIsProcessing(false);
+      stopCountdown();
+      
+      showErrorDialog(error);
+    }
+  };
+
+  const loginByFace = async (imageUri: string) => {
+    try {
+      // Create form data for face image upload
+      const formData = new FormData();
+      formData.append('FaceImage', {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'face.jpg',
+      } as any);
+
+      const response = await apiService.loginByFace(formData);
+      
+      if (response.flag && response.data) {
+        // Handle successful face login - set auth state directly
+        const authData = response.data;
+        const authStore = useAuthStore.getState();
+        
+        // Check if user is Collaborator (role: 3)
+        if (authData.account.role !== 3) {
+          throw new Error('WRONG_ROLE');
+        }
+        
+        // Calculate token expiry times (copy from authStore logic)
+        const AUTH_CONFIG = { TOKEN_EXPIRE_TIME: 3600, REFRESH_TOKEN_EXPIRE_TIME: 7200 }; // 1 hour and 2 hours
+        const calculateExpiryTime = (expiresInSeconds: number): number => {
+          return Date.now() + (expiresInSeconds * 1000);
+        };
+        const accessTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.TOKEN_EXPIRE_TIME);
+        const refreshTokenExpiresAt = calculateExpiryTime(AUTH_CONFIG.REFRESH_TOKEN_EXPIRE_TIME);
+        
+        // Map response data to CombinedUserData interface (copy from authStore logic)
+        const user = {
+          // Account fields
+          accountId: authData.account.accountId,
+          username: authData.account.username,
+          email: authData.account.email,
+          role: authData.account.role,
+          isActive: authData.account.isActive,
+          isEmailVerified: authData.account.isEmailVerified,
+          isOnline: authData.account.isOnline,
+          lastActiveAt: authData.account.lastActiveAt,
+          lastLoginDevice: authData.account.lastLoginDevice,
+          lastLoginIP: authData.account.lastLoginIP,
+          lastLoginLocation: authData.account.lastLoginLocation,
+          accountCreatedAt: authData.account.createdAt,
+          lastLogin: authData.account.lastLogin,
+          
+          // User fields
+          userId: authData.account.userId,
+          fullName: (authData.account as any).fullName || null,
+          phone: authData.account.phone,
+          avatarUrl: authData.account.avatar,
+          gender: authData.account.gender,
+          dob: authData.account.dob,
+          location: authData.account.location,
+        };
+        
+        // Set auth state directly
+        const setState = useAuthStore.setState;
+        setState({
+          accessToken: authData.accessToken,
+          refreshToken: authData.refreshToken,
+          accessTokenExpiresAt,
+          refreshTokenExpiresAt,
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+
+        // Set token for future API calls
+        apiService.setAuthToken(authData.accessToken);
+        
+        showSuccessToast(t('face.loginSuccess'));
+        
+        // Navigate to main screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainNavigator' as never }],
+        });
+      } else {
+        throw new Error(response.message || t('face.loginFailed'));
       }
     } catch (error: any) {
       // Stop scanning and show error dialog
@@ -307,7 +405,11 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         const result = await cameraRef.current.capture();
         if (result && result.uri) {
           setCapturedImage(result.uri);
-          await uploadFaceImage(result.uri);
+          if (mode === 'login') {
+            await loginByFace(result.uri);
+          } else {
+            await uploadFaceImage(result.uri);
+          }
         }
       }
     } catch (error) {

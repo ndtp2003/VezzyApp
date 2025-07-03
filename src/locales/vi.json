@@ -594,6 +594,8 @@
     "retakePhoto": "Chụp Lại",
     "updateSuccess": "Cập nhật khuôn mặt thành công",
     "updateFailed": "Không thể cập nhật khuôn mặt",
+    "loginSuccess": "Đăng nhập bằng khuôn mặt thành công",
+    "loginFailed": "Đăng nhập bằng khuôn mặt thất bại",
     "loginNotImplemented": "Tính năng đăng nhập bằng khuôn mặt chưa được triển khai",
     "capturing": "Đang chụp...",
     "faceDetected": "Đã phát hiện khuôn mặt!",

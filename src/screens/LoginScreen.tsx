@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAuthStore } from '../store/authStore';
 import { handleApiError } from '../utils';
@@ -19,9 +21,11 @@ import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../the
 import { useSettingsStore } from '../store/settingsStore';
 import { useToast } from '../components';
 
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList>;
+
 const LoginScreen: React.FC = () => {
   const { t } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login, isLoading } = useAuthStore();
   const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
@@ -56,6 +60,10 @@ const LoginScreen: React.FC = () => {
 
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword' as never);
+  };
+
+  const handleFaceLogin = () => {
+    navigation.navigate('FaceScanner', { mode: 'login' });
   };
 
   return (
@@ -141,6 +149,22 @@ const LoginScreen: React.FC = () => {
             >
               <Text style={styles.forgotPasswordText}>
                 {t('login.forgotPassword')}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Face Login Button */}
+            <TouchableOpacity
+              style={styles.faceLoginButton}
+              onPress={handleFaceLogin}
+            >
+              <Icon
+                name="scan"
+                size={20}
+                color={currentTheme.primary}
+                style={styles.faceLoginIcon}
+              />
+              <Text style={styles.faceLoginText}>
+                {t('face.loginByFace')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -249,6 +273,26 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     ...typography.body2,
     color: theme.primary,
     textDecorationLine: 'underline',
+  },
+  faceLoginButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
+    borderColor: theme.primary,
+    borderRadius: borderRadius.md,
+    backgroundColor: 'transparent',
+  },
+  faceLoginIcon: {
+    marginRight: spacing.sm,
+  },
+  faceLoginText: {
+    ...typography.body2,
+    color: theme.primary,
+    fontWeight: '600',
   },
 });
 

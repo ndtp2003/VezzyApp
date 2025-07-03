@@ -399,6 +399,7 @@ export type AuthStackParamList = {
   Login: undefined;
   ForgotPassword: undefined;
   ResetPassword: { email: string };
+  FaceScanner: { mode?: 'update' | 'login' };
 };
 
 export type MainTabParamList = {
