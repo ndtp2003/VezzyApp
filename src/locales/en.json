@@ -602,7 +602,7 @@
     "lookingForFace": "Looking for face...",
     "autoCapturing": "Auto capturing in",
     "errorDialog": {
-      "title": "Face Update Failed",
+      "title": "Update Failed",
       "tryAgain": "Try Again", 
       "goBack": "Go Back",
       "errors": {

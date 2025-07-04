@@ -602,7 +602,7 @@
     "lookingForFace": "Đang tìm khuôn mặt...",
     "autoCapturing": "Tự động chụp sau",
     "errorDialog": {
-      "title": "Cập nhật khuôn mặt thất bại",
+      "title": "Thất bại",
       "tryAgain": "Thử lại",
       "goBack": "Quay lại", 
       "errors": {

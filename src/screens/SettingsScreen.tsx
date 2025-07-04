@@ -264,16 +264,6 @@ const SettingsScreen: React.FC = () => {
           <Text style={styles.infoText}>{t('settings.appInfo.version')}: 1.0.0</Text>
           <Text style={styles.infoText}>{t('settings.appInfo.buildNumber')}: 1</Text>
         </View>
-
-        {/* Debug Info */}
-        {__DEV__ && (
-          <View style={styles.debugSection}>
-            <Text style={styles.debugText}>Debug Info:</Text>
-            <Text style={styles.debugText}>Settings Language: {language}</Text>
-            <Text style={styles.debugText}>i18n Language: {i18n.language}</Text>
-          </View>
-        )}
-
       </View>
     </ScrollView>
   );
