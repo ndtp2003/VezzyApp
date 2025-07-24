@@ -90,7 +90,19 @@ export const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-// Validation utilities
+// Re-export validation utilities from the main validation module
+export { 
+  validateEmail, 
+  validatePhone, 
+  validatePassword, 
+  validateFullName, 
+  validateUsername,
+  validateProfileUpdate,
+  validateRegistration,
+  VALIDATION_PATTERNS 
+} from './validation';
+
+// Legacy compatibility functions (deprecated - use validation module instead)
 export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);

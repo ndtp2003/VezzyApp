@@ -188,7 +188,8 @@
       "capacity": "Sức chứa",
       "status": "Trạng thái",
       "checkInHistory": "Lịch sử check-in",
-      "scanQR": "Quét mã QR"
+      "scanQR": "Quét mã QR",
+      "contents": "Nội dung"
     },
     "status": {
       "approved": "Đã duyệt",
@@ -210,7 +211,32 @@
     "checkInHistoryDesc": "Xem lịch sử check-in của sự kiện này",
     "faceCheckIn": "Check-in bằng khuôn mặt",
     "faceCheckInDesc": "Sử dụng nhận diện khuôn mặt để check-in",
-    "tapToSelect": "Nhấn để chọn"
+    "faceCheckInFailed": "Check-in bằng khuôn mặt thất bại",
+    "tapToSelect": "Nhấn để chọn",
+    "viewDetail": "Xem chi tiết sự kiện",
+    "viewDetailDesc": "Xem thông tin đầy đủ về sự kiện này"
+  },
+  "checkIn": {
+    "faceCheckInResult": "Kết Quả Check-in Khuôn Mặt",
+    "successful": "Thành Công",
+    "alreadyCheckedIn": "Đã Check-in",
+    "totalTickets": "Tổng Số Vé",
+    "ticketDetails": "Chi Tiết Vé",
+    "status": {
+      "success": "Thành công",
+      "already_checked_in": "Đã check-in",
+      "failed": "Thất bại"
+    },
+    "previousCheckIn": "Đã check-in trước đó",
+    "by": "bởi",
+    "method": {
+      "qrCode": "Mã QR",
+      "faceRecognition": "Nhận Diện Khuôn Mặt",
+      "other": "Khác"
+    },
+    "continueScanning": "Tiếp Tục Quét",
+    "noFaceDetected": "Không phát hiện khuôn mặt",
+    "faceNotRecognized": "Không nhận diện được khuôn mặt cho sự kiện này"
   },
   "checkInHistory": {
     "title": "Lịch sử Check-in",
@@ -296,6 +322,17 @@
       "NewsPublished": "Tin Tức Mới",
       "SystemUpdate": "Cập Nhật Hệ Thống",
       "CheckInCompleted": "Hoàn Thành Check-in"
+    },
+    "detail": {
+      "title": "Chi tiết thông báo",
+      "subject": "Tiêu đề",
+      "message": "Nội dung",
+      "type": "Loại",
+      "receivedAt": "Nhận lúc",
+      "readAt": "Đã đọc lúc",
+      "link": "Liên kết",
+      "noTitle": "Không có tiêu đề",
+      "noMessage": "Không có nội dung"
     }
   },
   "qrScanner": {
@@ -393,7 +430,11 @@
     "errors": {
       "fullNameRequired": "Họ và tên là bắt buộc",
       "emailRequired": "Email là bắt buộc",
-      "updateFailed": "Cập nhật hồ sơ thất bại"
+      "updateFailed": "Cập nhật hồ sơ thất bại",
+      "invalidFullName": "Họ và tên phải từ 2-50 ký tự và chỉ chứa chữ cái và khoảng trắng",
+      "invalidEmail": "Định dạng email không hợp lệ",
+      "invalidPhone": "Định dạng số điện thoại Việt Nam không hợp lệ. Vui lòng sử dụng định dạng: 0xxxxxxxxx hoặc +84xxxxxxxxx",
+      "invalidDateOfBirth": "Ngày sinh không hợp lệ"
     },
           "updateFace": "Cập nhật khuôn mặt",
       "messages": {

@@ -82,13 +82,20 @@ const EventsScreen: React.FC = () => {
   const handleFaceCheckIn = useCallback(() => {
     setShowActionModal(false);
     if (selectedEvent) {
-      Alert.alert(
-        t('events.faceCheckIn'),
-        t('events.faceCheckIn') + ' cho "' + selectedEvent.eventName + '"',
-        [{ text: t('common.ok') }]
-      );
+      try {
+        navigation.navigate('FaceScanner', { 
+          mode: 'checkin',
+          eventId: selectedEvent.eventId 
+        });
+      } catch (error) {
+        Alert.alert(
+          t('events.faceCheckIn'),
+          t('events.faceCheckIn') + ' cho "' + selectedEvent.eventName + '"',
+          [{ text: t('common.ok') }]
+        );
+      }
     }
-  }, [selectedEvent, t]);
+  }, [selectedEvent, t, navigation]);
 
   // Handle QR Scanner (from action buttons)
   const handleQRScanner = useCallback((event: Event) => {
@@ -102,6 +109,22 @@ const EventsScreen: React.FC = () => {
       );
     }
   }, [navigation, t]);
+
+  // Thêm hàm xử lý chuyển sang màn hình chi tiết sự kiện
+  const handleViewEventDetail = useCallback(() => {
+    setShowActionModal(false);
+    if (selectedEvent) {
+      try {
+        navigation.navigate('EventDetail', { eventId: selectedEvent.eventId });
+      } catch (error) {
+        Alert.alert(
+          t('events.viewDetail'),
+          t('events.viewDetail') + ' cho "' + selectedEvent.eventName + '"',
+          [{ text: t('common.ok') }]
+        );
+      }
+    }
+  }, [selectedEvent, t, navigation]);
 
   // Handle error
   useEffect(() => {
@@ -172,9 +195,9 @@ const EventsScreen: React.FC = () => {
             </View>
           </View>
           
-          <Text style={[styles.eventDescription, { color: currentTheme.textSecondary }]} numberOfLines={3}>
+          {/* <Text style={[styles.eventDescription, { color: currentTheme.textSecondary }]} numberOfLines={3}>
             {item.eventDescription}
-          </Text>
+          </Text> */}
           
           <View style={styles.eventDetails}>
             <View style={styles.eventTime}>
@@ -304,6 +327,18 @@ const EventsScreen: React.FC = () => {
                 </Text>
                 <Text style={[styles.actionOptionDesc, { color: currentTheme.textSecondary }]}>
                   {t('events.faceCheckInDesc')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionOption, { borderColor: currentTheme.border }]}
+                onPress={handleViewEventDetail}
+              >
+                <Icon name="info" size={32} color={currentTheme.primary} />
+                <Text style={[styles.actionOptionTitle, { color: currentTheme.text }]}>
+                  {t('events.viewDetail')}
+                </Text>
+                <Text style={[styles.actionOptionDesc, { color: currentTheme.textSecondary }]}>
+                  {t('events.viewDetailDesc')}
                 </Text>
               </TouchableOpacity>
             </View>

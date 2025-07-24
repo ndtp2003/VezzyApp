@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNotificationStore } from '../store/notificationStore';
 import { useSettingsStore } from '../store/settingsStore';
-import { useToast } from '../components';
+import { useToast, NotificationDetailModal } from '../components';
 import { lightTheme, darkTheme } from '../theme';
 import { Notification, NotificationType } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,6 +25,8 @@ const NotificationsScreen: React.FC = () => {
   const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
   const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const {
     notifications,
@@ -88,6 +90,18 @@ const NotificationsScreen: React.FC = () => {
       showErrorToast(error instanceof Error ? error.message : 'Failed to mark all as read');
     }
   }, [markAllAsRead, showSuccessToast, showErrorToast, t]);
+
+  // Handle notification press - show detail modal
+  const handleNotificationPress = useCallback((notification: Notification) => {
+    setSelectedNotification(notification);
+    setShowDetailModal(true);
+  }, []);
+
+  // Handle close detail modal
+  const handleCloseDetailModal = useCallback(() => {
+    setShowDetailModal(false);
+    setSelectedNotification(null);
+  }, []);
 
   // Confirm mark all as read
   const confirmMarkAllAsRead = () => {
@@ -217,7 +231,7 @@ const NotificationsScreen: React.FC = () => {
           styles.notificationItem,
           !item.isRead && styles.unreadItem,
         ]}
-        onPress={() => !item.isRead && handleMarkAsRead(item.notificationId)}
+        onPress={() => handleNotificationPress(item)}
         activeOpacity={0.7}
       >
         <View style={styles.notificationIcon}>
@@ -374,6 +388,15 @@ const NotificationsScreen: React.FC = () => {
           </View>
         </Pressable>
       </Modal>
+
+      {/* Notification Detail Modal */}
+      <NotificationDetailModal
+        visible={showDetailModal}
+        notification={selectedNotification}
+        onClose={handleCloseDetailModal}
+        onMarkAsRead={handleMarkAsRead}
+        theme={currentTheme}
+      />
     </View>
   );
 };
@@ -581,6 +604,6 @@ const createStyles = (theme: any) =>
       fontSize: 16,
       color: theme.text,
     },
-  });
+});
 
 export default NotificationsScreen; 

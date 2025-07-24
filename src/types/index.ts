@@ -48,6 +48,36 @@ export interface CheckInLogItem {
   createdAt: string;
 }
 
+// Face Check-in Response Types
+export interface FaceCheckInResponse {
+  success: boolean;
+  message: string;
+  data: {
+    orderId: string;
+    eventId: string;
+    customerName: string;
+    totalTickets: number;
+    successfulCheckins: number;
+    alreadyCheckedIn: number;
+    checkinDetails: CheckInTicketDetail[];
+  };
+}
+
+export interface CheckInTicketDetail {
+  ticketCode: string;
+  ticketType: string;
+  status: 'success' | 'already_checked_in' | 'failed';
+  message: string;
+  previousCheckIn?: PreviousCheckInInfo;
+}
+
+export interface PreviousCheckInInfo {
+  checkedInAt: string;
+  checkedInBy: string;
+  checkerName: string;
+  checkInMethod: 'QrCode' | 'FaceRecognition' | 'Other';
+}
+
 // QR Code Detail API Response
 export interface QRCodeDetailResponse {
   isSuccess: boolean;
@@ -392,14 +422,14 @@ export type RootStackParamList = {
   NewsDetail: { newsId: string };
   ChangePassword: undefined;
   CheckInHistory: { eventId: string; eventName: string };
-  FaceScanner: { mode?: 'update' | 'login' };
+  FaceScanner: { mode?: 'update' | 'login' | 'checkin'; eventId?: string };
 };
 
 export type AuthStackParamList = {
   Login: undefined;
   ForgotPassword: undefined;
   ResetPassword: { email: string };
-  FaceScanner: { mode?: 'update' | 'login' };
+  FaceScanner: { mode?: 'update' | 'login' | 'checkin'; eventId?: string };
 };
 
 export type MainTabParamList = {

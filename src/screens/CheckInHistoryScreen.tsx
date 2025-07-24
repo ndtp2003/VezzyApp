@@ -386,9 +386,9 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     backgroundColor: theme.background,
   },
   header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md, // giống ChangePasswordScreen
+    paddingTop: spacing.md, // nhỏ lại
+    paddingBottom: spacing.sm, // nhỏ lại
     backgroundColor: theme.surface,
     borderBottomWidth: 1,
     borderBottomColor: theme.border,
@@ -397,14 +397,14 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs, // nhỏ lại
   },
   backButton: {
     padding: spacing.sm,
     borderRadius: borderRadius.full,
   },
   headerTitle: {
-    ...typography.h2,
+    ...typography.h4, // nhỏ hơn
     color: theme.text,
     fontWeight: '600',
   },
@@ -421,12 +421,12 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     minWidth: 48,
   },
   eventName: {
-    ...typography.h3,
+    ...typography.body2, // nhỏ hơn
     color: theme.text,
     marginBottom: spacing.xs,
   },
   statsText: {
-    ...typography.body2,
+    ...typography.caption, // nhỏ hơn
     color: theme.textSecondary,
   },
   listContainer: {

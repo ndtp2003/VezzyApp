@@ -25,6 +25,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { launchImageLibrary, launchCamera, ImagePickerResponse } from 'react-native-image-picker';
 import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
 import { RootStackParamList } from '../types';
+import { validateProfileUpdate, validateFullName, validatePhone } from '../utils/validation';
 
 const EditProfileScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -178,14 +179,17 @@ const EditProfileScreen: React.FC = () => {
       setIsLoading(true);
       showLoading(t('common.savingProfile'));
       
-      // Validate required fields
-      if (!formData.fullName.trim()) {
-        showErrorToast(t('editProfile.errors.fullNameRequired'));
-        return;
-      }
+      // Validate form data using backend-compatible validation
+      const validationErrors = validateProfileUpdate(
+        formData.fullName,
+        user?.email || '',
+        formData.phone || undefined,
+        formData.dob || undefined
+      );
 
-      if (!user?.email) {
-        showErrorToast(t('editProfile.errors.emailRequired'));
+      if (validationErrors.length > 0) {
+        // Show first validation error
+        showErrorToast(validationErrors[0]);
         return;
       }
 

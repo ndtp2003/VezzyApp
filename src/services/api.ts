@@ -18,6 +18,7 @@ import {
   TicketIssued,
   News,
   Notification,
+  FaceCheckInResponse,
   UserSettings,
   User,
   DashboardStats,
@@ -327,6 +328,26 @@ class ApiService {
 
   async updateUserSettings(accountId: string, settings: Partial<UserSettings>): Promise<ApiResponse<UserSettings>> {
     const response = await this.axiosInstance.put(`/api/user/${accountId}/config`, settings);
+    return response.data;
+  }
+
+  // Face Check-in endpoint
+  async checkInByFace(eventId: string, imageUri: string): Promise<FaceCheckInResponse> {
+    const formData = new FormData();
+    formData.append('EventId', eventId);
+    formData.append('FaceImage', {
+      uri: imageUri,
+      type: 'image/jpeg',
+      name: 'face.jpg'
+    } as any);
+
+    const response = await this.axiosInstance.post('/api/TicketIssued/checkinbyface', formData, {
+      timeout: 30000, // 30-second timeout as per documentation
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
     return response.data;
   }
 

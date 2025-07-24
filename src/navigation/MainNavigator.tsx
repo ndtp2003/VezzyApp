@@ -54,12 +54,14 @@ const EventsNavigator: React.FC = () => {
       <EventStack.Screen
         name="EventsList"
         component={EventsScreen}
-        options={{ title: t('navigation.events') }}
+        options={{ headerShown: false }}
       />
       <EventStack.Screen
         name="EventDetail"
         component={EventDetailScreen}
-        options={{ title: t('events.eventDetails') }}
+        options={{ headerShown: true,
+          title: t('events.eventDetails')
+         }}
       />
     </EventStack.Navigator>
   );
@@ -88,7 +90,7 @@ const NewsNavigator: React.FC = () => {
       <NewsStack.Screen
         name="NewsList"
         component={NewsScreen}
-        options={{ title: t('navigation.news') }}
+        options={{ headerShown: false }}
       />
       <NewsStack.Screen
         name="NewsDetail"
@@ -122,7 +124,7 @@ const ProfileNavigator: React.FC = () => {
       <ProfileStack.Screen
         name="ProfileMain"
         component={ProfileScreen}
-        options={{ title: t('navigation.profile') }}
+        options={{ headerShown: false }}
       />
       <ProfileStack.Screen
         name="EditProfile"
@@ -244,7 +246,7 @@ const MainNavigator: React.FC = () => {
         component={HomeScreen}
         options={{
           title: t('navigation.home'),
-          headerTitle: t('home.title'),
+          headerShown: false
         }}
       />
       <Tab.Screen
@@ -268,7 +270,7 @@ const MainNavigator: React.FC = () => {
         component={NotificationsScreen}
         options={{
           title: t('navigation.notifications'),
-          headerTitle: t('notifications.title'),
+          headerShown: false
         }}
       />
       <Tab.Screen

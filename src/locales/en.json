@@ -187,7 +187,8 @@
       "location": "Location",
       "capacity": "Capacity",
       "status": "Status",
-      "scanQR": "Scan QR Code"
+      "scanQR": "Scan QR Code",
+      "contents": "Contents"
     },
     "status": {
       "approved": "Approved",
@@ -209,7 +210,32 @@
     "checkInHistoryDesc": "View check-in history for this event",
     "faceCheckIn": "Face Check-in",
     "faceCheckInDesc": "Use facial recognition for check-in",
-    "tapToSelect": "Tap to select"
+    "faceCheckInFailed": "Face check-in failed",
+    "tapToSelect": "Tap to select",
+    "viewDetail": "View event details",
+    "viewDetailDesc": "See full information about this event"
+  },
+  "checkIn": {
+    "faceCheckInResult": "Face Check-in Result",
+    "successful": "Successful",
+    "alreadyCheckedIn": "Already Checked In",
+    "totalTickets": "Total Tickets",
+    "ticketDetails": "Ticket Details",
+    "status": {
+      "success": "Success",
+      "already_checked_in": "Already Checked In",
+      "failed": "Failed"
+    },
+    "previousCheckIn": "Previously checked in",
+    "by": "by",
+    "method": {
+      "qrCode": "QR Code",
+      "faceRecognition": "Face Recognition", 
+      "other": "Other"
+    },
+    "continueScanning": "Continue Scanning",
+    "noFaceDetected": "No face detected",
+    "faceNotRecognized": "Face not recognized for this event"
   },
   "checkInHistory": {
     "title": "Check-in History",
@@ -294,7 +320,18 @@
     },
     "noNotifications": "No notifications",
     "markAsRead": "Mark as Read",
-    "markAllAsRead": "Mark All as Read"
+    "markAllAsRead": "Mark All as Read",
+    "detail": {
+      "title": "Notification Details",
+      "subject": "Subject",
+      "message": "Message",
+      "type": "Type",
+      "receivedAt": "Received At",
+      "readAt": "Read At",
+      "link": "Link",
+      "noTitle": "No title",
+      "noMessage": "No message"
+    }
   },
   "qrScanner": {
     "title": "QR Scanner",
@@ -571,7 +608,11 @@
     "errors": {
       "fullNameRequired": "Full name is required",
       "emailRequired": "Email is required",
-      "updateFailed": "Failed to update profile"
+      "updateFailed": "Failed to update profile",
+      "invalidFullName": "Full name must be 2-50 characters long and contain only letters and spaces",
+      "invalidEmail": "Invalid email format",
+      "invalidPhone": "Invalid Vietnamese phone number format. Please use format: 0xxxxxxxxx or +84xxxxxxxxx",
+      "invalidDateOfBirth": "Invalid date of birth"
     },
     "messages": {
       "updateSuccess": "Profile updated successfully"

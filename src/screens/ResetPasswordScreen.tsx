@@ -18,6 +18,7 @@ import { handleApiError } from '../utils';
 import { useToast } from '../components';
 import { useSettingsStore } from '../store/settingsStore';
 import { lightTheme, darkTheme } from '../theme';
+import { validatePassword } from '../utils/validation';
 
 interface RouteParams {
   email: string;
@@ -48,25 +49,16 @@ const ResetPasswordScreen: React.FC = () => {
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
   const styles = createStyles(currentTheme);
 
-  const validatePassword = (password: string): boolean => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-  };
-
   const validateForm = (): boolean => {
     if (!formData.verificationCode.trim()) {
       showErrorToast(t('resetPassword.errors.codeRequired'));
       return false;
     }
     
-    if (!formData.newPassword.trim()) {
-      showErrorToast(t('resetPassword.errors.passwordRequired'));
-      return false;
-    }
-    
-    if (!validatePassword(formData.newPassword)) {
-      showErrorToast(t('resetPassword.errors.passwordRequirements'));
+    // Use backend-compatible password validation
+    const passwordValidation = validatePassword(formData.newPassword);
+    if (!passwordValidation.isValid) {
+      showErrorToast(passwordValidation.errorMessage || t('resetPassword.errors.passwordRequirements'));
       return false;
     }
     

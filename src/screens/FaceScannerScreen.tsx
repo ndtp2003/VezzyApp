@@ -28,6 +28,7 @@ import { apiService } from '../services/api';
 import { showSuccessToast, showErrorToast } from '../utils/toast';
 import { useSettingsStore } from '../store/settingsStore';
 import { useAuthStore } from '../store/authStore';
+import { CheckInResultModal } from '../components';
 
 type FaceScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'FaceScanner'>;
 type FaceScannerScreenRouteProp = RouteProp<RootStackParamList, 'FaceScanner'>;
@@ -37,7 +38,7 @@ interface FaceScannerScreenProps {}
 const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
   const navigation = useNavigation<FaceScannerScreenNavigationProp>();
   const route = useRoute<FaceScannerScreenRouteProp>();
-  const { mode = 'update' } = route.params || {};
+  const { mode = 'update', eventId } = (route.params as any) || {};
   const { t } = useTranslation();
   const { theme } = useSettingsStore();
   const { setLoading, updateUser, updateUserConfig } = useAuthStore();
@@ -53,6 +54,9 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [errorTitle, setErrorTitle] = useState('');
+  const [showCheckInResultModal, setShowCheckInResultModal] = useState(false);
+  const [checkInResults, setCheckInResults] = useState<any>(null);
+  const [hasStartedCountdown, setHasStartedCountdown] = useState(false); // NEW
 
   const cameraRef = useRef<any>(null);
   const pulseAnimation = useRef(new Animated.Value(1)).current;
@@ -67,22 +71,27 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current);
       }
+      if (instructionTimeoutRef.current) {
+        clearTimeout(instructionTimeoutRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    if (isScanning && hasPermission && !capturedImage && !isProcessing && countdown === 0) {
-      // Start countdown after 2 seconds for user to read instructions
-      const timer = setTimeout(() => {
+    if (isScanning && hasPermission && !capturedImage && !isProcessing && countdown === 0 && !hasStartedCountdown) {
+      // Hiển thị hướng dẫn, sau 3s nếu chưa chụp thì bắt đầu đếm ngược 7s
+      instructionTimeoutRef.current = setTimeout(() => {
         setShowInstructions(false);
+        setHasStartedCountdown(true);
         startSmartCountdown();
-      }, 2000);
-      
-      return () => clearTimeout(timer);
+      }, 3000);
+      return () => {
+        if (instructionTimeoutRef.current) clearTimeout(instructionTimeoutRef.current);
+      };
     } else if (!isScanning || capturedImage || isProcessing) {
       stopCountdown();
     }
-  }, [isScanning, hasPermission, capturedImage, isProcessing]);
+  }, [isScanning, hasPermission, capturedImage, isProcessing, hasStartedCountdown]);
 
   const getCameraPermission = async () => {
     const granted = await requestCameraPermission();
@@ -132,6 +141,7 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
       countdownIntervalRef.current = null;
     }
     setCountdown(0);
+    setHasStartedCountdown(false);
   };
 
   const autoCapture = async () => {
@@ -149,6 +159,8 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
           setCapturedImage(result.uri);
           if (mode === 'login') {
             await loginByFace(result.uri);
+          } else if (mode === 'checkin') {
+            await checkInByFace(result.uri);
           } else {
             await uploadFaceImage(result.uri);
           }
@@ -280,8 +292,53 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
     }
   };
 
+  const checkInByFace = async (imageUri: string) => {
+    try {
+      // Get eventId from route params
+      if (!eventId) {
+        throw new Error('Event ID is required for check-in');
+      }
+
+      const response = await apiService.checkInByFace(eventId, imageUri);
+      
+      if (response.success && response.data) {
+        // Show detailed check-in results
+        const { data } = response;
+        setCheckInResults(data);
+        setShowCheckInResultModal(true);
+        setIsProcessing(false);
+      } else {
+        throw new Error(response.message || t('events.faceCheckInFailed'));
+      }
+    } catch (error: any) {
+      // Stop scanning and show error dialog
+      setIsScanning(false);
+      setIsProcessing(false);
+      stopCountdown();
+      
+      showErrorDialog(error);
+    }
+  };
+
   const handleBack = () => {
     navigation.goBack();
+  };
+
+  const handleCheckInResultClose = () => {
+    setShowCheckInResultModal(false);
+    setCheckInResults(null);
+    navigation.goBack();
+  };
+
+  const handleCheckInResultContinue = () => {
+    setShowCheckInResultModal(false);
+    setCheckInResults(null);
+    setCapturedImage(null);
+    setIsProcessing(false);
+    setIsScanning(true);
+    // Reset countdown for next capture
+    setCountdown(0);
+    setShowInstructions(true);
   };
 
   const parseErrorMessage = (error: any): string => {
@@ -391,26 +448,27 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
   };
 
   const handleManualCapture = async () => {
-    if (countdown > 0 || isProcessing) return;
-    
+    if (isProcessing) return; // chỉ disable khi đang xử lý
+    stopCountdown();
+    setShowInstructions(false);
+    setHasStartedCountdown(false);
+    setIsScanning(false);
+    setIsProcessing(true);
     try {
-      stopCountdown();
-      setIsScanning(false);
-      setIsProcessing(true);
-      
       if (cameraRef.current) {
         const result = await cameraRef.current.capture();
         if (result && result.uri) {
           setCapturedImage(result.uri);
           if (mode === 'login') {
             await loginByFace(result.uri);
+          } else if (mode === 'checkin') {
+            await checkInByFace(result.uri);
           } else {
             await uploadFaceImage(result.uri);
           }
         }
       }
     } catch (error) {
-      console.error('Manual capture error:', error);
       setIsProcessing(false);
       setIsScanning(false);
       stopCountdown();
@@ -448,7 +506,9 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
           <Icon name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {mode === 'update' ? t('face.updateFace') : t('face.loginByFace')}
+          {mode === 'update' ? t('face.updateFace') : 
+           mode === 'checkin' ? t('events.faceCheckIn') : 
+           t('face.loginByFace')}
         </Text>
         <View style={styles.headerRight} />
       </View>
@@ -474,18 +534,10 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
             <Camera
               ref={cameraRef}
               style={styles.camera}
-              cameraType={CameraType.Front}
+              cameraType={mode === 'checkin' ? CameraType.Back : CameraType.Front}
               showFrame={false}
               scanBarcode={false}
             />
-            
-            {showInstructions && (
-              <View style={styles.instructionsContainer}>
-                <Text style={styles.instructionsText}>
-                  {t('face.smartInstructions')}
-                </Text>
-              </View>
-            )}
             
             {/* Camera Overlay */}
             <View style={styles.overlay}>
@@ -496,27 +548,28 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
                     styles.faceOutline,
                     {
                       transform: [{ scale: pulseAnimation }],
-                      borderColor: countdown > 0 ? '#00FF00' : 'white',
+                      borderColor: 'white', // luôn là trắng
                     }
                   ]}
                 >
-                  <View style={[styles.faceCorner, countdown > 0 && styles.faceCornerActive]} />
-                  <View style={[styles.faceCorner, styles.faceCornerTopRight, countdown > 0 && styles.faceCornerActive]} />
-                  <View style={[styles.faceCorner, styles.faceCornerBottomLeft, countdown > 0 && styles.faceCornerActive]} />
-                  <View style={[styles.faceCorner, styles.faceCornerBottomRight, countdown > 0 && styles.faceCornerActive]} />
+                  <View style={styles.faceCorner} />
+                  <View style={[styles.faceCorner, styles.faceCornerTopRight]} />
+                  <View style={[styles.faceCorner, styles.faceCornerBottomLeft]} />
+                  <View style={[styles.faceCorner, styles.faceCornerBottomRight]} />
                 </Animated.View>
 
                 {/* Face Detection Indicator */}
-                                 {countdown > 0 && (
-                   <View style={styles.faceIndicatorContainer}>
-                     <Text style={styles.faceIndicatorText}>
-                       {countdown}
-                     </Text>
-                     <Text style={styles.faceIndicatorSubText}>
-                       {t('face.autoCapturing')}
-                     </Text>
-                   </View>
-                 )}
+                {countdown > 0 && (
+                  <View style={styles.faceIndicatorContainer}>
+                    <Text style={styles.faceIndicatorText}>{countdown}</Text>
+                    <Text style={styles.faceIndicatorSubText}>{t('face.autoCapturing')}</Text>
+                  </View>
+                )}
+                {showInstructions && (
+                  <View style={styles.instructionsContainer}>
+                    <Text style={styles.instructionsText}>{t('face.smartInstructions')}</Text>
+                  </View>
+                )}
               </View>
             </View>
           </>
@@ -530,25 +583,20 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
             <TouchableOpacity
               style={[
                 styles.captureButton, 
-                (countdown > 0 || isProcessing) && styles.captureButtonDisabled,
+                isProcessing && styles.captureButtonDisabled,
               ]}
-                             onPress={handleManualCapture}
-              disabled={countdown > 0 || isProcessing}
+              onPress={handleManualCapture}
+              disabled={isProcessing}
             >
               <View style={styles.captureButtonInner}>
-                <Icon name="camera-alt" size={32} color={countdown > 0 ? '#ccc' : 'white'} />
+                <Icon name="camera-alt" size={32} color={'white'} />
               </View>
             </TouchableOpacity>
           </View>
           
           {/* Auto Capture Status */}
           <View style={styles.statusContainer}>
-            <Text style={[
-              styles.statusText,
-              countdown > 0 && styles.statusTextActive
-            ]}>
-              {countdown > 0 ? t('face.faceDetected') : t('face.positionYourFace')}
-            </Text>
+            <Text style={styles.statusText}>{t('face.positionYourFace')}</Text>
           </View>
         </View>
       )}
@@ -607,6 +655,15 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
            </View>
          </View>
        )}
+
+      {/* Check-in Result Modal */}
+      <CheckInResultModal
+        visible={showCheckInResultModal}
+        data={checkInResults}
+        theme={theme === 'dark' ? 'dark' : 'light'}
+        onClose={handleCheckInResultClose}
+        onContinue={handleCheckInResultContinue}
+      />
       </View>
     );
   };
@@ -858,7 +915,7 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'transparent', // sửa lại hoàn toàn trong suốt
     padding: spacing.lg,
   },
   instructionsText: {
@@ -949,3 +1006,4 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
 });
 
 export default FaceScannerScreen;
+ 

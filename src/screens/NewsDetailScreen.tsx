@@ -141,26 +141,26 @@ const NewsDetailScreen: React.FC = () => {
     p: {
       ...typography.body1,
       color: currentTheme.text,
-      marginBottom: spacing.sm,
+      marginBottom: 4, // giảm margin
       lineHeight: 24,
     },
     h1: {
       ...typography.h4,
       color: currentTheme.text,
-      marginTop: spacing.md,
-      marginBottom: spacing.sm,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xs,
     },
     h2: {
       ...typography.h5,
       color: currentTheme.text,
-      marginTop: spacing.md,
-      marginBottom: spacing.sm,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xs,
     },
     h3: {
       ...typography.h6,
       color: currentTheme.text,
-      marginTop: spacing.md,
-      marginBottom: spacing.sm,
+      marginTop: spacing.xs,
+      marginBottom: spacing.xs,
     },
     strong: {
       color: currentTheme.text,
@@ -172,18 +172,24 @@ const NewsDetailScreen: React.FC = () => {
     },
     ul: {
       color: currentTheme.text,
-      marginBottom: spacing.sm,
+      marginBottom: 4,
     },
     ol: {
       color: currentTheme.text,
-      marginBottom: spacing.sm,
+      marginBottom: 4,
     },
     li: {
       color: currentTheme.text,
-      marginBottom: spacing.xs,
+      marginBottom: 2,
       lineHeight: 22,
     },
   });
+
+  // Thêm hàm chuyển đổi Markdown bold sang HTML bold
+  const convertMarkdownBoldToHtml = (html: string) => {
+    // Chuyển **text** thành <strong>text</strong>
+    return html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  };
 
   if (isLoading) {
     return <LoadingSpinner visible={true} message={t('common.loading')} />;
@@ -208,6 +214,8 @@ const NewsDetailScreen: React.FC = () => {
       </View>
     );
   }
+
+  const processedContent = convertMarkdownBoldToHtml(news.newsContent || '');
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -253,7 +261,7 @@ const NewsDetailScreen: React.FC = () => {
           )}
           
           {/* Status Badge and Event Tag - only for valid statuses */}
-          {(news.status >= 0 && news.status <= 2) || news.eventId ? (
+          {/* {(news.status >= 0 && news.status <= 2) || news.eventId ? (
             <View style={styles.statusContainer}>
               {news.status >= 0 && news.status <= 2 && (
                 <View style={[styles.statusBadge, { backgroundColor: getStatusColor(news.status) }]}>
@@ -268,7 +276,7 @@ const NewsDetailScreen: React.FC = () => {
                 </Text>
               )}
             </View>
-          ) : null}
+          ) : null} */}
         </View>
 
         {/* Description */}
@@ -278,7 +286,7 @@ const NewsDetailScreen: React.FC = () => {
         <View style={styles.contentSection}>
           <Text style={styles.sectionTitle}>{t('news.details.title')}</Text>
                      <HTMLView
-             value={news.newsContent || ('<p>' + t('news.noContent') + '</p>')}
+             value={processedContent}
              stylesheet={htmlStyles}
            />
         </View>
@@ -358,7 +366,7 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     borderRadius: borderRadius.full,
   },
   contentContainer: {
-    padding: spacing.lg,
+    padding: spacing.md, // giảm padding
   },
   statusContainer: {
     flexDirection: 'row',
@@ -420,15 +428,15 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     ...typography.body1,
     color: theme.text,
     lineHeight: 24,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md, // giảm margin
   },
   contentSection: {
-    marginBottom: spacing.xl,
+    marginBottom: spacing.md, // giảm margin
   },
   sectionTitle: {
     ...typography.h5,
     color: theme.text,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm, // giảm margin
     fontWeight: 'bold',
   },
   shareContainer: {

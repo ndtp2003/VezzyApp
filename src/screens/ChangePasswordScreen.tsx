@@ -17,6 +17,7 @@ import { apiService } from '../services/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useToast } from '../components';
 import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../theme';
+import { validatePassword } from '../utils/validation';
 
 interface PasswordRequirement {
   key: string;
@@ -96,13 +97,10 @@ const ChangePasswordScreen: React.FC = () => {
       return false;
     }
     
-    if (!formData.newPassword.trim()) {
-      showErrorToast(t('changePassword.errors.newPasswordRequired'));
-      return false;
-    }
-    
-    if (!isPasswordStrong(formData.newPassword)) {
-      showErrorToast(t('changePassword.errors.passwordRequirements'));
+    // Use backend-compatible password validation
+    const passwordValidation = validatePassword(formData.newPassword);
+    if (!passwordValidation.isValid) {
+      showErrorToast(passwordValidation.errorMessage || t('changePassword.errors.passwordRequirements'));
       return false;
     }
     
