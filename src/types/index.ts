@@ -548,3 +548,13 @@ export interface PaginatedResponse<T> {
     hasPrev: boolean;
   };
 } 
+
+// Thêm type cho thống kê collaborator
+export interface CollaboratorStaticResponse {
+  totalEvents: number;
+  ongoingEvents: number;
+  upcomingEvents: number;
+  completedEvents: number;
+  totalCheckIns: number;
+  generatedAt: string;
+} 

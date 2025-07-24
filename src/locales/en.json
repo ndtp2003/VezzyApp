@@ -164,7 +164,13 @@
       "totalCheckIns": "Total Check-ins",
       "todayCheckIns": "Today's Check-ins",
       "thisWeek": "This Week",
-      "thisMonth": "This Month"
+      "thisMonth": "This Month",
+      "title": "Statistics",
+      "ongoingEvents": "Ongoing Events",
+      "upcomingEvents": "Upcoming Events",
+      "completedEvents": "Completed Events",
+      "unreadNotifications": "Unread Notifications",
+      "generatedAt": "Updated at: {{date}}"
     },
     "viewAllEvents": "View All Events",
     "scanQRCode": "Scan QR Code"

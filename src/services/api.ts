@@ -25,7 +25,8 @@ import {
   SearchFilters,
   PaginationParams,
   CheckInHistoryResponse,
-  QRCodeDetailResponse
+  QRCodeDetailResponse,
+  CollaboratorStaticResponse
 } from '../types';
 
 class ApiService {
@@ -354,6 +355,12 @@ class ApiService {
   // Dashboard stats
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
     const response = await this.axiosInstance.get('/api/dashboard/stats');
+    return response.data;
+  }
+
+  // Lấy thống kê collaborator
+  async getCollaboratorStatic(userId: string): Promise<CollaboratorStaticResponse> {
+    const response = await this.axiosInstance.get(`/api/Event/collaborator/static?userId=${userId}`);
     return response.data;
   }
 

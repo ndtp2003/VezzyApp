@@ -164,7 +164,13 @@
       "totalCheckIns": "Tổng số check-in",
       "todayCheckIns": "Check-in hôm nay",
       "thisWeek": "Tuần này",
-      "thisMonth": "Tháng này"
+      "thisMonth": "Tháng này",
+      "title": "Thống kê",
+      "ongoingEvents": "Đang diễn ra",
+      "upcomingEvents": "Sắp tới",
+      "completedEvents": "Đã hoàn thành",
+      "unreadNotifications": "Thông báo chưa đọc",
+      "generatedAt": "Cập nhật: {{date}}"
     },
     "viewAllEvents": "Xem tất cả sự kiện",
     "scanQRCode": "Quét mã QR"
