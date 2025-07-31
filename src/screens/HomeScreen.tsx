@@ -17,12 +17,14 @@ import { lightTheme, darkTheme, spacing, borderRadius, typography, shadows } fro
 import { apiService } from '../services/api';
 import { CollaboratorStaticResponse } from '../types';
 import { useNotificationStore } from '../store/notificationStore';
+import { useEventStore } from '../store/eventStore';
 
 const HomeScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { user } = useAuthStore();
   const { theme } = useSettingsStore();
+  const collaboratorStats = useEventStore(state => state.collaboratorStats);
   
   // Sync language with user config
   useLanguageSync();
@@ -57,7 +59,6 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       if (!user?.userId) return;
-      console.log('[HomeScreen] Gọi getCollaboratorStatic với userId:', user.userId);
       setLoadingStats(true);
       setStatsError(null);
       try {
@@ -71,6 +72,13 @@ const HomeScreen: React.FC = () => {
     };
     fetchStats();
   }, [user?.userId]);
+
+  // Realtime: cập nhật dashboard khi có event SignalR
+  useEffect(() => {
+    if (collaboratorStats) {
+      setStats(collaboratorStats);
+    }
+  }, [collaboratorStats]);
 
   const unreadCount = useNotificationStore(state => state.unreadCount || 0);
 
@@ -153,7 +161,6 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     ...typography.h4,
     color: theme.text,
     textAlign: 'center',
-    marginBottom: spacing.sm,
   },
   welcomeSubtitle: {
     ...typography.body1,
@@ -217,7 +224,7 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   statsCard: {
     borderRadius: 16,
     padding: 16,
-    margin: 16,
+    margin: 8,
     marginBottom: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

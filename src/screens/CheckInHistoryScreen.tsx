@@ -22,6 +22,7 @@ import { lightTheme, darkTheme, spacing, borderRadius, typography } from '../the
 import { apiService } from '../services/api';
 import { useToast } from '../components';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useCheckInStore } from '../store/checkInStore';
 
 type CheckInHistoryScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 type CheckInHistoryScreenRouteProp = RouteProp<RootStackParamList, 'CheckInHistory'>;
@@ -53,6 +54,8 @@ const CheckInHistoryScreen: React.FC = () => {
   const [showQRSearch, setShowQRSearch] = useState(false);
   const [searchResult, setSearchResult] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  const checkInHistoryRealtime = useCheckInStore(state => state.checkInHistory);
 
   const styles = createStyles(currentTheme);
 
@@ -125,6 +128,13 @@ const CheckInHistoryScreen: React.FC = () => {
       loadCheckInHistory(1, true);
     }
   }, [eventId, loadCheckInHistory]); // Safe now with reduced dependencies
+
+  // Realtime: cập nhật lịch sử check-in khi có event SignalR
+  useEffect(() => {
+    if (checkInHistoryRealtime && checkInHistoryRealtime.length > 0) {
+      setCheckInHistory(checkInHistoryRealtime);
+    }
+  }, [checkInHistoryRealtime]);
 
   // Handle refresh - Now safe to include loadCheckInHistory
   const handleRefresh = useCallback(() => {

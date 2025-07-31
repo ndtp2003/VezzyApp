@@ -31,6 +31,7 @@ interface NewsState {
   setSelectedNews: (news: News | null) => void;
   clearError: () => void;
   reset: () => void;
+  setNewsRealtime: (news: any) => void;
 }
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -214,5 +215,11 @@ export const useNewsStore = create<NewsState>((set, get) => ({
       isRefreshing: false,
       error: null,
     });
+  },
+
+  setNewsRealtime: (news: any) => {
+    set(state => ({
+      newsList: [news, ...state.newsList.filter(n => n.newsId !== news.newsId)],
+    }));
   },
 })); 

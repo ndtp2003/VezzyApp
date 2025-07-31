@@ -304,6 +304,8 @@
     "subtitle": "Cập nhật thông báo mới nhất",
     "loading": "Đang tải thông báo...",
     "markAllRead": "Đánh Dấu Tất Cả Đã Đọc",
+    "markAllReadConfirm": "Bạn có chắc chắn muốn đánh dấu tất cả thông báo đã đọc?",
+    "newMessage": "Bạn có thông báo mới",
     "empty": {
       "title": "Không Có Thông Báo",
       "message": "Bạn đã xem hết! Không có thông báo mới."

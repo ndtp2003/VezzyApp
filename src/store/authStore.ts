@@ -80,7 +80,6 @@ export const useAuthStore = create<AuthStore>()(
           loadingStore.showLoading('Authenticating...');
           
           const response = await apiService.login(credentials);
-          
           if (response.flag) {
             const authData = response.data as AuthResponseDto;
             

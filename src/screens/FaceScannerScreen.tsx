@@ -186,7 +186,6 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
       } as any);
 
       const response = await apiService.updateFace(formData);
-      
       if (response.flag) {
         showSuccessToast(t('face.updateSuccess'));
         navigation.goBack();

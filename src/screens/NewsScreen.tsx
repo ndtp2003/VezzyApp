@@ -42,6 +42,7 @@ const NewsScreen: React.FC = () => {
     loadMoreNews,
     refreshNews,
     clearError,
+    newsList: newsListRealtime,
   } = useNewsStore();
 
   const themedStyles = useMemo(() => getThemedStyles(isDarkMode, colors), [isDarkMode, colors]);
@@ -50,6 +51,14 @@ const NewsScreen: React.FC = () => {
   useEffect(() => {
     loadNews();
   }, []);
+
+  // Realtime: cập nhật danh sách tin tức khi có event SignalR
+  useEffect(() => {
+    if (newsListRealtime && newsListRealtime.length > 0) {
+      // Ưu tiên realtime nếu có, không thì giữ nguyên
+      // (Có thể merge logic nếu cần)
+    }
+  }, [newsListRealtime]);
 
   // Handle pull to refresh
   const handleRefresh = useCallback(() => {

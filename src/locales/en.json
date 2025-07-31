@@ -99,6 +99,8 @@
     "updatingSettings": "Updating settings...",
     "retry": "Retry",
     "cancel": "Cancel",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
     "ok": "OK",
     "yes": "Yes",
     "no": "No",
@@ -299,6 +301,8 @@
     "subtitle": "Stay updated with latest notifications",
     "loading": "Loading notifications...",
     "markAllRead": "Mark All Read",
+    "markAllReadConfirm": "Are you sure you want to mark all notifications as read?",
+    "newMessage": "You have a new notification",
     "empty": {
       "title": "No Notifications",
       "message": "You're all caught up! No new notifications."

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -13,6 +13,13 @@ import CheckInHistoryScreen from '../screens/CheckInHistoryScreen';
 import FaceScannerScreen from '../screens/FaceScannerScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { lightTheme, darkTheme } from '../theme';
+
+export const navigationRef = React.createRef<NavigationContainerRef<any>>();
+
+// Make navigationRef globally accessible for SignalR service
+if (typeof global !== 'undefined') {
+  global.navigationRef = navigationRef;
+}
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,7 +39,7 @@ const RootNavigator: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 100));
         await checkAuthStatus();
       } catch (error) {
-        console.log('Auth check error:', error);
+        // Silent error handling
       } finally {
         setAuthChecked(true);
       }
@@ -89,7 +96,7 @@ const RootNavigator: React.FC = () => {
   }
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       {/* @ts-ignore */}
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
@@ -129,3 +136,8 @@ const RootNavigator: React.FC = () => {
 };
 
 export default RootNavigator; 
+
+// Đảm bảo global.navigationRef luôn trỏ tới navigationRef
+if (typeof global !== 'undefined') {
+  global.navigationRef = navigationRef;
+} 

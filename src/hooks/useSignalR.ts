@@ -8,17 +8,10 @@ export const useSignalR = () => {
 
   useEffect(() => {
     const handleSignalRConnection = async () => {
-      // Temporarily disable SignalR connection
-      console.log('SignalR temporarily disabled - using API-based notifications only');
-      return;
-
-      /* 
-      // Re-enable this code when backend SignalR is ready
       if (isAuthenticated && user && !connectionStarted.current) {
         try {
           await signalrService.connect();
           connectionStarted.current = true;
-          console.log('SignalR connection established for account ID: ' + String(user.accountId));
         } catch (error) {
           console.error('Failed to connect to SignalR:', error);
           connectionStarted.current = false;
@@ -27,12 +20,10 @@ export const useSignalR = () => {
         try {
           await signalrService.disconnect();
           connectionStarted.current = false;
-          console.log('SignalR connection closed');
         } catch (error) {
           console.error('Error disconnecting from SignalR:', error);
         }
       }
-      */
     };
 
     handleSignalRConnection();

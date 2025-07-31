@@ -41,6 +41,7 @@ const NewsDetailScreen: React.FC = () => {
   
   // Get news from store first
   const { newsList, selectedNews, loadNewsDetail } = useNewsStore();
+  const { newsList: newsListRealtime } = useNewsStore();
 
   useEffect(() => {
     // Always fetch from API to get complete news with authorName
@@ -64,6 +65,18 @@ const NewsDetailScreen: React.FC = () => {
       setError(null);
     }
   }, [selectedNews, newsId]);
+
+  // Realtime: cập nhật chi tiết tin tức khi có event SignalR
+  useEffect(() => {
+    if (newsListRealtime && newsListRealtime.length > 0) {
+      const found = newsListRealtime.find(n => n.newsId === newsId);
+      if (found) {
+        setNews(found);
+        setIsLoading(false);
+        setError(null);
+      }
+    }
+  }, [newsListRealtime, newsId]);
 
   const handleShare = async () => {
     if (!news) return;
@@ -133,7 +146,7 @@ const NewsDetailScreen: React.FC = () => {
       'system': 'Hệ thống',
     };
     
-    return authorNames[authorId] || ('Tác giả #' + authorId.slice(0, 8));
+    return authorNames[authorId] || ('Tác giả #' + (authorId ? authorId.slice(0, 8) : ''));
   };
 
   // HTML styles for theme support

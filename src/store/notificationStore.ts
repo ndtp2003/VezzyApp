@@ -119,8 +119,6 @@ export const useNotificationStore = create<NotificationStore>()(
               return true;
             });
 
-            console.log('Fetched notifications - Total:', String(items.length), 'Valid:', String(validNotifications.length));
-
             set(state => ({
               notifications: page === 1 ? validNotifications : [...state.notifications, ...validNotifications],
               currentPage: currentPage,
@@ -140,7 +138,6 @@ export const useNotificationStore = create<NotificationStore>()(
           
           // Fallback to mock data if API fails (for development)
           if (page === 1 && get().notifications.length === 0) {
-            console.log('Falling back to mock notifications for development');
             get().loadMockNotifications();
           } else {
             set({
@@ -234,13 +231,25 @@ export const useNotificationStore = create<NotificationStore>()(
           return;
         }
         
-        set(state => ({
-          notifications: [notification, ...state.notifications],
-        }));
+        set(state => {
+          // Check if notification already exists to avoid duplicates
+          const existingIndex = state.notifications.findIndex(n => n.notificationId === notification.notificationId);
+          
+          if (existingIndex >= 0) {
+            // Update existing notification if it's different
+            const updatedNotifications = [...state.notifications];
+            updatedNotifications[existingIndex] = notification;
+            return { notifications: updatedNotifications };
+          } else {
+            // Add new notification at the beginning
+            return { notifications: [notification, ...state.notifications] };
+          }
+        });
         
         // Update unread count
         get().updateUnreadCount();
       },
+      // TODO: add more realtime handlers for dashboard, check-in, news, ...
 
       clearNotifications: () => {
         set({
@@ -260,7 +269,6 @@ export const useNotificationStore = create<NotificationStore>()(
         const { notifications } = get();
         try {
           const unreadCount = notifications.filter(n => n && typeof n === 'object' && !n.isRead).length;
-          console.log('Updated unread count to:', String(unreadCount));
           set({ unreadCount });
         } catch (error) {
           console.warn('Error updating unread count:', error);
@@ -361,8 +369,6 @@ export const useNotificationStore = create<NotificationStore>()(
 
         // Update unread count
         get().updateUnreadCount();
-        
-        console.log('Loaded mock notifications for testing');
       },
     }),
     {

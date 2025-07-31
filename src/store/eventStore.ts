@@ -23,6 +23,9 @@ interface EventState {
   // Error state
   error: string | null;
   
+  // Realtime dashboard/collaborator stats
+  collaboratorStats?: any;
+  
   // Actions
   loadEvents: (refresh?: boolean) => Promise<void>;
   loadMoreEvents: () => Promise<void>;
@@ -30,6 +33,7 @@ interface EventState {
   setSelectedEvent: (event: Event | null) => void;
   clearError: () => void;
   reset: () => void;
+  setCollaboratorStats: (stats: any) => void;
 }
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -47,6 +51,7 @@ export const useEventStore = create<EventState>((set, get) => ({
   isLoadingMore: false,
   isRefreshing: false,
   error: null,
+  collaboratorStats: undefined,
 
   // Load events with pagination
   loadEvents: async (refresh = false) => {
@@ -154,6 +159,13 @@ export const useEventStore = create<EventState>((set, get) => ({
       isLoadingMore: false,
       isRefreshing: false,
       error: null,
+      collaboratorStats: undefined,
+    });
+  },
+
+  setCollaboratorStats: (stats: any) => {
+    set({
+      collaboratorStats: stats,
     });
   },
 })); 

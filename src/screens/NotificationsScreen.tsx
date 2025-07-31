@@ -27,6 +27,7 @@ const NotificationsScreen: React.FC = () => {
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const {
     notifications,
@@ -47,7 +48,6 @@ const NotificationsScreen: React.FC = () => {
 
   // Load notifications on mount
   useEffect(() => {
-    console.log('NotificationsScreen mounted, fetching notifications from backend...');
     fetchNotifications(1, true);
     
     // Fallback to mock data if API fails (for development)
@@ -58,7 +58,6 @@ const NotificationsScreen: React.FC = () => {
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
-    console.log('Refreshing notifications from backend...');
     fetchNotifications(1, true);
   }, [fetchNotifications]);
 
@@ -105,14 +104,25 @@ const NotificationsScreen: React.FC = () => {
 
   // Confirm mark all as read
   const confirmMarkAllAsRead = () => {
-    Alert.alert(
-      t('notifications.markAllRead'),
-      'Are you sure you want to mark all notifications as read?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Confirm', onPress: handleMarkAllAsRead },
-      ]
-    );
+    setShowConfirmModal(true);
+  };
+
+  // Handle confirm mark all as read
+  const handleConfirmMarkAllAsRead = useCallback(async () => {
+    try {
+      await markAllAsRead();
+      showSuccessToast(t('notifications.markAllAsRead'));
+      setShowConfirmModal(false);
+      setShowOptionsModal(false);
+    } catch (error) {
+      showErrorToast(error instanceof Error ? error.message : 'Failed to mark all as read');
+    }
+  }, [markAllAsRead, showSuccessToast, showErrorToast, t]);
+
+  // Handle cancel confirmation
+  const handleCancelConfirm = () => {
+    setShowConfirmModal(false);
+    setShowOptionsModal(false);
   };
 
   // Get notification type label
@@ -397,6 +407,38 @@ const NotificationsScreen: React.FC = () => {
         onMarkAsRead={handleMarkAsRead}
         theme={currentTheme}
       />
+
+      {/* Confirmation Modal */}
+      <Modal
+        visible={showConfirmModal}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCancelConfirm}
+      >
+        <Pressable style={styles.modalOverlay} onPress={handleCancelConfirm}>
+          <View style={styles.confirmModal}>
+            <View style={styles.confirmIconContainer}>
+              <Icon name="checkmark-circle" size={48} color={currentTheme.primary} />
+            </View>
+            <Text style={styles.confirmTitle}>{t('notifications.markAllRead')}</Text>
+            <Text style={styles.confirmMessage}>{t('notifications.markAllReadConfirm')}</Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity
+                style={[styles.confirmButton, styles.cancelButton]}
+                onPress={handleCancelConfirm}
+              >
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmButton, styles.confirmButtonPrimary]}
+                onPress={handleConfirmMarkAllAsRead}
+              >
+                <Text style={styles.confirmButtonText}>{t('common.confirm')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -603,6 +645,63 @@ const createStyles = (theme: any) =>
       marginLeft: 12,
       fontSize: 16,
       color: theme.text,
+    },
+    confirmModal: {
+      backgroundColor: theme.card,
+      borderRadius: 12,
+      padding: 24,
+      alignItems: 'center',
+      width: '80%',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    confirmIconContainer: {
+      marginBottom: 16,
+    },
+    confirmTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: theme.text,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    confirmMessage: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textAlign: 'center',
+      marginBottom: 24,
+    },
+    confirmButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+    },
+    confirmButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    confirmButtonPrimary: {
+      backgroundColor: theme.primary,
+    },
+    confirmButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    cancelButton: {
+      backgroundColor: theme.border,
+    },
+    cancelButtonText: {
+      color: theme.text,
+      fontSize: 16,
+      fontWeight: '600',
     },
 });
 

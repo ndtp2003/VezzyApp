@@ -48,7 +48,7 @@ class ApiService {
       async (config) => {
         // Skip token validation for public endpoints
         const skipTokenValidation = [
-          '/api/account/login',
+          '/api/account/loginMobile',
           '/api/account/refresh-token',
           '/api/account/forgot-password',
           '/api/account/reset-password',
@@ -100,7 +100,7 @@ class ApiService {
 
   // Authentication endpoints
   async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponseDto>> {
-    const response = await this.axiosInstance.post('/api/account/login', credentials);
+    const response = await this.axiosInstance.post('/api/account/loginMobile', credentials);
     return response.data;
   }
 
@@ -149,7 +149,7 @@ class ApiService {
   }
 
   async loginByFace(formData: FormData): Promise<ApiResponse<AuthResponseDto>> {
-    const response = await this.axiosInstance.post('/api/account/loginByFace', formData, {
+    const response = await this.axiosInstance.post('/api/account/loginByFaceMobile', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
