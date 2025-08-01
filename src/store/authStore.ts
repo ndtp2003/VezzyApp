@@ -15,6 +15,7 @@ interface AuthState {
   userConfig: UserConfig | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  shouldRefreshHomeStats: boolean;
 }
 
 interface AuthActions {
@@ -26,6 +27,8 @@ interface AuthActions {
   setLoading: (loading: boolean) => void;
   checkAuthStatus: () => Promise<void>;
   ensureValidToken: () => Promise<boolean>;
+  resetHomeStatsRefresh: () => void;
+  setShouldRefreshHomeStats: (value: boolean) => void;
 }
 
 export type AuthStore = AuthState & AuthActions;
@@ -66,6 +69,7 @@ export const useAuthStore = create<AuthStore>()(
       userConfig: null,
       isLoading: false,
       isAuthenticated: false,
+      shouldRefreshHomeStats: false,
 
       // Actions
       login: async (credentials: LoginRequest) => {
@@ -460,6 +464,14 @@ export const useAuthStore = create<AuthStore>()(
         }
 
         return true;
+      },
+
+      resetHomeStatsRefresh: () => {
+        set({ shouldRefreshHomeStats: false });
+      },
+
+      setShouldRefreshHomeStats: (value: boolean) => {
+        set({ shouldRefreshHomeStats: value });
       },
     }),
     {

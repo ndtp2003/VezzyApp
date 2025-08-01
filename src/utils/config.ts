@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.38.168:5000', // Backend server IP (giữ nguyên nếu API vẫn ở 5000)
-  NOTIFICATION_SERVICE_URL: 'http://192.168.38.168:5003', // Đúng port backend mới cho SignalR
+  BASE_URL: 'http://192.168.101.10:5000', // Backend server IP (giữ nguyên nếu API vẫn ở 5000)
+  NOTIFICATION_SERVICE_URL: 'http://192.168.101.10:5003', // Đúng port backend mới cho SignalR
   TEST_NOTIFICATION_SERVICE_URL: 'http://0.0.0.0:5003',
   TIMEOUT: 30000, // Increased to 30 seconds for better reliability
   HEADERS: {
@@ -9,7 +9,7 @@ export const API_CONFIG = {
     'Accept': 'application/json',
   },
 };
-
+//192.168.38.168
 // Authentication Configuration
 export const AUTH_CONFIG = {
   TOKEN_EXPIRE_TIME: 10800, // 3 hours in seconds

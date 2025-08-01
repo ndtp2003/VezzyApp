@@ -24,6 +24,7 @@ import { lightTheme, darkTheme, spacing, borderRadius } from '../theme';
 import { useToast } from '../components';
 import { apiService } from '../services/api';
 import { requestCameraPermission } from '../utils/permissions';
+import { useAuthStore } from '../store/authStore';
 
 type QRScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'QRScanner'>;
 type QRScannerScreenRouteProp = RouteProp<RootStackParamList, 'QRScanner'>;
@@ -36,6 +37,7 @@ const QRScannerScreen: React.FC = () => {
   const route = useRoute<QRScannerScreenRouteProp>();
   const { theme } = useSettingsStore();
   const { showSuccessToast, showErrorToast } = useToast();
+  const { setShouldRefreshHomeStats } = useAuthStore();
   
   const [manualCode, setManualCode] = useState('');
   const [showManualInput, setShowManualInput] = useState(false);
@@ -44,6 +46,7 @@ const QRScannerScreen: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scannedCodes, setScannedCodes] = useState<string[]>([]);
   const [lastScanTime, setLastScanTime] = useState(0);
+  const [checkInSuccessCount, setCheckInSuccessCount] = useState(0);
   
   const scanAnimation = useRef(new Animated.Value(0)).current;
   const pulseAnimation = useRef(new Animated.Value(1)).current;
@@ -52,6 +55,13 @@ const QRScannerScreen: React.FC = () => {
   const styles = createStyles(currentTheme);
   
   const { eventId } = route.params || {};
+
+  // Auto-set refresh flag when check-in success count changes
+  useEffect(() => {
+    if (checkInSuccessCount > 0) {
+      setShouldRefreshHomeStats(true);
+    }
+  }, [checkInSuccessCount, setShouldRefreshHomeStats]);
 
   // Request camera permission
   useEffect(() => {
@@ -184,9 +194,12 @@ const QRScannerScreen: React.FC = () => {
       };
       
       const response: BackendApiResponse<boolean> = await apiService.checkInByQR(checkInRequest);
-      
       if (response.success && response.data) {
         showSuccessToast(t('qr.checkInSuccess'), 4000);
+        setCheckInSuccessCount(prev => {
+          const newCount = prev + 1;
+          return newCount;
+        });
         try {
           Vibration.vibrate([0, 200, 100, 200]);
         } catch (error) {
@@ -273,6 +286,9 @@ const QRScannerScreen: React.FC = () => {
   };
 
   const handleBack = () => {
+    if (checkInSuccessCount > 0) {
+      setShouldRefreshHomeStats(true);
+    }
     navigation.goBack();
   };
 

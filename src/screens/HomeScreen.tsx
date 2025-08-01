@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -22,9 +22,10 @@ import { useEventStore } from '../store/eventStore';
 const HomeScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const { user } = useAuthStore();
+  const { user, shouldRefreshHomeStats, resetHomeStatsRefresh } = useAuthStore();
   const { theme } = useSettingsStore();
   const collaboratorStats = useEventStore(state => state.collaboratorStats);
+  const isFocused = useIsFocused();
   
   // Sync language with user config
   useLanguageSync();
@@ -52,9 +53,35 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('Events' as never);
   };
 
+  const handleManualRefresh = async () => {
+    if (!user?.userId) return;
+    setLoadingStats(true);
+    setStatsError(null);
+    try {
+      const res = await apiService.getCollaboratorStatic(user.userId);
+      setStats(res);
+    } catch (e: any) {
+      setStatsError(e?.response?.data?.message || 'Lỗi khi lấy thống kê');
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
   const [stats, setStats] = useState<CollaboratorStaticResponse | null>(null);
   const [loadingStats, setLoadingStats] = useState(false);
   const [statsError, setStatsError] = useState<string | null>(null);
+
+  // Initialize stats with default values to maintain UI structure
+  const defaultStats: CollaboratorStaticResponse = {
+    totalEvents: 0,
+    ongoingEvents: 0,
+    upcomingEvents: 0,
+    completedEvents: 0,
+    totalCheckIns: 0,
+    generatedAt: new Date().toISOString(),
+  };
+
+  const displayStats = stats || defaultStats;
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -80,6 +107,113 @@ const HomeScreen: React.FC = () => {
     }
   }, [collaboratorStats]);
 
+  // Refresh stats when returning to HomeScreen after successful check-in
+  useEffect(() => {
+    if (isFocused && shouldRefreshHomeStats) {
+      // Reset the flag first
+      resetHomeStatsRefresh();
+      
+      // Refresh stats
+      const fetchStats = async () => {
+        if (!user?.userId) return;
+        setLoadingStats(true);
+        setStatsError(null);
+        try {
+          const res = await apiService.getCollaboratorStatic(user.userId);
+          setStats(res);
+        } catch (e: any) {
+          setStatsError(e?.response?.data?.message || 'Lỗi khi lấy thống kê');
+        } finally {
+          setLoadingStats(false);
+        }
+      };
+      
+      fetchStats();
+    }
+  }, [isFocused, shouldRefreshHomeStats, user?.userId, resetHomeStatsRefresh]);
+
+  // Alternative approach: Listen to navigation focus events
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (shouldRefreshHomeStats) {
+        resetHomeStatsRefresh();
+        
+        const fetchStats = async () => {
+          if (!user?.userId) return;
+          setLoadingStats(true);
+          setStatsError(null);
+          try {
+            const res = await apiService.getCollaboratorStatic(user.userId);
+            setStats(res);
+          } catch (e: any) {
+            setStatsError(e?.response?.data?.message || 'Lỗi khi lấy thống kê');
+          } finally {
+            setLoadingStats(false);
+          }
+        };
+        
+        fetchStats();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, shouldRefreshHomeStats, user?.userId, resetHomeStatsRefresh]);
+
+  // Use useFocusEffect as backup approach
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldRefreshHomeStats) {
+        resetHomeStatsRefresh();
+        
+        const fetchStats = async () => {
+          if (!user?.userId) return;
+          setLoadingStats(true);
+          setStatsError(null);
+          try {
+            const res = await apiService.getCollaboratorStatic(user.userId);
+            setStats(res);
+          } catch (e: any) {
+            setStatsError(e?.response?.data?.message || 'Lỗi khi lấy thống kê');
+          } finally {
+            setLoadingStats(false);
+          }
+        };
+        
+        fetchStats();
+      }
+    }, [shouldRefreshHomeStats, user?.userId, resetHomeStatsRefresh])
+  );
+
+  // Additional check with delay after focus
+  useEffect(() => {
+    if (isFocused) {
+      const timer = setTimeout(() => {
+        const currentFlag = useAuthStore.getState().shouldRefreshHomeStats;
+        if (currentFlag) {
+          resetHomeStatsRefresh();
+          
+          const fetchStats = async () => {
+            if (!user?.userId) return;
+            setLoadingStats(true);
+            setStatsError(null);
+            try {
+              const res = await apiService.getCollaboratorStatic(user.userId);
+              setStats(res);
+            } catch (e: any) {
+              setStatsError(e?.response?.data?.message || 'Lỗi khi lấy thống kê');
+            } finally {
+              setLoadingStats(false);
+            }
+          };
+          
+          fetchStats();
+        }
+      }, 500); // 500ms delay
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isFocused, user?.userId, resetHomeStatsRefresh]);
+
   const unreadCount = useNotificationStore(state => state.unreadCount || 0);
 
   return (
@@ -96,19 +230,30 @@ const HomeScreen: React.FC = () => {
 
       {/* Section thống kê collaborator */}
       <View style={[styles.statsCard, { backgroundColor: currentTheme.surface }]}>
-        <Text style={[styles.statsTitle, { color: currentTheme.primary }]}>{t('home.stats.title')}</Text>
-        {loadingStats ? (
-          <ActivityIndicator size="small" color={currentTheme.primary} />
-        ) : statsError ? (
+        <View style={styles.statsHeader}>
+          <Text style={[styles.statsTitle, { color: currentTheme.primary }]}>{t('home.stats.title')}</Text>
+          <TouchableOpacity onPress={handleManualRefresh} style={styles.refreshButton}>
+            <Icon name="refresh" size={20} color={currentTheme.primary} />
+          </TouchableOpacity>
+        </View>
+        
+        {/* Always show stats grid, only show loading indicator on top */}
+        {loadingStats && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color={currentTheme.primary} />
+          </View>
+        )}
+        
+        {statsError ? (
           <Text style={[styles.statsError, { color: currentTheme.error }]}>{statsError}</Text>
-        ) : stats ? (
+        ) : (
           <View style={styles.statsGrid}>
             {[
-              { icon: "event", key: "totalEvents", value: stats.totalEvents, color: currentTheme.primary },
-              { icon: "play-circle", key: "ongoingEvents", value: stats.ongoingEvents, color: currentTheme.success },
-              { icon: "schedule", key: "upcomingEvents", value: stats.upcomingEvents, color: currentTheme.primary },
-              { icon: "check-circle", key: "completedEvents", value: stats.completedEvents, color: currentTheme.success },
-              { icon: "how-to-reg", key: "totalCheckIns", value: stats.totalCheckIns, color: currentTheme.primary },
+              { icon: "event", key: "totalEvents", value: displayStats.totalEvents, color: currentTheme.primary },
+              { icon: "play-circle", key: "ongoingEvents", value: displayStats.ongoingEvents, color: currentTheme.success },
+              { icon: "schedule", key: "upcomingEvents", value: displayStats.upcomingEvents, color: currentTheme.primary },
+              { icon: "check-circle", key: "completedEvents", value: displayStats.completedEvents, color: currentTheme.success },
+              { icon: "how-to-reg", key: "totalCheckIns", value: displayStats.totalCheckIns, color: currentTheme.primary },
               { icon: "notifications", key: "unreadNotifications", value: unreadCount, color: currentTheme.primary },
             ].map((item, idx) => (
               <StatBox
@@ -125,7 +270,7 @@ const HomeScreen: React.FC = () => {
               />
             ))}
           </View>
-        ) : null}
+        )}
       </View>
 
       {/* Quick Actions */}
@@ -232,10 +377,18 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  statsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   statsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 12,
+  },
+  refreshButton: {
+    padding: 4,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -268,6 +421,18 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   statsError: {
     fontSize: 13,
     marginBottom: 8,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 16,
+    zIndex: 1,
   },
 });
 
