@@ -9,7 +9,6 @@ import {
   Image,
   Modal,
   Platform,
-  Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
@@ -54,6 +53,7 @@ const EditProfileScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGenderModal, setShowGenderModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
@@ -91,15 +91,7 @@ const EditProfileScreen: React.FC = () => {
   };
 
   const handleAvatarSelection = () => {
-    Alert.alert(
-      t('editProfile.selectAvatarSource'),
-      t('editProfile.selectAvatarMessage'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        { text: t('editProfile.camera'), onPress: () => openCamera() },
-        { text: t('editProfile.gallery'), onPress: () => openGallery() },
-      ]
-    );
+    setShowAvatarModal(true);
   };
 
   const openCamera = () => {
@@ -391,6 +383,71 @@ const EditProfileScreen: React.FC = () => {
         />
       )}
 
+      {/* Avatar Selection Modal */}
+      <Modal
+        visible={showAvatarModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAvatarModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('editProfile.selectAvatarSource')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowAvatarModal(false)}
+                style={styles.modalCloseButton}
+              >
+                <Icon name="close" size={24} color={currentTheme.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <Text style={styles.modalSubtitle}>{t('editProfile.selectAvatarMessage')}</Text>
+            
+            <TouchableOpacity
+              style={styles.avatarOption}
+              onPress={() => {
+                setShowAvatarModal(false);
+                openCamera();
+              }}
+            >
+              <View style={styles.avatarOptionIcon}>
+                <Icon name="camera-alt" size={24} color={currentTheme.primary} />
+              </View>
+              <View style={styles.avatarOptionContent}>
+                <Text style={styles.avatarOptionTitle}>{t('editProfile.camera')}</Text>
+                <Text style={styles.avatarOptionSubtitle}>{t('editProfile.cameraDescription')}</Text>
+              </View>
+              <Icon name="chevron-right" size={24} color={currentTheme.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.avatarOption}
+              onPress={() => {
+                setShowAvatarModal(false);
+                openGallery();
+              }}
+            >
+              <View style={styles.avatarOptionIcon}>
+                <Icon name="photo-library" size={24} color={currentTheme.primary} />
+              </View>
+              <View style={styles.avatarOptionContent}>
+                <Text style={styles.avatarOptionTitle}>{t('editProfile.gallery')}</Text>
+                <Text style={styles.avatarOptionSubtitle}>{t('editProfile.galleryDescription')}</Text>
+              </View>
+              <Icon name="chevron-right" size={24} color={currentTheme.textSecondary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setShowAvatarModal(false)}
+            >
+              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Gender Selection Modal */}
       <Modal
         visible={showGenderModal}
@@ -635,6 +692,59 @@ const createStyles = (theme: typeof lightTheme) => StyleSheet.create({
   selectedGenderOptionText: {
     color: theme.primary,
     fontWeight: '600',
+  },
+  modalSubtitle: {
+    ...typography.body2,
+    color: theme.textSecondary,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  avatarOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.sm,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+  },
+  avatarOptionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: theme.primary + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
+  },
+  avatarOptionContent: {
+    flex: 1,
+  },
+  avatarOptionTitle: {
+    ...typography.body1,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: spacing.xs,
+  },
+  avatarOptionSubtitle: {
+    ...typography.caption,
+    color: theme.textSecondary,
+  },
+  cancelButton: {
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
+    backgroundColor: theme.surface,
+    borderWidth: 1,
+    borderColor: theme.border,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    ...typography.body1,
+    color: theme.textSecondary,
+    fontWeight: '500',
   },
 });
 

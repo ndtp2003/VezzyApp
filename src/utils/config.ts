@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.101.10:5000', // Backend server IP (giữ nguyên nếu API vẫn ở 5000)
-  NOTIFICATION_SERVICE_URL: 'http://192.168.101.10:5003', // Đúng port backend mới cho SignalR
+  BASE_URL: 'http://192.168.38.5:5000', // Backend server IP (giữ nguyên nếu API vẫn ở 5000)
+  NOTIFICATION_SERVICE_URL: 'http://192.168.38.5:5003', // Đúng port backend mới cho SignalR
   TEST_NOTIFICATION_SERVICE_URL: 'http://0.0.0.0:5003',
   TIMEOUT: 30000, // Increased to 30 seconds for better reliability
   HEADERS: {

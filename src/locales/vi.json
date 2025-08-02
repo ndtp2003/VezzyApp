@@ -39,7 +39,7 @@
     "invalidOrExpiredCode": "Mã xác thực không hợp lệ hoặc đã hết hạn",
     "ticketNotFound": "Không tìm thấy vé",
     "ticketAlreadyUsed": "Vé đã được sử dụng",
-    "updateFailed": "Cập nhật thất bại",
+    "updateFailed": "Thất bại",
     "logCreationFailed": "Không thể tạo log",
     "checkinError": "Check-in thất bại"
   },
@@ -422,10 +422,12 @@
     "selectAvatarSource": "Chọn nguồn ảnh",
     "selectAvatarMessage": "Chọn nơi để lấy ảnh đại diện của bạn",
     "camera": "Camera",
+    "cameraDescription": "Chụp ảnh mới bằng camera",
     "gallery": "Thư viện",
+    "galleryDescription": "Chọn từ thư viện ảnh của bạn",
     "uploading": "Đang tải lên...",
     "avatarUpdateSuccess": "Cập nhật ảnh đại diện thành công",
-    "avatarUpdateFailed": "Cập nhật ảnh đại diện thất bại",
+    "avatarUpdateFailed": "Thất bại",
     "emailCannotChange": "Không thể thay đổi địa chỉ email",
     "selectGender": "Chọn giới tính",
     "placeholders": {
