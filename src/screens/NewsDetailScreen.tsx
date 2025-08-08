@@ -82,7 +82,7 @@ const NewsDetailScreen: React.FC = () => {
     if (!news) return;
     
     try {
-      const shareUrl = `https://vezzy.com/News/${news.newsId}`;
+      const shareUrl = `https://www.vezzy.site/news/${news.newsId}`;
       await Share.share({
         message: `${news.newsTitle}\n\n${shareUrl}`,
         url: shareUrl,

@@ -1,15 +1,13 @@
-// API Configuration
+// API Configuration - Production domains only
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.38.5:5000', // Backend server IP (giữ nguyên nếu API vẫn ở 5000)
-  NOTIFICATION_SERVICE_URL: 'http://192.168.38.5:5003', // Đúng port backend mới cho SignalR
-  TEST_NOTIFICATION_SERVICE_URL: 'http://0.0.0.0:5003',
+  BASE_URL: 'https://api.vezzy.site', // Gateway API
+  NOTIFICATION_SERVICE_URL: 'https://notification.vezzy.site', // Notification Service
   TIMEOUT: 30000, // Increased to 30 seconds for better reliability
   HEADERS: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
 };
-//192.168.38.168
 // Authentication Configuration
 export const AUTH_CONFIG = {
   TOKEN_EXPIRE_TIME: 10800, // 3 hours in seconds
@@ -62,29 +60,29 @@ export const ERROR_CODES = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
 
-// API Endpoints - Cập nhật theo backend mới
+// API Endpoints - Production backend
 export const API_ENDPOINTS = {
   // Authentication
-  LOGIN: '/api/account/login',
+  LOGIN: '/api/account/loginMobile',
   LOGOUT: '/api/account/logout',
   REFRESH_TOKEN: '/api/account/refresh-token',
   UPDATE_PROFILE: '/api/account/profile',
   CHANGE_PASSWORD: '/api/account/change-password',
   
-  // Events - Cập nhật endpoint mới
+  // Events
   MY_EVENTS: '/api/Event/collaborator/my-events',
   EVENT_DETAIL: (eventId: string) => `/api/Event/${eventId}`,
   EVENT_STATS: (eventId: string) => `/api/Event/${eventId}/stats`,
   
-  // Check-in - Cập nhật endpoint mới
+  // Check-in
   CHECKIN_MOBILE: '/api/TicketIssued/checkinMobile',
   CHECKIN_HISTORY: (eventId: string) => `/api/TicketIssued/event/${eventId}/checkin-history`,
   
-  // News - Cập nhật endpoint mới (PUBLIC)
+  // News (PUBLIC)
   NEWS_ACTIVE: '/api/News/active',
   NEWS_DETAIL: (newsId: string) => `/api/News/${newsId}`,
   
-  // Notifications - Cập nhật endpoint mới
+  // Notifications
   USER_NOTIFICATIONS: (userId: string) => `/api/Notification/user/${userId}`,
   MARK_NOTIFICATION_READ: (notificationId: string) => `/api/Notification/${notificationId}/read`,
   MARK_ALL_NOTIFICATIONS_READ: (userId: string) => `/api/Notification/user/${userId}/read-all`,

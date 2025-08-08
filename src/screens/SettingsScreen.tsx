@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useSettingsStore } from '../store/settingsStore';
 import { useToast } from '../components';
 import { lightTheme, darkTheme } from '../theme';
+import { saveLanguagePreference } from '../utils/i18n';
 
 const SettingsScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -70,11 +71,15 @@ const SettingsScreen: React.FC = () => {
       // Update settings store
       setLanguage(newLanguage);
       
+      // Save to persistent storage
+      await saveLanguagePreference(newLanguage);
+      
       // Update user config
       await updateUserConfigApi(user.accountId, { language: newLanguage });
       
       showSuccessToast(t('settings.messages.themeUpdated'));
     } catch (error) {
+      // Revert on error
       setLanguage(language);
       i18n.changeLanguage(language);
       showErrorToast(t('settings.errors.updateFailed'));

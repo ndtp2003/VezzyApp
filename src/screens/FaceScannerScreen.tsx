@@ -25,10 +25,10 @@ import { lightTheme, darkTheme } from '../theme/colors';
 import { spacing, borderRadius } from '../theme';
 import { requestCameraPermission } from '../utils/permissions';
 import { apiService } from '../services/api';
-import { showSuccessToast, showErrorToast } from '../utils/toast';
 import { useSettingsStore } from '../store/settingsStore';
 import { useAuthStore } from '../store/authStore';
 import { CheckInResultModal } from '../components';
+import CustomToast from '../components/CustomToast';
 
 type FaceScannerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'FaceScanner'>;
 type FaceScannerScreenRouteProp = RouteProp<RootStackParamList, 'FaceScanner'>;
@@ -57,11 +57,27 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
   const [showCheckInResultModal, setShowCheckInResultModal] = useState(false);
   const [checkInResults, setCheckInResults] = useState<any>(null);
   const [hasStartedCountdown, setHasStartedCountdown] = useState(false); // NEW
+  
+  // Custom Toast states
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
   const cameraRef = useRef<any>(null);
   const pulseAnimation = useRef(new Animated.Value(1)).current;
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const instructionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Helper function to show custom toast
+  const showCustomToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
+
+  const hideCustomToast = () => {
+    setShowToast(false);
+  };
 
   useEffect(() => {
     getCameraPermission();
@@ -187,8 +203,8 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
 
       const response = await apiService.updateFace(formData);
       if (response.flag) {
-        showSuccessToast(t('face.updateSuccess'));
-        navigation.goBack();
+        showCustomToast(t('face.updateSuccess'));
+        setTimeout(() => navigation.goBack(), 1500);
       } else {
         throw new Error(response.message || t('face.updateFailed'));
       }
@@ -274,7 +290,7 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         // Set token for future API calls
         apiService.setAuthToken(authData.accessToken);
         
-        showSuccessToast(t('face.loginSuccess'));
+        showCustomToast(t('face.loginSuccess'));
         
         // No need to navigate manually - RootNavigator will automatically 
         // switch to MainNavigator when isAuthenticated becomes true
@@ -662,6 +678,15 @@ const FaceScannerScreen: React.FC<FaceScannerScreenProps> = () => {
         theme={theme === 'dark' ? 'dark' : 'light'}
         onClose={handleCheckInResultClose}
         onContinue={handleCheckInResultContinue}
+      />
+
+      {/* Custom Toast */}
+      <CustomToast
+        visible={showToast}
+        message={toastMessage}
+        type={toastType}
+        onHide={hideCustomToast}
+        duration={3000}
       />
       </View>
     );

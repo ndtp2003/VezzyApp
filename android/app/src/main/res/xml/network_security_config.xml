@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.38.5</domain>
-        <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">10.0.2.2</domain>
+    <!-- Production domains - HTTPS only -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.vezzy.site</domain>
+        <domain includeSubdomains="true">notification.vezzy.site</domain>
+        <domain includeSubdomains="true">event.vezzy.site</domain>
+        <domain includeSubdomains="true">identity.vezzy.site</domain>
+        <domain includeSubdomains="true">ticket.vezzy.site</domain>
+        <domain includeSubdomains="true">analytics.vezzy.site</domain>
+        <domain includeSubdomains="true">chat.vezzy.site</domain>
+        <domain includeSubdomains="true">feedback.vezzy.site</domain>
     </domain-config>
 </network-security-config> 

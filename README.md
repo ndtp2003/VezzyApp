@@ -68,10 +68,13 @@ apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 
 ## 🌐 API Configuration
 
-Update the base URL in `src/services/api.ts`:
+The API configuration is centralized in `src/utils/config.ts`:
 
 ```typescript
-private baseURL = 'http://192.168.38.49:5000'; // Backend server IP
+export const API_CONFIG = {
+  BASE_URL: 'https://api.vezzy.site', // Gateway API - Production
+  NOTIFICATION_SERVICE_URL: 'https://notification.vezzy.site', // Notification Service
+};
 ```
 
 ## 📝 Environment Setup
@@ -80,7 +83,8 @@ The app automatically detects device language and sets appropriate defaults.
 
 ### API Endpoints
 
-- **Base URL:** `http://192.168.38.49:5000`
+- **Base URL:** `https://api.vezzy.site` (Gateway - Recommended)
+- **Notification Service:** `https://notification.vezzy.site`
 - **Authentication:** JWT Bearer tokens (accessToken + refreshToken)
 - **Response Format:** `{ flag: boolean, message: string, data: any }`
 

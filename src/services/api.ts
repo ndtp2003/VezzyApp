@@ -37,7 +37,7 @@ class ApiService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
-      timeout: 30000,
+      timeout: 40000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -49,6 +49,7 @@ class ApiService {
         // Skip token validation for public endpoints
         const skipTokenValidation = [
           '/api/account/loginMobile',
+          '/api/account/loginByFaceMobile', // Face login is public
           '/api/account/refresh-token',
           '/api/account/forgot-password',
           '/api/account/reset-password',
@@ -143,7 +144,7 @@ class ApiService {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 10000, // 10 seconds for AI face processing
+      timeout: 40000, // 40 seconds for AI face processing
     });
     return response.data;
   }
@@ -153,7 +154,7 @@ class ApiService {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 20000, // 10 seconds for AI face processing
+      timeout: 40000, // 40 seconds for AI face processing
     });
     return response.data;
   }
@@ -343,7 +344,7 @@ class ApiService {
     } as any);
 
     const response = await this.axiosInstance.post('/api/TicketIssued/checkinbyface', formData, {
-      timeout: 30000, // 30-second timeout as per documentation
+      timeout: 40000, // 40-second timeout for AI face processing
       headers: {
         'Content-Type': 'multipart/form-data'
       }

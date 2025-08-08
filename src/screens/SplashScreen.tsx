@@ -105,9 +105,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish, canFinish = false
       >
         {/* You can replace this with an actual logo image */}
         <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoText}>C</Text>
+          <Text style={styles.logoText}>V</Text>
         </View>
-        <Text style={styles.appName}>CollaboratorApp</Text>
+        <Text style={styles.appName}>Vezzy</Text>
         <Text style={styles.tagline}>{t('splash.tagline')}</Text>
       </Animated.View>
 
