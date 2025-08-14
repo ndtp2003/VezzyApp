@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Package Diagram - CollaboratorApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .diagram-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border: 2px solid #333;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .diagram {
+            position: relative;
+            width: 100%;
+            height: 600px;
+        }
+
+        .package {
+            position: absolute;
+            border: 1px solid #333;
+            background: white;
+            font-size: 11px;
+        }
+
+        .package-header {
+            background: #e8e8e8;
+            padding: 3px 6px;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .package-content {
+            padding: 6px;
+        }
+
+        .package-item {
+            background: white;
+            border: 1px solid #666;
+            padding: 3px;
+            margin: 2px 0;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        /* Specific package positions */
+        .lib {
+            background: #87CEEB;
+            top: 20px;
+            left: 450px;
+            width: 150px;
+        }
+
+        .ios {
+            background: #87CEEB;
+            top: 20px;
+            right: 100px;
+            width: 120px;
+        }
+
+        .android {
+            background: #87CEEB;
+            top: 100px;
+            right: 100px;
+            width: 120px;
+        }
+
+        .components {
+            background: #90EE90;
+            top: 200px;
+            left: 50px;
+            width: 160px;
+        }
+
+        .core {
+            background: white;
+            top: 200px;
+            left: 350px;
+            width: 300px;
+            height: 80px;
+            border: 1px solid #333;
+        }
+
+        .core-item {
+            display: inline-block;
+            border: 1px solid #333;
+            background: white;
+            padding: 5px;
+            margin: 3px;
+            text-align: center;
+            font-size: 10px;
+            width: 70px;
+            height: 20px;
+            line-height: 10px;
+        }
+
+        .screens {
+            background: #FFB6C1;
+            top: 200px;
+            right: 50px;
+            width: 150px;
+        }
+
+        .assets {
+            background: #DDA0DD;
+            top: 400px;
+            left: 450px;
+            width: 120px;
+        }
+
+        /* Arrow styles */
+        .arrow-h {
+            position: absolute;
+            border-top: 1px dashed #666;
+            height: 1px;
+        }
+
+        .arrow-v {
+            position: absolute;
+            border-left: 1px dashed #666;
+            width: 1px;
+        }
+
+        .arrow-head {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 6px solid #666;
+        }
+
+        .arrow-head-right {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-left: 6px solid #666;
+        }
+
+        .arrow-label {
+            position: absolute;
+            font-size: 9px;
+            color: #666;
+            background: white;
+            padding: 1px 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram-wrapper">
+        <div class="title">MOBILE PACKAGE DIAGRAM</div>
+        
+        <div class="diagram">
+            <!-- Lib Package -->
+            <div class="package lib">
+                <div class="package-header">Lib</div>
+                <div class="package-content">
+                    <div class="package-item">Firebase</div>
+                    <div class="package-item">SignalR</div>
+                </div>
+            </div>
+
+            <!-- iOS Package -->
+            <div class="package ios">
+                <div class="package-header">ios</div>
+                <div class="package-content">
+                    <div class="package-item">app</div>
+                </div>
+            </div>
+
+            <!-- Android Package -->
+            <div class="package android">
+                <div class="package-header">android</div>
+                <div class="package-content">
+                    <div class="package-item">gradle</div>
+                </div>
+            </div>
+
+            <!-- Components Package -->
+            <div class="package components">
+                <div class="package-header">Components</div>
+                <div class="package-content">
+                    <div class="package-item">CheckInResultModal</div>
+                    <div class="package-item">ConfirmDialog</div>
+                    <div class="package-item">CustomToast</div>
+                    <div class="package-item">LoadingSpinner</div>
+                    <div class="package-item">NotificationModal</div>
+                    <div class="package-item">ToastManager</div>
+                </div>
+            </div>
+
+            <!-- Core Packages -->
+            <div class="package core">
+                <div style="padding: 10px;">
+                    <div class="core-item">Context</div>
+                    <div class="core-item">Hub</div>
+                    <div class="core-item">Navigation</div>
+                    <div class="core-item">Services</div>
+                    <div class="core-item">Store</div>
+                </div>
+            </div>
+
+            <!-- Screens Package -->
+            <div class="package screens">
+                <div class="package-header">Screens</div>
+                <div class="package-content">
+                    <div class="package-item">Auth</div>
+                    <div class="package-item">Home</div>
+                    <div class="package-item">Events</div>
+                    <div class="package-item">CheckIn</div>
+                    <div class="package-item">News</div>
+                    <div class="package-item">Profile</div>
+                    <div class="package-item">Notifications</div>
+                    <div class="package-item">QRScanner</div>
+                    <div class="package-item">FaceScanner</div>
+                    <div class="package-item">History</div>
+                </div>
+            </div>
+
+            <!-- Assets Package -->
+            <div class="package assets">
+                <div class="package-header">Assets</div>
+                <div class="package-content">
+                    <div class="package-item">Images</div>
+                    <div class="package-item">Icons</div>
+                    <div class="package-item">Fonts</div>
+                </div>
+            </div>
+
+            <!-- Arrows -->
+            <!-- Lib to Core -->
+            <div class="arrow-v" style="left: 525px; top: 110px; height: 90px;"></div>
+            <div class="arrow-head" style="top: 195px; left: 521px;"></div>
+            <div class="arrow-label" style="top: 150px; left: 480px;">imports</div>
+
+            <!-- Components to Core -->
+            <div class="arrow-h" style="top: 240px; left: 210px; width: 140px;"></div>
+            <div class="arrow-head-right" style="top: 236px; left: 345px;"></div>
+            <div class="arrow-label" style="top: 225px; left: 260px;">imports</div>
+
+            <!-- Core to Screens -->
+            <div class="arrow-h" style="top: 240px; left: 650px; width: 100px;"></div>
+            <div class="arrow-head-right" style="top: 236px; left: 745px;"></div>
+            <div class="arrow-label" style="top: 225px; left: 680px;">imports</div>
+
+            <!-- Assets to Core -->
+            <div class="arrow-v" style="left: 510px; top: 280px; height: 120px;"></div>
+            <div class="arrow-head" style="top: 275px; left: 506px;"></div>
+            <div class="arrow-label" style="top: 340px; left: 470px;">imports</div>
+
+            <!-- iOS/Android to Screens -->
+            <div class="arrow-v" style="right: 160px; top: 80px; height: 120px;"></div>
+            <div class="arrow-head" style="top: 195px; right: 164px;"></div>
+            <div class="arrow-label" style="top: 130px; right: 120px;">deploys</div>
+        </div>
+    </div>
+</body>
+</html>

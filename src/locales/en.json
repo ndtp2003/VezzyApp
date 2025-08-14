@@ -128,7 +128,8 @@
     "reset": "Reset",
     "submit": "Submit",
     "required": "Required",
-    "createdBy": "Created by"
+    "createdBy": "Created by",
+    "goBack": "Go Back"
   },
   "splash": {
     "welcome": "Welcome to Vezzy",

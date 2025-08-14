@@ -126,7 +126,8 @@
     "reset": "Đặt lại",
     "submit": "Gửi",
     "required": "Bắt buộc",
-    "createdBy": "Tạo bởi"
+    "createdBy": "Tạo bởi",
+    "goBack": "Quay lại"
   },
   "splash": {
     "welcome": "Chào mừng đến với Vezzy",
